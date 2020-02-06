@@ -1,8 +1,9 @@
 /*
- * Prototype Java GUI to run REDUCE using Swing.
+ * Prototype Java Swing GUI to run CLI REDUCE.
  * Based on https://docs.oracle.com/javase/tutorial/uiswing/index.html.
  * This file is ../fjwright/runreduce/RunREDUCE.java
- * Compile and run it from the PARENT directory of fjwright:
+ * It requires also ../fjwright/runreduce/RunREDUCEProcess.java
+ * Compile and run the app from the PARENT directory of fjwright:
  * javac fjwright/runreduce/RunREDUCE.java
  * java fjwright.runreduce.RunREDUCE
  * (The above works in a Windows cmd shell.)
@@ -17,8 +18,10 @@ import javax.swing.text.*;
 import javax.swing.border.*;
 import java.io.*;
 
-/* RunREDUCE.java requires no other files. */
-
+/**
+ * This is the main class that runs the whole app.  It also provide
+ * the pane that displays REDUCE input and output.
+ */
 public class RunREDUCE extends JPanel implements ActionListener {
     private static JTextArea inputTextArea;
     static JTextArea outputTextArea;
@@ -80,7 +83,7 @@ public class RunREDUCE extends JPanel implements ActionListener {
 
             // Send the input to the REDUCE input pipe:
             RunREDUCEProcess.reduceInputPrintWriter.print(text);
-            RunREDUCEProcess.reduceInputPrintWriter.flush(); // Necessary?
+            RunREDUCEProcess.reduceInputPrintWriter.flush();
         }
     }
     
