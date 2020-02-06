@@ -20,9 +20,9 @@ import java.io.*;
 /* RunREDUCE.java requires no other files. */
 
 public class RunREDUCE extends JPanel implements ActionListener {
-    public JTextArea outputTextArea, inputTextArea;
+    private static JTextArea inputTextArea;
+    static JTextArea outputTextArea;
     private final static String newline = "\n";
-    public static PrintWriter reduceInputPrintWriter;
 
     public RunREDUCE() {
         super(new BorderLayout()); // JPanel defaults to FlowLayout!
@@ -76,8 +76,8 @@ public class RunREDUCE extends JPanel implements ActionListener {
             outputTextArea.setCaretPosition(outputTextArea.getDocument().getLength());
 
             // Send the input to the REDUCE input pipe:
-            reduceInputPrintWriter.print(text);
-            reduceInputPrintWriter.flush(); // Necessary?
+            RunREDUCEProcess.reduceInputPrintWriter.print(text);
+            RunREDUCEProcess.reduceInputPrintWriter.flush(); // Necessary?
         }
     }
     
@@ -123,16 +123,33 @@ public class RunREDUCE extends JPanel implements ActionListener {
         // Display the window:
         frame.pack();
         frame.setVisible(true);
+    }
 
-        // Run REDUCE.  A direct call hangs the GUI!
+    public static void main(String... args) {
+        // Schedule jobs for the event-dispatching thread.
+        // Create and show this application's GUI:
         SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    reduce(runREDUCE);
+                    createAndShowGUI();
+                }
+            });
+        // Run REDUCE.  (A direct call hangs the GUI!)
+        SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    RunREDUCEProcess.reduce();
                 }
             });
     }
+}
 
-    public static void reduce(RunREDUCE runREDUCE) {
+
+/**
+ * This class runs the REDUCE sub-process.
+ */
+class RunREDUCEProcess {
+    static PrintWriter reduceInputPrintWriter;
+
+    public static void reduce() {
         try {
             ProcessBuilder pb =
                 new ProcessBuilder("D:\\Program Files\\Reduce\\lib\\psl\\psl\\bpsl.exe",
@@ -146,23 +163,15 @@ public class RunREDUCE extends JPanel implements ActionListener {
             OutputStreamWriter osr = new OutputStreamWriter(p.getOutputStream());
             reduceInputPrintWriter = new PrintWriter(osr);
 
-            // Start a thread to handle the REDUCE output stream:
+            // Start a thread to handle the REDUCE output stream
+            // (assigned to a global variable):
             ReduceOutputThread outputGobbler = new 
-                ReduceOutputThread(p.getInputStream(), runREDUCE.outputTextArea);
+                ReduceOutputThread(p.getInputStream(), RunREDUCE.outputTextArea);
             outputGobbler.start();
 
-            // } catch (IOException | InterruptedException e) {}
-        } catch (Exception e) {}
-    }
-
-    public static void main(String... args) {
-        // Schedule a job for the event-dispatching thread:
-        // creating and showing this application's GUI.
-        javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                createAndShowGUI();
-            }
-        });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
 
