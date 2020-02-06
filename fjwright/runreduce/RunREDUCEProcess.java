@@ -60,7 +60,8 @@ class ReduceOutputThread extends Thread {
                     Thread.sleep(10);
                 else if ((c = br.read()) != -1) {
                     outputTextArea.append(String.valueOf((char) c));
-                    // outputTextArea.setCaretPosition(outputTextArea.getDocument().getLength());
+                    outputTextArea.setCaretPosition
+                        (outputTextArea.getDocument().getLength());
                 }
                 else break;
             }

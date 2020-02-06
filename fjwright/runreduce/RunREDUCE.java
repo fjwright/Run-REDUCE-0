@@ -73,7 +73,10 @@ public class RunREDUCE extends JPanel implements ActionListener {
             outputTextArea.append(text);
             // Make sure the new text is visible, even if there was a
             // selection in the text area:
-            outputTextArea.setCaretPosition(outputTextArea.getDocument().getLength());
+            outputTextArea.setCaretPosition
+                (outputTextArea.getDocument().getLength());
+            // Return the focus to the input text area:
+            inputTextArea.requestFocusInWindow(); 
 
             // Send the input to the REDUCE input pipe:
             RunREDUCEProcess.reduceInputPrintWriter.print(text);
@@ -122,6 +125,8 @@ public class RunREDUCE extends JPanel implements ActionListener {
 
         // Display the window:
         frame.pack();
+        // Give the input text area the initial focus:
+        inputTextArea.requestFocusInWindow(); 
         frame.setVisible(true);
     }
 
