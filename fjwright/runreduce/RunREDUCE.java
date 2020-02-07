@@ -101,30 +101,8 @@ public class RunREDUCE extends JPanel implements ActionListener {
         RunREDUCE runREDUCE = new RunREDUCE();
         frame.add(runREDUCE);
 
-        // Create a menu bar:
-        JMenuBar menuBar = new JMenuBar();
-        frame.setJMenuBar(menuBar);
-        // menuBar.setOpaque(true);
-
-        // Create a Help menu:
-        JMenu menu = new JMenu("Help");
-        menuBar.add(menu);
-
-        // Create an About menuItem that pops up a dialogue:
-        JMenuItem menuItem = new JMenuItem("About");
-        menuItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    JOptionPane.showMessageDialog
-                        (frame,
-                         // "Prototype version 0.1\nFrancis Wright, February 2020",
-                         new String [] {"Run CLI REDUCE in a Java Swing GUI.",
-                                        "Prototype version 0.1",
-                                        "Francis Wright, February 2020"},
-                         "About RunREDUCE",
-                         JOptionPane.PLAIN_MESSAGE);
-                }
-            });
-        menu.add(menuItem);
+        // Create the menu bar and add it to the frame:
+        new RunREDUCEMenubar(frame);
 
         // Display the window:
         frame.pack();

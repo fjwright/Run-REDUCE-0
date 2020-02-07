@@ -11,7 +11,7 @@ private. I will make it public when I have developed it a bit further.
 This version uses the Java Swing library, but at some future date I
 will probably switch to using JavaFX. Swing has the advantage that it
 is still a standard component of the latest Java SE SDK. I am using
-Java 13.
+Java 13 and the command line to compile and run.
 
 This version only runs on Microsoft Windows, but I plan to add support
 for Linux. (Whilst Java is portable, filesystem structures and
