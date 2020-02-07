@@ -25,7 +25,7 @@ import java.io.*;
 public class RunREDUCE extends JPanel implements ActionListener {
     private static JTextArea inputTextArea;
     static JTextArea outputTextArea;
-    private final static String newline = "\n";
+    private final static String NEWLINE = "\n";
 
     public RunREDUCE() {
         super(new BorderLayout()); // JPanel defaults to FlowLayout!
@@ -69,24 +69,25 @@ public class RunREDUCE extends JPanel implements ActionListener {
 
     public void actionPerformed(ActionEvent e) {
         if ("input".equals(e.getActionCommand())) {
-            // System.out.println("Input button clicked!");
-            String text = inputTextArea.getText();
-            if (!text.endsWith(newline)) text += newline;
+            sendStringToREDUCE(inputTextArea.getText());
             inputTextArea.setText(null);
-            outputTextArea.append(text);
-            // Make sure the new text is visible, even if there was a
-            // selection in the text area:
-            outputTextArea.setCaretPosition
-                (outputTextArea.getDocument().getLength());
             // Return the focus to the input text area:
             inputTextArea.requestFocusInWindow(); 
-
-            // Send the input to the REDUCE input pipe:
-            RunREDUCEProcess.reduceInputPrintWriter.print(text);
-            RunREDUCEProcess.reduceInputPrintWriter.flush();
         }
     }
-    
+
+    static void sendStringToREDUCE(String text) {
+        if (!text.endsWith(NEWLINE)) text += NEWLINE;
+        outputTextArea.append(text);
+        // Make sure the new input text is visible, even if there was
+        // a selection in the output text area:
+        outputTextArea.setCaretPosition
+            (outputTextArea.getDocument().getLength());
+        // Send the input to the REDUCE input pipe:
+        RunREDUCEProcess.reduceInputPrintWriter.print(text);
+        RunREDUCEProcess.reduceInputPrintWriter.flush();
+    }
+
     /**
      * Create the GUI and show it.  For thread safety,
      * this method should be invoked from the
