@@ -14,13 +14,18 @@ import java.nio.file.*;
  * relative to that directory or absolute; I currently use the latter.
  */
 class RunREDUCEMenubar extends JMenuBar {
+
+    static final JMenuItem closeFileMenuItem = new JMenuItem("Shut Output Files...");
+    static final JMenuItem closeLastMenuItem = new JMenuItem("Shut Last Output File");
+
     static final JFileChooser fileChooser = new JFileChooser();
     static final FileNameExtensionFilter inputFileFilter =
         new FileNameExtensionFilter("REDUCE Input Files (*.red, *.txt)", "red", "txt");
     static final FileNameExtensionFilter outputFileFilter =
         new FileNameExtensionFilter("REDUCE Output Files (*.rlg, *.txt)", "rlg", "txt");
     static final JCheckBox echoButton = new JCheckBox("Echo");
-    static Path lastOutputFile;
+    static Path lastOutputFile = null;
+
 
     RunREDUCEMenubar(JFrame frame) {
         frame.setJMenuBar(this);
@@ -77,16 +82,19 @@ class RunREDUCEMenubar extends JMenuBar {
                     if (returnVal == JFileChooser.APPROVE_OPTION) {
                         Path currentDirectory = fileChooser.getCurrentDirectory().toPath();
                         Path file = fileChooser.getSelectedFile().toPath();
-                        RunREDUCEMenubar.lastOutputFile = currentDirectory.resolve(file);
+                        lastOutputFile = currentDirectory.resolve(file);
                         RunREDUCE.sendStringToREDUCE
-                            ("out \"" + RunREDUCEMenubar.lastOutputFile.toString() + "\"$");
+                            ("out \"" + lastOutputFile.toString() + "\"$");
+                        closeLastMenuItem.setEnabled(true);
+                        closeFileMenuItem.setEnabled(true);
                     } 
                 }
             });
 
         // Shut one or more output files.
-        JMenuItem closeFileMenuItem = new JMenuItem("Shut Output Files...");
+        // JMenuItem closeFileMenuItem = new JMenuItem("Shut Output Files...");
         fileMenu.add(closeFileMenuItem);
+        closeFileMenuItem.setEnabled(false);
         closeFileMenuItem.setToolTipText
             ("Select and close one or more output files.");
         closeFileMenuItem.addActionListener(new ActionListener() {
@@ -108,15 +116,16 @@ class RunREDUCEMenubar extends JMenuBar {
             });
 
         // Shut the last output file used.
-        JMenuItem closeLastMenuItem = new JMenuItem("Shut Last Output File");
+        // JMenuItem closeLastMenuItem = new JMenuItem("Shut Last Output File");
         fileMenu.add(closeLastMenuItem);
+        closeLastMenuItem.setEnabled(false);
         closeLastMenuItem.setToolTipText
             ("Shut the last output file used.");
         closeLastMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    if (RunREDUCEMenubar.lastOutputFile != null)
+                    if (lastOutputFile != null) // not really necessary!
                         RunREDUCE.sendStringToREDUCE
-                            ("shut \"" + RunREDUCEMenubar.lastOutputFile.toString() + "\"$");
+                            ("shut \"" + lastOutputFile.toString() + "\"$");
                 }
             });
 
