@@ -4,7 +4,7 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.filechooser.*;
 import java.io.*;
-import java.nio.file.*;
+import java.util.*;
 
 /**
  * This class provides the RunREDUCE menu bar.
@@ -24,7 +24,7 @@ class RunREDUCEMenubar extends JMenuBar {
     static final FileNameExtensionFilter outputFileFilter =
         new FileNameExtensionFilter("REDUCE Output Files (*.rlg, *.txt)", "rlg", "txt");
     static final JCheckBox echoButton = new JCheckBox("Echo");
-    static File lastOutputFile = null;
+    static final List<File> outputFileList = new ArrayList<>();
 
 
     RunREDUCEMenubar(JFrame frame) {
@@ -77,27 +77,15 @@ class RunREDUCEMenubar extends JMenuBar {
                     fileChooser.setAccessory(null);
                     int returnVal = fileChooser.showOpenDialog(frame);
                     if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        lastOutputFile = fileChooser.getSelectedFile();
+                        File file = fileChooser.getSelectedFile();
                         RunREDUCE.sendStringToREDUCE
-                            ("out \"" + lastOutputFile.toString() + "\"$");
+                            ("out \"" + file.toString() + "\"$");
+                        outputFileList.add(file);
                         closeLastMenuItem.setEnabled(true);
                         closeFileMenuItem.setEnabled(true);
                     } 
                 }
             });
-
-        // Shut one or more output files.
-        // JMenuItem closeFileMenuItem = new JMenuItem("Shut Output Files...");
-        fileMenu.add(closeFileMenuItem);
-        closeFileMenuItem.setEnabled(false);
-        closeFileMenuItem.setToolTipText
-            ("Select and close one or more output files.");
-        closeFileMenuItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                }
-            });
-
-        fileMenu.addSeparator();
 
         // Output to this GUI.
         JMenuItem outputHereMenuItem = new JMenuItem("Output Here");
@@ -110,6 +98,8 @@ class RunREDUCEMenubar extends JMenuBar {
                 }
             });
 
+        fileMenu.addSeparator();
+
         // Shut the last output file used.
         // JMenuItem closeLastMenuItem = new JMenuItem("Shut Last Output File");
         fileMenu.add(closeLastMenuItem);
@@ -118,9 +108,34 @@ class RunREDUCEMenubar extends JMenuBar {
             ("Shut the last output file used.");
         closeLastMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    if (lastOutputFile != null) // not really necessary!
+                    if (!outputFileList.isEmpty()) { // not strictly necessary
+                        int last = outputFileList.size() - 1;
                         RunREDUCE.sendStringToREDUCE
-                            ("shut \"" + lastOutputFile.toString() + "\"$");
+                            ("shut \"" + outputFileList.remove(last).toString() + "\"$");
+                    }
+                    if (outputFileList.isEmpty()) {
+                        closeLastMenuItem.setEnabled(false);
+                        closeFileMenuItem.setEnabled(false);
+                    }
+                }
+            });
+
+        // Shut one or more output files.
+        // JMenuItem closeFileMenuItem = new JMenuItem("Shut Output Files...");
+        fileMenu.add(closeFileMenuItem);
+        closeFileMenuItem.setEnabled(false);
+        closeFileMenuItem.setToolTipText
+            ("Select and shut one or more output files.");
+        closeFileMenuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (!outputFileList.isEmpty()) { // not strictly necessary
+                        // Select output files to shut:
+                        // ...
+                    }
+                    if (outputFileList.isEmpty()) {
+                        closeLastMenuItem.setEnabled(false);
+                        closeFileMenuItem.setEnabled(false);
+                    }
                 }
             });
 
