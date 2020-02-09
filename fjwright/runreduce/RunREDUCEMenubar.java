@@ -24,7 +24,7 @@ class RunREDUCEMenubar extends JMenuBar {
     static final FileNameExtensionFilter outputFileFilter =
         new FileNameExtensionFilter("REDUCE Output Files (*.rlg, *.txt)", "rlg", "txt");
     static final JCheckBox echoButton = new JCheckBox("Echo");
-    static Path lastOutputFile = null;
+    static File lastOutputFile = null;
 
 
     RunREDUCEMenubar(JFrame frame) {
@@ -52,13 +52,10 @@ class RunREDUCEMenubar extends JMenuBar {
                     echoButton.setSelected(true);
                     int returnVal = fileChooser.showOpenDialog(frame);
                     if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        Path currentDirectory = fileChooser.getCurrentDirectory().toPath();
                         File files[] = fileChooser.getSelectedFiles();
-                        Path file = currentDirectory.resolve(files[0].toPath());
-                        String text = "in \"" + file.toString();
+                        String text = "in \"" + files[0].toString();
                         for (int i = 1; i < files.length; i++) {
-                            file = currentDirectory.resolve(files[i].toPath());
-                            text += "\", \"" + file.toString();
+                            text += "\", \"" + files[i].toString();
                         }
                         RunREDUCE.sendStringToREDUCE
                             (text + (echoButton.isSelected() ? "\";" : "\"$"));
@@ -80,9 +77,7 @@ class RunREDUCEMenubar extends JMenuBar {
                     fileChooser.setAccessory(null);
                     int returnVal = fileChooser.showOpenDialog(frame);
                     if (returnVal == JFileChooser.APPROVE_OPTION) {
-                        Path currentDirectory = fileChooser.getCurrentDirectory().toPath();
-                        Path file = fileChooser.getSelectedFile().toPath();
-                        lastOutputFile = currentDirectory.resolve(file);
+                        lastOutputFile = fileChooser.getSelectedFile();
                         RunREDUCE.sendStringToREDUCE
                             ("out \"" + lastOutputFile.toString() + "\"$");
                         closeLastMenuItem.setEnabled(true);
