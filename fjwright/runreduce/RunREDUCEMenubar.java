@@ -6,6 +6,7 @@ import javax.swing.filechooser.*;
 import java.io.*;
 import java.util.*;
 
+
 /**
  * This class provides the RunREDUCE menu bar.
  *
@@ -25,7 +26,7 @@ class RunREDUCEMenubar extends JMenuBar {
         new FileNameExtensionFilter("REDUCE Output Files (*.rlg, *.txt)", "rlg", "txt");
     static final JCheckBox echoButton = new JCheckBox("Echo");
     static final List<File> outputFileList = new ArrayList<>();
-
+    static ShutOutputFilesDialog dialog;
 
     RunREDUCEMenubar(JFrame frame) {
         frame.setJMenuBar(this);
@@ -121,6 +122,7 @@ class RunREDUCEMenubar extends JMenuBar {
             });
 
         // Shut one or more output files.
+        dialog = new ShutOutputFilesDialog(frame);
         // JMenuItem closeFileMenuItem = new JMenuItem("Shut Output Files...");
         fileMenu.add(closeFileMenuItem);
         closeFileMenuItem.setEnabled(false);
@@ -130,7 +132,15 @@ class RunREDUCEMenubar extends JMenuBar {
                 public void actionPerformed(ActionEvent e) {
                     if (!outputFileList.isEmpty()) { // not strictly necessary
                         // Select output files to shut:
-                        // ...
+                        int[] fileIndices = dialog.showDialog(outputFileList);
+                        int length = fileIndices.length;
+                        if (length != 0) {
+                            // Process backwards to avoid remove changing subsequent indices:
+                            String text = outputFileList.remove(fileIndices[--length]).toString() + "\"$";
+                            for (int i = --length; i >= 0; i--)
+                                text = outputFileList.remove(fileIndices[i]).toString() + "\", \"" + text;
+                            RunREDUCE.sendStringToREDUCE("shut \"" + text);
+                        }
                     }
                     if (outputFileList.isEmpty()) {
                         closeLastMenuItem.setEnabled(false);
