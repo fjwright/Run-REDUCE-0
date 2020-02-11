@@ -17,15 +17,20 @@ import javax.swing.*;
 import javax.swing.text.*;
 import javax.swing.border.*;
 import java.io.*;
+import java.util.List;          // Also in java.awt!
+import java.util.ArrayList;
 
 /**
- * This is the main class that runs the whole app.  It also provide
+ * This is the main class that runs the whole app.  It also provides
  * the pane that displays REDUCE input and output.
  */
 public class RunREDUCE extends JPanel implements ActionListener {
     private static JTextArea inputTextArea;
     static JTextArea outputTextArea;
     private final static String NEWLINE = "\n";
+    private final static List<String> inputList = new ArrayList<>();
+    private static int inputListIndex = 0;
+    private static int maxInputListIndex = 0;
 
     public RunREDUCE() {
         super(new BorderLayout()); // JPanel defaults to FlowLayout!
@@ -45,7 +50,8 @@ public class RunREDUCE extends JPanel implements ActionListener {
 
         // Create titled borders for the scrollpanes:
         Border border = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
-        TitledBorder titledBorder = BorderFactory.createTitledBorder(border, "Input/Output Display");
+        TitledBorder titledBorder =
+            BorderFactory.createTitledBorder(border, "Input/Output Display");
         titledBorder.setTitlePosition(TitledBorder.ABOVE_TOP);
         outputScrollPane.setBorder(titledBorder);
         titledBorder = BorderFactory.createTitledBorder(border, "Input editor");
@@ -59,21 +65,61 @@ public class RunREDUCE extends JPanel implements ActionListener {
         splitPane.setResizeWeight(0.8);
         add(splitPane, BorderLayout.CENTER);
 
-        // Create a button to input the text entered above:
-        JButton inputButton = new JButton("Input");
-        add(inputButton, BorderLayout.SOUTH);
-        inputButton.setActionCommand("input");
-        inputButton.addActionListener(this);
-        inputButton.setToolTipText("Send the input above to REDUCE. It is terminated with a newline if necessary.");
+        // Buttons to control the input:
+        JButton previousButton = new JButton("\u25b2 Previous Input");
+        previousButton.setActionCommand("Previous");
+        previousButton.addActionListener(this);
+        previousButton.setToolTipText("Select the previous input.");
+
+        JButton sendButton = new JButton("Send Input");
+        sendButton.setActionCommand("Send");
+        sendButton.addActionListener(this);
+        sendButton.setToolTipText("Send the input above to REDUCE. It is terminated with a newline if necessary.");
+
+        JButton nextButton = new JButton("\u25bc Next Input");
+        nextButton.setActionCommand("Next");
+        nextButton.addActionListener(this);
+        nextButton.setToolTipText("Select the next input.");
+
+        // Set buttons to all have the same size as the widest:
+        Dimension buttonDimension = previousButton.getPreferredSize();
+        sendButton.setPreferredSize(buttonDimension);
+        nextButton.setPreferredSize(buttonDimension);
+
+        // Lay out the buttons horizontally and uniformly spaced:
+        JPanel buttonPane = new JPanel();
+        buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
+        buttonPane.setBorder(BorderFactory.createEmptyBorder(5, 10, 10, 10));
+        buttonPane.add(Box.createHorizontalGlue());
+        buttonPane.add(previousButton);
+        buttonPane.add(Box.createHorizontalGlue());
+        buttonPane.add(sendButton);
+        buttonPane.add(Box.createHorizontalGlue());
+        buttonPane.add(nextButton);
+        buttonPane.add(Box.createHorizontalGlue());
+
+        add(buttonPane, BorderLayout.PAGE_END);
     }
 
     public void actionPerformed(ActionEvent e) {
-        if ("input".equals(e.getActionCommand())) {
-            sendStringToREDUCE(inputTextArea.getText());
-            inputTextArea.setText(null);
-            // Return the focus to the input text area:
-            inputTextArea.requestFocusInWindow(); 
+        if ("Send".equals(e.getActionCommand())) {
+            String text = inputTextArea.getText();
+            if (text.length() > 0) {
+                inputList.add(text);
+                sendStringToREDUCE(text);
+                inputTextArea.setText(null);
+                inputListIndex = inputList.size();
+                maxInputListIndex = inputListIndex - 1;
+            }
+        } else if ("Previous".equals(e.getActionCommand())) {
+            if (inputListIndex > 0)
+                inputTextArea.setText(inputList.get(--inputListIndex));
+        } else if ("Next".equals(e.getActionCommand())) {
+            if (inputListIndex < maxInputListIndex)
+                inputTextArea.setText(inputList.get(++inputListIndex));
         }
+        // Return the focus to the input text area:
+        inputTextArea.requestFocusInWindow();
     }
 
     static void sendStringToREDUCE(String text) {
