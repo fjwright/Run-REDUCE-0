@@ -6,7 +6,6 @@ import javax.swing.*;
 import java.io.*;
 import java.util.List;          // Also in java.awt!
 import java.util.ArrayList;
-import java.lang.reflect.*;
 
 
 /**
@@ -15,10 +14,13 @@ import java.lang.reflect.*;
  */
 class ShutOutputFilesDialog extends JDialog implements ActionListener {
     private static JList<File> list = new JList<File>();
+    private Frame frame;
     private static int[] fileIndices;
 
     int[] showDialog(List<File> outputFileList) {
         list.setListData(outputFileList.toArray(new File[0]));
+        pack();                       // must be done dynamically
+        setLocationRelativeTo(frame); // ditto
         setVisible(true);
         return fileIndices;
     }
@@ -26,6 +28,7 @@ class ShutOutputFilesDialog extends JDialog implements ActionListener {
     ShutOutputFilesDialog(Frame frame) {
         // Create a modal dialog:
         super(frame, "Shut Output Files...", true);
+        this.frame = frame;
 
         list.setLayoutOrientation(JList.VERTICAL);
         list.setVisibleRowCount(5);
@@ -62,7 +65,6 @@ class ShutOutputFilesDialog extends JDialog implements ActionListener {
         // Lay out the dialog contents:
         add(listPane, BorderLayout.CENTER);
         add(buttonPane, BorderLayout.PAGE_END);
-        pack();
     }
 
     public void actionPerformed(ActionEvent e) {
