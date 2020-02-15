@@ -20,6 +20,7 @@ import java.io.*;
 import java.util.List;          // Also in java.awt!
 import java.util.ArrayList;
 
+
 /**
  * This is the main class that runs the whole app.  It also provides
  * the pane that displays REDUCE input and output.
@@ -39,30 +40,27 @@ public class RunREDUCE extends JPanel implements ActionListener {
         outputTextArea = new JTextArea();
         outputTextArea.setEditable(false);
         JScrollPane outputScrollPane = new JScrollPane(outputTextArea);
-        outputScrollPane.setPreferredSize(new Dimension(640, 480));
-        outputScrollPane.setMinimumSize(new Dimension(120, 120));
+        JPanel outputPane = new JPanel(new BorderLayout(0,3));
+        outputPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JLabel outputLabel = new JLabel("Input/Output Display");
+        outputPane.add(outputLabel, BorderLayout.PAGE_START);
+        outputPane.add(outputScrollPane);
 
         // Create the editable vertically-scrollable input text area:
         inputTextArea = new JTextArea();
         JScrollPane inputScrollPane = new JScrollPane(inputTextArea);
-        inputScrollPane.setPreferredSize(new Dimension(640, 120));
-        inputScrollPane.setMinimumSize(new Dimension(120, 30));
-
-        // Create titled borders for the scrollpanes:
-        Border border = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
-        TitledBorder titledBorder =
-            BorderFactory.createTitledBorder(border, "Input/Output Display");
-        titledBorder.setTitlePosition(TitledBorder.ABOVE_TOP);
-        outputScrollPane.setBorder(titledBorder);
-        titledBorder = BorderFactory.createTitledBorder(border, "Input editor");
-        titledBorder.setTitlePosition(TitledBorder.ABOVE_TOP);
-        inputScrollPane.setBorder(titledBorder);
+        JPanel inputPane = new JPanel(new BorderLayout(0,3));
+        inputPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        JLabel inputLabel = new JLabel("Input editor");
+        inputPane.add(inputLabel, BorderLayout.PAGE_START);
+        inputPane.add(inputScrollPane);
 
         // Create a split pane to contain the output and input scrollpanes:
         JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                                              outputScrollPane, inputScrollPane);
+                                              outputPane, inputPane);
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0.8);
+
         add(splitPane, BorderLayout.CENTER);
 
         // Buttons to control the input:
@@ -70,12 +68,10 @@ public class RunREDUCE extends JPanel implements ActionListener {
         previousButton.setActionCommand("Previous");
         previousButton.addActionListener(this);
         previousButton.setToolTipText("Select the previous input.");
-
         JButton sendButton = new JButton("Send Input");
         sendButton.setActionCommand("Send");
         sendButton.addActionListener(this);
         sendButton.setToolTipText("Send the input above to REDUCE. It is terminated with a newline if necessary.");
-
         JButton nextButton = new JButton("\u25bc Next Input");
         nextButton.setActionCommand("Next");
         nextButton.addActionListener(this);
@@ -89,7 +85,7 @@ public class RunREDUCE extends JPanel implements ActionListener {
         // Lay out the buttons horizontally and uniformly spaced:
         JPanel buttonPane = new JPanel();
         buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
-        buttonPane.setBorder(BorderFactory.createEmptyBorder(5, 10, 10, 10));
+        buttonPane.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
         buttonPane.add(Box.createHorizontalGlue());
         buttonPane.add(previousButton);
         buttonPane.add(Box.createHorizontalGlue());
@@ -143,6 +139,7 @@ public class RunREDUCE extends JPanel implements ActionListener {
         // Create and set up the window:
         JFrame frame = new JFrame("RunREDUCE");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setPreferredSize(new Dimension(640, 480)); // (960, 720)???
 
         // Add content to the window:
         RunREDUCE runREDUCE = new RunREDUCE();
