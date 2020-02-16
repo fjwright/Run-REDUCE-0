@@ -1,21 +1,45 @@
 # Run REDUCE
 
-## A Java GUI to run any CLI version of the REDUCE CAS
+## A Java GUI to run any CLI version of the REDUCE Computer Algebra System
 
-### Copyright &copy; Dr Francis J. Wright, February 2020
+### Francis Wright, February 2020
 
 This is the first prototype that does anything useful and my first
-ever check-in to GitHub! This GitHub repository is currently
-private. I will make it public when I have developed it a bit further.
+ever GitHub repository, which is currently private.  I will make it
+public when I have developed it a bit further.
 
 This version uses the Java Swing library, but at some future date I
-will probably switch to using JavaFX. Swing has the advantage that it
-is still a standard component of the latest Java SE SDK. I am using
+will probably switch to using JavaFX.  Swing has the advantage that it
+is still a standard component of the latest Java SE SDK.  I am using
 Java 13 and the command line to compile and run.
 
 This version only runs on Microsoft Windows, but I plan to add support
-for Linux. (Whilst Java is portable, filesystem structures and
+for Linux.  (Whilst Java is portable, filesystem structures and
 installation conventions are not!)
 
 This version only runs PSL REDUCE, but I plan to add support for the
 CLI version of CSL REDUCE and probably CL REDUCE.
+
+REDUCE is an open source project available from
+[SourceForge](https://sourceforge.net/projects/reduce-algebra/).  I'm
+releasing this project under the [BSD 2-Clause License](LICENSE),
+mainly because it's the license used by REDUCE.
+
+### To do soon
+
+* Load Packages dialog as a subclass of the ShutOutputFilesDialog.
+* Multiple tabs that each run an independent invocation of REDUCE.
+* Find REDUCE installation directory automatically.
+* Select REDUCE version to run.
+* Use a Maven build system.
+* Remember user choices, such as default REDUCE version, commands to
+  run REDUCE, window configurations.
+
+### To do later
+
+* Typeset output supporting copy and paste. Could parse `off nat`
+  output, or use it together with TeX or MathML output.
+* Merge input region into output region (maybe).
+* Integrated plotting support; maybe plots in a new tab or in a
+  horizontally split window (maybe).
+* A calculator-style interface option (maybe).

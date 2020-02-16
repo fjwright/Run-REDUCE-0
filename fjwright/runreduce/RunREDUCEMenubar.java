@@ -11,8 +11,8 @@ import java.util.*;
  * This class provides the RunREDUCE menu bar.
  *
  * Note that the current directory for REDUCE is the directory from
- * which this GUI was run, so filenames must be resolved to be
- * relative to that directory or absolute; I currently use the latter.
+ * which this GUI was run, so filenames must be relative to that
+ * directory or absolute; I currently use the latter.
  */
 class RunREDUCEMenubar extends JMenuBar {
 
@@ -25,6 +25,7 @@ class RunREDUCEMenubar extends JMenuBar {
     static final FileNameExtensionFilter outputFileFilter =
         new FileNameExtensionFilter("REDUCE Output Files (*.rlg, *.txt)", "rlg", "txt");
     static final JCheckBox echoButton = new JCheckBox("Echo");
+    static final JCheckBox appendButton = new JCheckBox("Append");
     static final List<File> outputFileList = new ArrayList<>();
     static ShutOutputFilesDialog dialog;
 
@@ -50,6 +51,8 @@ class RunREDUCEMenubar extends JMenuBar {
                     fileChooser.setFileFilter(inputFileFilter);
                     fileChooser.setMultiSelectionEnabled(true);
                     fileChooser.setAccessory(echoButton);
+                    fileChooser.setApproveButtonText("Input");
+                    fileChooser.setApproveButtonToolTipText("Input from selected files");
                     echoButton.setSelected(true);
                     int returnVal = fileChooser.showOpenDialog(frame);
                     if (returnVal == JFileChooser.APPROVE_OPTION) {
@@ -76,6 +79,8 @@ class RunREDUCEMenubar extends JMenuBar {
                     fileChooser.setFileFilter(outputFileFilter);
                     fileChooser.setMultiSelectionEnabled(false);
                     fileChooser.setAccessory(null);
+                    fileChooser.setApproveButtonText("Output");
+                    fileChooser.setApproveButtonToolTipText("Output to selected file");
                     int returnVal = fileChooser.showOpenDialog(frame);
                     if (returnVal == JFileChooser.APPROVE_OPTION) {
                         File file = fileChooser.getSelectedFile();
@@ -96,28 +101,6 @@ class RunREDUCEMenubar extends JMenuBar {
         outputHereMenuItem.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
                     RunREDUCE.sendStringToREDUCE("out t$");
-                }
-            });
-
-        fileMenu.addSeparator();
-
-        // Shut the last output file used.
-        // JMenuItem closeLastMenuItem = new JMenuItem("Shut Last Output File");
-        fileMenu.add(closeLastMenuItem);
-        closeLastMenuItem.setEnabled(false);
-        closeLastMenuItem.setToolTipText
-            ("Shut the last output file used.");
-        closeLastMenuItem.addActionListener(new ActionListener() {
-                public void actionPerformed(ActionEvent e) {
-                    if (!outputFileList.isEmpty()) { // not strictly necessary
-                        int last = outputFileList.size() - 1;
-                        RunREDUCE.sendStringToREDUCE
-                            ("shut \"" + outputFileList.remove(last).toString() + "\"$");
-                    }
-                    if (outputFileList.isEmpty()) {
-                        closeLastMenuItem.setEnabled(false);
-                        closeFileMenuItem.setEnabled(false);
-                    }
                 }
             });
 
@@ -149,7 +132,54 @@ class RunREDUCEMenubar extends JMenuBar {
                 }
             });
 
+        // Shut the last output file used.
+        // JMenuItem closeLastMenuItem = new JMenuItem("Shut Last Output File");
+        fileMenu.add(closeLastMenuItem);
+        closeLastMenuItem.setEnabled(false);
+        closeLastMenuItem.setToolTipText
+            ("Shut the last output file used.");
+        closeLastMenuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    if (!outputFileList.isEmpty()) { // not strictly necessary
+                        int last = outputFileList.size() - 1;
+                        RunREDUCE.sendStringToREDUCE
+                            ("shut \"" + outputFileList.remove(last).toString() + "\"$");
+                    }
+                    if (outputFileList.isEmpty()) {
+                        closeLastMenuItem.setEnabled(false);
+                        closeFileMenuItem.setEnabled(false);
+                    }
+                }
+            });
+
         fileMenu.addSeparator();
+
+        // Save the display log to file.
+        JMenuItem saveLogMenuItem = new JMenuItem("Save Session Log...");
+        fileMenu.add(saveLogMenuItem);
+        saveLogMenuItem.setToolTipText
+            ("Save the full session log to the selected text file.");
+        saveLogMenuItem.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    fileChooser.setDialogTitle("Save Session Log...");
+                    fileChooser.resetChoosableFileFilters();
+                    fileChooser.setFileFilter(outputFileFilter);
+                    fileChooser.setMultiSelectionEnabled(false);
+                    fileChooser.setAccessory(appendButton);
+                    fileChooser.setApproveButtonText("Save");
+                    fileChooser.setApproveButtonToolTipText("Save to selected file");
+                    int returnVal = fileChooser.showOpenDialog(frame);
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        File file = fileChooser.getSelectedFile();
+                        try (Writer out = new BufferedWriter
+                             (new FileWriter(file, appendButton.isSelected()))) {
+                            RunREDUCE.outputTextArea.write(out);
+                        } catch (IOException ioe) {
+                            ioe.printStackTrace();
+                        }
+                    }
+                }
+            });
 
         // Quit:
         JMenuItem quitMenuItem = new JMenuItem("Quit");

@@ -56,14 +56,14 @@ class ReduceOutputThread extends Thread {
              BufferedReader br = new BufferedReader(isr)) {
             int c;
             for (;;) {
-                if (!br.ready())
-                    Thread.sleep(10);
-                else if ((c = br.read()) != -1) {
-                    outputTextArea.append(String.valueOf((char) c));
+                if (!br.ready()) {
                     outputTextArea.setCaretPosition
                         (outputTextArea.getDocument().getLength());
-                }
-                else break;
+                    Thread.sleep(10);
+                } else if ((c = br.read()) != -1) {
+                    if ((char) c != '\r') // ignore CRs
+                        outputTextArea.append(String.valueOf((char) c));
+                } else break;
             }
         } catch (Exception e) {
             e.printStackTrace();
