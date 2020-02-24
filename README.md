@@ -25,6 +25,10 @@ REDUCE is an open source project available from
 releasing this project under the [BSD 2-Clause License](LICENSE),
 mainly because it's the license used by REDUCE.
 
+The project is set up for development using
+[IntelliJ IDEA](https://www.jetbrains.com/idea/)
+with Run-REDUCE as the top-level directory.
+
 ### To do soon
 
 * Load Packages dialog as a subclass of the ShutOutputFilesDialog.
