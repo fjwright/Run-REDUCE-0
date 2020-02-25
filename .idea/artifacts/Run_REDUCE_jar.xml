@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Run-REDUCE:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/Run_REDUCE_jar</output-path>
+    <root id="archive" name="Run-REDUCE.jar">
+      <element id="module-output" name="Run-REDUCE" />
+    </root>
+  </artifact>
+</component>
