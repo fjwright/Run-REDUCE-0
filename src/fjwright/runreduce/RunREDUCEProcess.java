@@ -37,7 +37,7 @@ class RunREDUCEProcess {
 
             // Start a thread to handle the REDUCE output stream
             // (assigned to a global variable):
-            ReduceOutputThread outputGobbler = new 
+            ReduceOutputThread outputGobbler = new
                 ReduceOutputThread(p.getInputStream(), RunREDUCE.outputTextArea);
             outputGobbler.start();
 
@@ -51,7 +51,7 @@ class RunREDUCEProcess {
 /**
  * This thread reads from the REDUCE output pipe and appends it to the
  * GUI output pane.
- */ 
+ */
 class ReduceOutputThread extends Thread {
     InputStream input;        // REDUCE pipe output (buffered)
     JTextArea outputTextArea; // GUI output pane
@@ -137,9 +137,9 @@ class REDUCEPackageList extends ArrayList<String> {
         }
 
         // For testing only:
-        for (int i = 0; i < this.size(); i++) {
-            System.out.print(this.get(i));
-            System.out.print(" ");
-        }
+//        for (int i = 0; i < this.size(); i++) {
+//            System.out.print(this.get(i));
+//            System.out.print(" ");
+//        }
     }
 }
