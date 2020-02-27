@@ -4,12 +4,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This class provides a modal dialog to select open output files to
- * shut or packages to load.
+ * This abstract class provides the basis for a modal dialog to select open output files to shut or packages to load.
  */
 abstract class RunREDUCEListDialog<E> extends JDialog implements ActionListener {
     protected Frame frame;
@@ -55,10 +55,9 @@ abstract class RunREDUCEListDialog<E> extends JDialog implements ActionListener 
 }
 
 /**
- * This class provides a modal dialog to select open output files to
- * shut.
+ * This class provides a modal dialog to select open output files to shut.
  */
-class ShutOutputFilesDialog<File> extends RunREDUCEListDialog<File> {
+class ShutOutputFilesDialog extends RunREDUCEListDialog<File> {
     private static int[] fileIndices;
 
     ShutOutputFilesDialog(Frame frame) {
@@ -71,7 +70,7 @@ class ShutOutputFilesDialog<File> extends RunREDUCEListDialog<File> {
     }
 
     int[] showDialog(List<File> outputFileList) {
-        list.setListData((File[]) outputFileList.toArray());
+        list.setListData(outputFileList.toArray(new File[0]));
         pack();                       // must be done dynamically
         setLocationRelativeTo(frame); // ditto
         setVisible(true);
@@ -79,9 +78,9 @@ class ShutOutputFilesDialog<File> extends RunREDUCEListDialog<File> {
     }
 
     public void actionPerformed(ActionEvent e) {
-        if ("Shut".equals(e.getActionCommand())) {
+        if ("Shut".equals(e.getActionCommand()))
             fileIndices = list.getSelectedIndices();
-        } else
+        else
             fileIndices = new int[0];
         setVisible(false);
     }
@@ -90,11 +89,10 @@ class ShutOutputFilesDialog<File> extends RunREDUCEListDialog<File> {
 /**
  * This class provides a modal dialog to select packages to load.
  */
-class LoadPackagesDialog<String> extends RunREDUCEListDialog<String> {
+class LoadPackagesDialog extends RunREDUCEListDialog<String> {
     private List<String> selectedPackages;
 
     LoadPackagesDialog(Frame frame) {
-        // Create a modal dialog:
         super(frame,
                 "Load Packages...",
                 "Select one or more packages to load...",
@@ -104,7 +102,7 @@ class LoadPackagesDialog<String> extends RunREDUCEListDialog<String> {
     }
 
     List<String> showDialog(List<String> packageList) {
-        list.setListData((String[]) packageList.toArray());
+        list.setListData(packageList.toArray(new String[0]));
         pack();                       // must be done dynamically
         setLocationRelativeTo(frame); // ditto
         setVisible(true);
@@ -112,10 +110,10 @@ class LoadPackagesDialog<String> extends RunREDUCEListDialog<String> {
     }
 
     public void actionPerformed(ActionEvent e) {
-        if ("Load".equals(e.getActionCommand())) {
+        if ("Load".equals(e.getActionCommand()))
             selectedPackages = list.getSelectedValuesList();
-        } else
-            selectedPackages = new ArrayList<>();
+        else
+            selectedPackages = new ArrayList<>(0);
         setVisible(false);
     }
 }

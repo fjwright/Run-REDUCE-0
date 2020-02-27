@@ -5,7 +5,6 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.*;
 
-
 /**
  * This class runs the REDUCE sub-process.
  */
@@ -14,16 +13,15 @@ class RunREDUCEProcess {
 
     public static void reduce() {
         if (FindREDUCE.reduceRootPath == null) FindREDUCE.findREDUCERootDir();
-        // new REDUCEPackageList();
         Path CSLRootPath = FindREDUCE.reduceRootPath.resolve("lib").resolve("csl");
         String[] CSLProcessBuilderArgs =
-            {CSLRootPath.resolve("reduce.exe").toString(), "--nogui"};
+                {CSLRootPath.resolve("reduce.exe").toString(), "--nogui"};
 
         Path PSLRootPath = FindREDUCE.reduceRootPath.resolve("lib").resolve("psl");
         String[] PSLProcessBuilderArgs =
-            {PSLRootPath.resolve("psl").resolve("bpsl.exe").toString(),
-             "-td", "1000", "-f",
-             PSLRootPath.resolve("red").resolve("reduce.img").toString()};
+                {PSLRootPath.resolve("psl").resolve("bpsl.exe").toString(),
+                        "-td", "1000", "-f",
+                        PSLRootPath.resolve("red").resolve("reduce.img").toString()};
 
         try {
             ProcessBuilder pb = new ProcessBuilder(CSLProcessBuilderArgs);
@@ -38,7 +36,7 @@ class RunREDUCEProcess {
             // Start a thread to handle the REDUCE output stream
             // (assigned to a global variable):
             ReduceOutputThread outputGobbler = new
-                ReduceOutputThread(p.getInputStream(), RunREDUCE.outputTextArea);
+                    ReduceOutputThread(p.getInputStream(), RunREDUCE.outputTextArea);
             outputGobbler.start();
 
         } catch (Exception e) {
@@ -47,10 +45,8 @@ class RunREDUCEProcess {
     }
 }
 
-
 /**
- * This thread reads from the REDUCE output pipe and appends it to the
- * GUI output pane.
+ * This thread reads from the REDUCE output pipe and appends it to the GUI output pane.
  */
 class ReduceOutputThread extends Thread {
     InputStream input;        // REDUCE pipe output (buffered)
@@ -66,10 +62,10 @@ class ReduceOutputThread extends Thread {
         try (InputStreamReader isr = new InputStreamReader(input);
              BufferedReader br = new BufferedReader(isr)) {
             int c;
-            for (;;) {
+            for (; ; ) {
                 if (!br.ready()) {
                     outputTextArea.setCaretPosition
-                        (outputTextArea.getDocument().getLength());
+                            (outputTextArea.getDocument().getLength());
                     Thread.sleep(10);
                 } else if ((c = br.read()) != -1) {
                     if ((char) c != '\r') // ignore CRs
@@ -81,7 +77,6 @@ class ReduceOutputThread extends Thread {
         }
     }
 }
-
 
 /**
  * This class attempts to locate the REDUCE installation directory.
@@ -95,7 +90,7 @@ class FindREDUCE {
             System.exit(1);
         }
         boolean reduceRootPathFound = false;
-        for (Path root: FileSystems.getDefault().getRootDirectories()) {
+        for (Path root : FileSystems.getDefault().getRootDirectories()) {
             reduceRootPath = root.resolve("Program Files/Reduce");
             if (Files.exists(reduceRootPath)) {
                 reduceRootPathFound = true;
@@ -108,7 +103,6 @@ class FindREDUCE {
         }
     }
 }
-
 
 /**
  * This class provides a list of all REDUCE packages by finding the
@@ -126,7 +120,7 @@ class REDUCEPackageList extends ArrayList<String> {
         }
 
         try (BufferedReader reader = Files.newBufferedReader(packageMapFile)) {
-            String line = null;
+            String line;
             while ((line = reader.readLine()) != null) {
                 if (line.length() > 2 && line.substring(0, 2).equals(" (")) {
                     this.add(line.substring(2, line.indexOf(' ', 3)));

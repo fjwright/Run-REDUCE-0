@@ -1,11 +1,10 @@
 package fjwright.runreduce;
 
-import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.filechooser.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.*;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class provides the RunREDUCE menu bar.
@@ -47,26 +46,22 @@ class RunREDUCEMenubar extends JMenuBar {
         fileMenu.add(inputFileMenuItem);
         inputFileMenuItem.setToolTipText
                 ("Select and input from one or more REDUCE source files.");
-        inputFileMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                fileChooser.setDialogTitle("Input from Files...");
-                fileChooser.resetChoosableFileFilters();
-                fileChooser.setFileFilter(inputFileFilter);
-                fileChooser.setMultiSelectionEnabled(true);
-                fileChooser.setAccessory(echoButton);
-                fileChooser.setApproveButtonText("Input");
-                fileChooser.setApproveButtonToolTipText("Input from selected files");
-                echoButton.setSelected(true);
-                int returnVal = fileChooser.showOpenDialog(frame);
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    File[] files = fileChooser.getSelectedFiles();
-                    String text = "in \"" + files[0].toString();
-                    for (int i = 1; i < files.length; i++) {
-                        text += "\", \"" + files[i].toString();
-                    }
-                    RunREDUCE.sendStringToREDUCE
-                            (text + (echoButton.isSelected() ? "\";" : "\"$"));
-                }
+        inputFileMenuItem.addActionListener(e -> {
+            fileChooser.setDialogTitle("Input from Files...");
+            fileChooser.resetChoosableFileFilters();
+            fileChooser.setFileFilter(inputFileFilter);
+            fileChooser.setMultiSelectionEnabled(true);
+            fileChooser.setAccessory(echoButton);
+            fileChooser.setApproveButtonText("Input");
+            fileChooser.setApproveButtonToolTipText("Input from selected files");
+            echoButton.setSelected(true);
+            int returnVal = fileChooser.showOpenDialog(frame);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File[] files = fileChooser.getSelectedFiles();
+                String text = "in \"" + files[0].toString();
+                for (int i = 1; i < files.length; i++)
+                    text += "\", \"" + files[i].toString();
+                RunREDUCE.sendStringToREDUCE(text + (echoButton.isSelected() ? "\";" : "\"$"));
             }
         });
 
@@ -75,24 +70,22 @@ class RunREDUCEMenubar extends JMenuBar {
         fileMenu.add(outputFileMenuItem);
         outputFileMenuItem.setToolTipText
                 ("Select and output to a text file. Append if the file is already open.");
-        outputFileMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                fileChooser.setDialogTitle("Output to File...");
-                fileChooser.resetChoosableFileFilters();
-                fileChooser.setFileFilter(outputFileFilter);
-                fileChooser.setMultiSelectionEnabled(false);
-                fileChooser.setAccessory(null);
-                fileChooser.setApproveButtonText("Output");
-                fileChooser.setApproveButtonToolTipText("Output to selected file");
-                int returnVal = fileChooser.showOpenDialog(frame);
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    File file = fileChooser.getSelectedFile();
-                    RunREDUCE.sendStringToREDUCE
-                            ("out \"" + file.toString() + "\"$");
-                    outputFileList.add(file);
-                    closeLastMenuItem.setEnabled(true);
-                    closeFileMenuItem.setEnabled(true);
-                }
+        outputFileMenuItem.addActionListener(e -> {
+            fileChooser.setDialogTitle("Output to File...");
+            fileChooser.resetChoosableFileFilters();
+            fileChooser.setFileFilter(outputFileFilter);
+            fileChooser.setMultiSelectionEnabled(false);
+            fileChooser.setAccessory(null);
+            fileChooser.setApproveButtonText("Output");
+            fileChooser.setApproveButtonToolTipText("Output to selected file");
+            int returnVal = fileChooser.showOpenDialog(frame);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                RunREDUCE.sendStringToREDUCE
+                        ("out \"" + file.toString() + "\"$");
+                outputFileList.add(file);
+                closeLastMenuItem.setEnabled(true);
+                closeFileMenuItem.setEnabled(true);
             }
         });
 
@@ -101,37 +94,32 @@ class RunREDUCEMenubar extends JMenuBar {
         fileMenu.add(outputHereMenuItem);
         outputHereMenuItem.setToolTipText
                 ("Switch output back to this GUI.");
-        outputHereMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                RunREDUCE.sendStringToREDUCE("out t$");
-            }
-        });
+        outputHereMenuItem.addActionListener(e -> RunREDUCE.sendStringToREDUCE("out t$"));
 
         // Shut one or more output files.
-        shutOutputFilesDialog = new ShutOutputFilesDialog(frame);
         // JMenuItem closeFileMenuItem = new JMenuItem("Shut Output Files...");
         fileMenu.add(closeFileMenuItem);
         closeFileMenuItem.setEnabled(false);
         closeFileMenuItem.setToolTipText
                 ("Select and shut one or more output files.");
-        closeFileMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (!outputFileList.isEmpty()) { // not strictly necessary
-                    // Select output files to shut:
-                    int[] fileIndices = shutOutputFilesDialog.showDialog(outputFileList);
-                    int length = fileIndices.length;
-                    if (length != 0) {
-                        // Process backwards to avoid remove() changing subsequent indices:
-                        String text = outputFileList.remove(fileIndices[--length]).toString() + "\"$";
-                        for (int i = --length; i >= 0; i--)
-                            text = outputFileList.remove(fileIndices[i]).toString() + "\", \"" + text;
-                        RunREDUCE.sendStringToREDUCE("shut \"" + text);
-                    }
+        closeFileMenuItem.addActionListener(e -> {
+            if (shutOutputFilesDialog == null)
+                shutOutputFilesDialog = new ShutOutputFilesDialog(frame);
+            if (!outputFileList.isEmpty()) { // not strictly necessary
+                // Select output files to shut:
+                int[] fileIndices = shutOutputFilesDialog.showDialog(outputFileList);
+                int length = fileIndices.length;
+                if (length != 0) {
+                    // Process backwards to avoid remove() changing subsequent indices:
+                    String text = outputFileList.remove(fileIndices[--length]).toString() + "\"$";
+                    for (int i = --length; i >= 0; i--)
+                        text = outputFileList.remove(fileIndices[i]).toString() + "\", \"" + text;
+                    RunREDUCE.sendStringToREDUCE("shut \"" + text);
                 }
-                if (outputFileList.isEmpty()) {
-                    closeLastMenuItem.setEnabled(false);
-                    closeFileMenuItem.setEnabled(false);
-                }
+            }
+            if (outputFileList.isEmpty()) {
+                closeLastMenuItem.setEnabled(false);
+                closeFileMenuItem.setEnabled(false);
             }
         });
 
@@ -141,17 +129,14 @@ class RunREDUCEMenubar extends JMenuBar {
         closeLastMenuItem.setEnabled(false);
         closeLastMenuItem.setToolTipText
                 ("Shut the last output file used.");
-        closeLastMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (!outputFileList.isEmpty()) { // not strictly necessary
-                    int last = outputFileList.size() - 1;
-                    RunREDUCE.sendStringToREDUCE
-                            ("shut \"" + outputFileList.remove(last).toString() + "\"$");
-                }
-                if (outputFileList.isEmpty()) {
-                    closeLastMenuItem.setEnabled(false);
-                    closeFileMenuItem.setEnabled(false);
-                }
+        closeLastMenuItem.addActionListener(e -> {
+            if (!outputFileList.isEmpty()) { // not strictly necessary
+                int last = outputFileList.size() - 1;
+                RunREDUCE.sendStringToREDUCE("shut \"" + outputFileList.remove(last).toString() + "\"$");
+            }
+            if (outputFileList.isEmpty()) {
+                closeLastMenuItem.setEnabled(false);
+                closeFileMenuItem.setEnabled(false);
             }
         });
 
@@ -162,17 +147,16 @@ class RunREDUCEMenubar extends JMenuBar {
         fileMenu.add(loadPackagesMenuItem);
         loadPackagesMenuItem.setToolTipText
                 ("Select and load one or more packages.");
-        loadPackagesMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (loadPackagesDialog == null) loadPackagesDialog = new LoadPackagesDialog(frame);
-                if (packageList == null) packageList = new REDUCEPackageList();
-                // Select packages to load:
-                List<String> selectedPackages = loadPackagesDialog.showDialog(packageList);
-                if (selectedPackages.size() != 0) {
-                    String text = "load_package " + selectedPackages.get(0);
-                    for (int i = 1; i < selectedPackages.size(); i++) text += ", " + selectedPackages.get(i);
-                    RunREDUCE.sendStringToREDUCE(text + ";");
-                }
+        loadPackagesMenuItem.addActionListener(e -> {
+            if (loadPackagesDialog == null) loadPackagesDialog = new LoadPackagesDialog(frame);
+            if (packageList == null) packageList = new REDUCEPackageList();
+            // Select packages to load:
+            List<String> selectedPackages = loadPackagesDialog.showDialog(packageList);
+            if (!selectedPackages.isEmpty()) {
+                String text = "load_package " + selectedPackages.get(0);
+                for (int i = 1; i < selectedPackages.size(); i++)
+                    text += ", " + selectedPackages.get(i);
+                RunREDUCE.sendStringToREDUCE(text + ";");
             }
         });
 
@@ -181,24 +165,22 @@ class RunREDUCEMenubar extends JMenuBar {
         fileMenu.add(saveLogMenuItem);
         saveLogMenuItem.setToolTipText
                 ("Save the full session log to the selected text file.");
-        saveLogMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                fileChooser.setDialogTitle("Save Session Log...");
-                fileChooser.resetChoosableFileFilters();
-                fileChooser.setFileFilter(outputFileFilter);
-                fileChooser.setMultiSelectionEnabled(false);
-                fileChooser.setAccessory(appendButton);
-                fileChooser.setApproveButtonText("Save");
-                fileChooser.setApproveButtonToolTipText("Save to selected file");
-                int returnVal = fileChooser.showOpenDialog(frame);
-                if (returnVal == JFileChooser.APPROVE_OPTION) {
-                    File file = fileChooser.getSelectedFile();
-                    try (Writer out = new BufferedWriter
-                            (new FileWriter(file, appendButton.isSelected()))) {
-                        RunREDUCE.outputTextArea.write(out);
-                    } catch (IOException ioe) {
-                        ioe.printStackTrace();
-                    }
+        saveLogMenuItem.addActionListener(e -> {
+            fileChooser.setDialogTitle("Save Session Log...");
+            fileChooser.resetChoosableFileFilters();
+            fileChooser.setFileFilter(outputFileFilter);
+            fileChooser.setMultiSelectionEnabled(false);
+            fileChooser.setAccessory(appendButton);
+            fileChooser.setApproveButtonText("Save");
+            fileChooser.setApproveButtonToolTipText("Save to selected file");
+            int returnVal = fileChooser.showOpenDialog(frame);
+            if (returnVal == JFileChooser.APPROVE_OPTION) {
+                File file = fileChooser.getSelectedFile();
+                try (Writer out = new BufferedWriter
+                        (new FileWriter(file, appendButton.isSelected()))) {
+                    RunREDUCE.outputTextArea.write(out);
+                } catch (IOException ioe) {
+                    ioe.printStackTrace();
                 }
             }
         });
@@ -207,11 +189,7 @@ class RunREDUCEMenubar extends JMenuBar {
         JMenuItem quitMenuItem = new JMenuItem("Quit");
         fileMenu.add(quitMenuItem);
         quitMenuItem.setToolTipText("Quit REDUCE and this GUI.");
-        quitMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
-            }
-        });
+        quitMenuItem.addActionListener(e -> System.exit(0));
 
         /* ************* *
          * The Help menu *
@@ -223,17 +201,13 @@ class RunREDUCEMenubar extends JMenuBar {
         JMenuItem aboutMenuItem = new JMenuItem("About RunREDUCE");
         helpMenu.add(aboutMenuItem);
         aboutMenuItem.setToolTipText("Information about this app.");
-        aboutMenuItem.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog
-                        (frame,
-                                // "Prototype version 0.1\nFrancis Wright, February 2020",
-                                new String[]{"Run CLI REDUCE in a Java Swing GUI.",
-                                        "Prototype version 0.1",
-                                        "Francis Wright, February 2020"},
-                                "About RunREDUCE",
-                                JOptionPane.PLAIN_MESSAGE);
-            }
-        });
+        aboutMenuItem.addActionListener(e -> JOptionPane.showMessageDialog
+                (frame,
+                        // "Prototype version 0.1\nFrancis Wright, February 2020",
+                        new String[]{"Run CLI REDUCE in a Java Swing GUI.",
+                                "Prototype version 0.1",
+                                "Francis Wright, February 2020"},
+                        "About RunREDUCE",
+                        JOptionPane.PLAIN_MESSAGE));
     }
 }

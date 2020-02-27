@@ -2,28 +2,24 @@
  * Prototype Java Swing GUI to run CLI REDUCE.
  * Based on https://docs.oracle.com/javase/tutorial/uiswing/index.html.
  * This file is ../fjwright/runreduce/RunREDUCE.java
- * It requires also ../fjwright/runreduce/RunREDUCEProcess.java
+ * It requires also ../fjwright/runreduce/RunREDUCE*.java
  * Compile and run the app from the PARENT directory of fjwright:
  * javac fjwright/runreduce/RunREDUCE.java
  * java fjwright.runreduce.RunREDUCE
- * (The above works in a Windows cmd shell.)
- */ 
+ * (The above works in a Microsoft Windows cmd shell.)
+ */
 
 package fjwright.runreduce;
 
-import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
-import javax.swing.text.*;
-import javax.swing.border.*;
-import java.io.*;
-import java.util.List;          // Also in java.awt!
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
-
+import java.util.List;
 
 /**
- * This is the main class that runs the whole app.  It also provides
- * the pane that displays REDUCE input and output.
+ * This is the main class that runs the whole app.  It also provides the pane that displays REDUCE input and output.
  */
 public class RunREDUCE extends JPanel implements ActionListener {
     private static JTextArea inputTextArea;
@@ -40,7 +36,7 @@ public class RunREDUCE extends JPanel implements ActionListener {
         outputTextArea = new JTextArea();
         outputTextArea.setEditable(false);
         JScrollPane outputScrollPane = new JScrollPane(outputTextArea);
-        JPanel outputPane = new JPanel(new BorderLayout(0,3));
+        JPanel outputPane = new JPanel(new BorderLayout(0, 3));
         outputPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JLabel outputLabel = new JLabel("Input/Output Display");
         outputPane.add(outputLabel, BorderLayout.PAGE_START);
@@ -49,15 +45,14 @@ public class RunREDUCE extends JPanel implements ActionListener {
         // Create the editable vertically-scrollable input text area:
         inputTextArea = new JTextArea();
         JScrollPane inputScrollPane = new JScrollPane(inputTextArea);
-        JPanel inputPane = new JPanel(new BorderLayout(0,3));
+        JPanel inputPane = new JPanel(new BorderLayout(0, 3));
         inputPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JLabel inputLabel = new JLabel("Input editor");
         inputPane.add(inputLabel, BorderLayout.PAGE_START);
         inputPane.add(inputScrollPane);
 
         // Create a split pane to contain the output and input scrollpanes:
-        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-                                              outputPane, inputPane);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, outputPane, inputPane);
         splitPane.setOneTouchExpandable(true);
         splitPane.setResizeWeight(0.8);
 
@@ -124,16 +119,14 @@ public class RunREDUCE extends JPanel implements ActionListener {
         // Make sure the new input text is visible, even if there was
         // a selection in the output text area:
         outputTextArea.setCaretPosition
-            (outputTextArea.getDocument().getLength());
+                (outputTextArea.getDocument().getLength());
         // Send the input to the REDUCE input pipe:
         RunREDUCEProcess.reduceInputPrintWriter.print(text);
         RunREDUCEProcess.reduceInputPrintWriter.flush();
     }
 
     /**
-     * Create the GUI and show it.  For thread safety,
-     * this method should be invoked from the
-     * event-dispatching thread.
+     * Create the GUI and show it.  For thread safety, this method should be invoked from the event-dispatching thread.
      */
     private static void createAndShowGUI() {
         // Create and set up the window:
@@ -151,23 +144,15 @@ public class RunREDUCE extends JPanel implements ActionListener {
         // Display the window:
         frame.pack();
         // Give the input text area the initial focus:
-        inputTextArea.requestFocusInWindow(); 
+        inputTextArea.requestFocusInWindow();
         frame.setVisible(true);
     }
 
     public static void main(String... args) {
         // Schedule jobs for the event-dispatching thread.
         // Create and show this application's GUI:
-        SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    createAndShowGUI();
-                }
-            });
+        SwingUtilities.invokeLater(RunREDUCE::createAndShowGUI);
         // Run REDUCE.  (A direct call hangs the GUI!)
-        SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    RunREDUCEProcess.reduce();
-                }
-            });
+        SwingUtilities.invokeLater(RunREDUCEProcess::reduce);
     }
 }
