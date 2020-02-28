@@ -1,9 +1,13 @@
 package fjwright.runreduce;
 
-import javax.swing.JTextArea;
+import javax.swing.*;
 import java.io.*;
-import java.nio.file.*;
-import java.util.*;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * This class runs the REDUCE sub-process.
@@ -107,7 +111,8 @@ class FindREDUCE {
 /**
  * This class provides a list of all REDUCE packages by finding the
  * REDUCE packages directory in a standard installation and parsing
- * the packages.map file.
+ * the packages.map file. The list only includes packages that are
+ * not loaded by default, and it is sorted alphabetically.
  */
 class REDUCEPackageList extends ArrayList<String> {
 
@@ -115,24 +120,25 @@ class REDUCEPackageList extends ArrayList<String> {
         if (FindREDUCE.reduceRootPath == null) FindREDUCE.findREDUCERootDir();
         Path packageMapFile = FindREDUCE.reduceRootPath.resolve("packages/package.map");
         if (!Files.isReadable(packageMapFile)) {
-            System.err.println("REDUCE packages map file is not readable!");
+            System.err.println("REDUCE package map file is not readable!");
             return;
         }
 
         try (BufferedReader reader = Files.newBufferedReader(packageMapFile)) {
             String line;
+            Pattern pattern = Pattern.compile("\\s*\\((\\w+)\\s+\".+\"\\s+(\\w+)");
             while ((line = reader.readLine()) != null) {
-                if (line.length() > 2 && line.substring(0, 2).equals(" (")) {
-                    this.add(line.substring(2, line.indexOf(' ', 3)));
-                }
+                Matcher matcher = pattern.matcher(line);
+                if (matcher.lookingAt() && !matcher.group(2).equals("core"))
+                    this.add(matcher.group(1));
             }
         } catch (IOException x) {
             System.err.format("IOException: %s%n", x);
         }
 
         // For testing only:
-//        for (int i = 0; i < this.size(); i++) {
-//            System.out.print(this.get(i));
+//        for (String s : this) {
+//            System.out.print(s);
 //            System.out.print(" ");
 //        }
     }
