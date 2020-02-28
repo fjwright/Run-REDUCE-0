@@ -6,6 +6,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -111,8 +112,8 @@ class FindREDUCE {
 /**
  * This class provides a list of all REDUCE packages by finding the
  * REDUCE packages directory in a standard installation and parsing
- * the packages.map file. The list only includes packages that are
- * not loaded by default, and it is sorted alphabetically.
+ * the packages.map file.
+ * The list excludes preloaded packages, and it is sorted alphabetically.
  */
 class REDUCEPackageList extends ArrayList<String> {
 
@@ -126,15 +127,21 @@ class REDUCEPackageList extends ArrayList<String> {
 
         try (BufferedReader reader = Files.newBufferedReader(packageMapFile)) {
             String line;
-            Pattern pattern = Pattern.compile("\\s*\\((\\w+)\\s+\".+\"\\s+(\\w+)");
+            Pattern pattern = Pattern.compile("\\s*\\((\\w+)");
+            // The preloaded packages are these (using non-capturing groups):
+            Pattern exclude = Pattern.compile("(?:alg)|(?:arith)|(?:mathpr)|(?:poly)|(?:rlisp)");
             while ((line = reader.readLine()) != null) {
                 Matcher matcher = pattern.matcher(line);
-                if (matcher.lookingAt() && !matcher.group(2).equals("core"))
-                    this.add(matcher.group(1));
+                if (matcher.lookingAt()) {
+                    String pkg = matcher.group(1);
+                    if (!exclude.matcher(pkg).matches()) this.add(pkg);
+                }
             }
         } catch (IOException x) {
             System.err.format("IOException: %s%n", x);
         }
+
+        Collections.sort(this);
 
         // For testing only:
 //        for (String s : this) {
