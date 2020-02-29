@@ -59,34 +59,34 @@ public class RunREDUCE extends JPanel implements ActionListener {
         add(splitPane, BorderLayout.CENTER);
 
         // Buttons to control the input:
-        JButton previousButton = new JButton("\u25b2 Previous Input");
-        previousButton.setActionCommand("Previous");
-        previousButton.addActionListener(this);
-        previousButton.setToolTipText("Select the previous input.");
+        JButton earlierButton = new JButton("\u25b2 Earlier Input");
+        earlierButton.setActionCommand("Earlier");
+        earlierButton.addActionListener(this);
+        earlierButton.setToolTipText("Select earlier input.");
         JButton sendButton = new JButton("Send Input");
         sendButton.setActionCommand("Send");
         sendButton.addActionListener(this);
         sendButton.setToolTipText("Send the input above to REDUCE. It is terminated with a newline if necessary.");
-        JButton nextButton = new JButton("\u25bc Next Input");
-        nextButton.setActionCommand("Next");
-        nextButton.addActionListener(this);
-        nextButton.setToolTipText("Select the next input.");
+        JButton laterButton = new JButton("\u25bc Later Input");
+        laterButton.setActionCommand("Later");
+        laterButton.addActionListener(this);
+        laterButton.setToolTipText("Select later input.");
 
         // Set buttons to all have the same size as the widest:
-        Dimension buttonDimension = previousButton.getPreferredSize();
+        Dimension buttonDimension = earlierButton.getPreferredSize();
         sendButton.setPreferredSize(buttonDimension);
-        nextButton.setPreferredSize(buttonDimension);
+        laterButton.setPreferredSize(buttonDimension);
 
         // Lay out the buttons horizontally and uniformly spaced:
         JPanel buttonPane = new JPanel();
         buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
         buttonPane.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
         buttonPane.add(Box.createHorizontalGlue());
-        buttonPane.add(previousButton);
+        buttonPane.add(earlierButton);
         buttonPane.add(Box.createHorizontalGlue());
         buttonPane.add(sendButton);
         buttonPane.add(Box.createHorizontalGlue());
-        buttonPane.add(nextButton);
+        buttonPane.add(laterButton);
         buttonPane.add(Box.createHorizontalGlue());
 
         add(buttonPane, BorderLayout.PAGE_END);
@@ -102,10 +102,10 @@ public class RunREDUCE extends JPanel implements ActionListener {
                 inputListIndex = inputList.size();
                 maxInputListIndex = inputListIndex - 1;
             }
-        } else if ("Previous".equals(e.getActionCommand())) {
+        } else if ("Earlier".equals(e.getActionCommand())) {
             if (inputListIndex > 0)
                 inputTextArea.setText(inputList.get(--inputListIndex));
-        } else if ("Next".equals(e.getActionCommand())) {
+        } else if ("Later".equals(e.getActionCommand())) {
             if (inputListIndex < maxInputListIndex)
                 inputTextArea.setText(inputList.get(++inputListIndex));
         }
