@@ -2,7 +2,7 @@
 
 ## A Java GUI to run any CLI version of the REDUCE Computer Algebra System
 
-### Francis Wright, February 2020
+### Francis Wright, March 2020
 
 This is the first prototype that does anything useful and my first
 ever GitHub repository, which is currently private.  I will make it
@@ -33,9 +33,11 @@ top-level directory.
 
 * Multiple tabs that each run an independent invocation of REDUCE.
 * Select REDUCE version to run.
-* Use a Maven build system.
 * Remember user choices, such as default REDUCE version, commands to
   run REDUCE, window configurations.
+* Select font size.
+* Horizontal scrolling of REDUCE I/O windows, essential to support long lines of
+ output.
 
 ### To do later
 

@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,10 +20,18 @@ class RunREDUCEProcess {
     public static void reduce() {
         if (FindREDUCE.reduceRootPath == null) FindREDUCE.findREDUCERootDir();
         Path CSLRootPath = FindREDUCE.reduceRootPath.resolve("lib").resolve("csl");
+        if (!Files.isReadable(CSLRootPath)) {
+            System.err.println("Fatal error: CSL directory " + CSLRootPath + " does not exist!");
+            System.exit(1);
+        }
         String[] CSLProcessBuilderArgs =
                 {CSLRootPath.resolve("reduce.exe").toString(), "--nogui"};
 
         Path PSLRootPath = FindREDUCE.reduceRootPath.resolve("lib").resolve("psl");
+        if (!Files.isReadable(PSLRootPath)) {
+            System.err.println("Fatal error: PSL directory " + PSLRootPath + " does not exist!");
+            System.exit(1);
+        }
         String[] PSLProcessBuilderArgs =
                 {PSLRootPath.resolve("psl").resolve("bpsl.exe").toString(),
                         "-td", "1000", "-f",
@@ -44,8 +53,10 @@ class RunREDUCEProcess {
                     ReduceOutputThread(p.getInputStream(), RunREDUCE.outputTextArea);
             outputGobbler.start();
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception exc) {
+//            exc.printStackTrace();
+            System.err.println("Fatal error running REDUCE -- " + exc);
+            System.exit(1);
         }
     }
 }
@@ -77,8 +88,8 @@ class ReduceOutputThread extends Thread {
                         outputTextArea.append(String.valueOf((char) c));
                 } else break;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception exc) {
+            exc.printStackTrace();
         }
     }
 }
@@ -90,20 +101,33 @@ class FindREDUCE {
     static Path reduceRootPath = null;
 
     static void findREDUCERootDir() {
+        String reduce = System.getenv("REDUCE");
+        if (reduce != null) {
+            try {
+                reduceRootPath = Path.of(reduce);
+            } catch (InvalidPathException exc) {
+                System.err.println("Fatal error processing environment variable $REDUCE = " + reduce);
+                System.err.println(exc);
+                System.exit(1);
+            }
+            if (Files.exists(reduceRootPath)) return;
+        }
+
         if (!"Windows 10".equals(System.getProperty("os.name"))) {
-            System.err.println("Only Windows 10 currently supported!");
+            System.err.println("Fatal error: Only Windows 10 currently supported!");
             System.exit(1);
         }
         boolean reduceRootPathFound = false;
+        Path targetPath = Path.of("Program Files", "Reduce");
         for (Path root : FileSystems.getDefault().getRootDirectories()) {
-            reduceRootPath = root.resolve("Program Files/Reduce");
+            reduceRootPath = root.resolve(targetPath);
             if (Files.exists(reduceRootPath)) {
                 reduceRootPathFound = true;
                 break;
             }
         }
         if (!reduceRootPathFound) {
-            System.err.println("REDUCE installation directory not found!");
+            System.err.println("Fatal error: REDUCE installation directory not found!");
             System.exit(1);
         }
     }
@@ -112,7 +136,7 @@ class FindREDUCE {
 /**
  * This class provides a list of all REDUCE packages by finding the
  * REDUCE packages directory in a standard installation and parsing
- * the packages.map file.
+ * the package.map file.
  * The list excludes preloaded packages, and it is sorted alphabetically.
  */
 class REDUCEPackageList extends ArrayList<String> {
@@ -121,7 +145,7 @@ class REDUCEPackageList extends ArrayList<String> {
         if (FindREDUCE.reduceRootPath == null) FindREDUCE.findREDUCERootDir();
         Path packageMapFile = FindREDUCE.reduceRootPath.resolve("packages/package.map");
         if (!Files.isReadable(packageMapFile)) {
-            System.err.println("REDUCE package map file is not readable!");
+            System.err.println("REDUCE package map file is not available!");
             return;
         }
 

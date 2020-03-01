@@ -1,6 +1,6 @@
 # Run-REDUCE User Guide
 
-### Francis Wright, February 2020
+### Francis Wright, March 2020
 
 Run-REDUCE is an open-source Java GUI to run the REDUCE Computer
 Algebra System, which must be installed separately from
@@ -13,7 +13,9 @@ mathematical notation.
 ## Installation
 
 Download the file
-[Run-REDUCE.jar](out/artifacts/Run_REDUCE_jar/Run-REDUCE.jar).
+[Run-REDUCE.jar](out/artifacts/Run_REDUCE_jar/Run-REDUCE.jar)
+and run it from the directory to which you downloaded it using the command
+`java -jar Run-REDUCE.jar`.
 
 ## The Main Window
 
