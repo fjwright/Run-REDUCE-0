@@ -30,6 +30,7 @@ class RunREDUCEMenubar extends JMenuBar {
     static final List<File> outputFileList = new ArrayList<>();
     static LoadPackagesDialog loadPackagesDialog;
     static List<String> packageList;
+    static FontSizeDialog fontSizeDialog;
 
     RunREDUCEMenubar(JFrame frame) {
         frame.setJMenuBar(this);
@@ -191,6 +192,23 @@ class RunREDUCEMenubar extends JMenuBar {
         quitMenuItem.setToolTipText("Quit REDUCE and this GUI.");
         quitMenuItem.addActionListener(e -> System.exit(0));
 
+
+        /* ******************** *
+         * The Preferences menu *
+         * ******************** */
+        JMenu preferencesMenu = new JMenu("Preferences");
+        this.add(preferencesMenu);
+
+        // Create a Font Size... item in the Preferences menu that pops up a dialogue:
+        JMenuItem fontSizeMenuItem = new JMenuItem("Font Size...");
+        preferencesMenu.add(fontSizeMenuItem);
+        fontSizeMenuItem.setToolTipText("Change the font size used for REDUCE input and output.");
+        fontSizeMenuItem.addActionListener(e -> {
+            if (fontSizeDialog == null) fontSizeDialog = new FontSizeDialog(frame);
+            fontSizeDialog.showDialog();
+        });
+
+
         /* ************* *
          * The Help menu *
          * ************* */
@@ -203,11 +221,11 @@ class RunREDUCEMenubar extends JMenuBar {
         aboutMenuItem.setToolTipText("Information about this app.");
         aboutMenuItem.addActionListener(e -> JOptionPane.showMessageDialog
                 (frame,
-                        // "Prototype version 0.1\nFrancis Wright, February 2020",
                         new String[]{"Run CLI REDUCE in a Java Swing GUI.",
-                                "Prototype version 0.1",
-                                "Francis Wright, February 2020"},
+                                "Prototype version 0.2",
+                                "Francis Wright, March 2020"},
                         "About RunREDUCE",
                         JOptionPane.PLAIN_MESSAGE));
     }
 }
+

@@ -1,6 +1,8 @@
 package fjwright.runreduce;
 
 import javax.swing.*;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -114,6 +116,92 @@ class LoadPackagesDialog extends RunREDUCEListDialog<String> {
             selectedPackages = list.getSelectedValuesList();
         else
             selectedPackages = new ArrayList<>(0);
+        setVisible(false);
+    }
+}
+
+/**
+ * This class provides a modal dialog to change the REDUCE I/O font size.
+ */
+class FontSizeDialog extends JDialog implements ActionListener, ChangeListener {
+    private Frame frame;
+    private JTextField currentSizeDemoTextField;
+    private JTextField currentSizeValueTextField;
+    private JTextField newSizeDemoTextField;
+    private JSpinner newSizeValueSpinner;
+    private Font currentFont = RunREDUCE.outputTextArea.getFont();
+    private Font newFont = currentFont;
+
+    FontSizeDialog(Frame frame) {
+        // Create a modal dialog:
+        super(frame, "Font Size...", true);
+        this.frame = frame;
+
+        JLabel defaultFontSize = new JLabel("Default font size is 12.");
+
+        JPanel fontPane = new JPanel(new GridLayout(2, 2, 5, 5));
+        currentSizeDemoTextField = new JTextField("Current size demo");
+        currentSizeDemoTextField.setEditable(false);
+        fontPane.add(currentSizeDemoTextField);
+        currentSizeValueTextField = new JTextField("10");
+        currentSizeValueTextField.setEditable(false);
+        fontPane.add(currentSizeValueTextField);
+        newSizeDemoTextField = new JTextField("New size demo");
+        newSizeDemoTextField.setEditable(false);
+        fontPane.add(newSizeDemoTextField);
+        SpinnerModel spinnerModel = new SpinnerNumberModel(10, 5, 30, 1);
+        newSizeValueSpinner = new JSpinner(spinnerModel);
+        fontPane.add(newSizeValueSpinner);
+        fontPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        // Create and initialize the control buttons:
+        JButton okButton = new JButton("OK");
+        okButton.setActionCommand("OK");
+        okButton.addActionListener(this);
+        JButton cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener(this);
+
+        // Lay out the buttons horizontally and right-justified:
+        JPanel buttonPane = new JPanel();
+        buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
+        buttonPane.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
+        buttonPane.add(Box.createHorizontalGlue());
+        buttonPane.add(okButton);
+        buttonPane.add(Box.createRigidArea(new Dimension(10, 0)));
+        buttonPane.add(cancelButton);
+
+        // Lay out the dialog contents:
+        add(defaultFontSize, BorderLayout.PAGE_START);
+        add(fontPane, BorderLayout.CENTER);
+        add(buttonPane, BorderLayout.PAGE_END);
+    }
+
+    void showDialog() {
+        int currentSize = currentFont.getSize();
+        currentSizeDemoTextField.setFont(currentFont);
+        currentSizeValueTextField.setText(String.valueOf(currentSize));
+        newSizeDemoTextField.setFont(newFont);
+        newSizeValueSpinner.setValue(currentSize);
+        //Listen for changes on the spinner.
+        newSizeValueSpinner.addChangeListener(this);
+        pack();                       // must be done dynamically
+        setLocationRelativeTo(frame); // ditto
+        setVisible(true);
+    }
+
+    public void stateChanged(ChangeEvent e) {
+        float newSize = (int) newSizeValueSpinner.getValue();
+        newFont = currentFont.deriveFont(newSize);
+        newSizeDemoTextField.setFont(newFont);
+        pack();
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        // Update the font size
+        if ("OK".equals(e.getActionCommand())) {
+            RunREDUCE.outputTextArea.setFont(newFont);
+            RunREDUCE.inputTextArea.setFont(newFont);
+        }
         setVisible(false);
     }
 }

@@ -22,7 +22,7 @@ import java.util.List;
  * This is the main class that runs the whole app.  It also provides the pane that displays REDUCE input and output.
  */
 public class RunREDUCE extends JPanel implements ActionListener {
-    private static JTextArea inputTextArea;
+    static JTextArea inputTextArea;
     static JTextArea outputTextArea;
     private final static String NEWLINE = "\n";
     private final static List<String> inputList = new ArrayList<>();

@@ -8,6 +8,7 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -98,10 +99,16 @@ class ReduceOutputThread extends Thread {
  * This class attempts to locate the REDUCE installation directory.
  */
 class FindREDUCE {
+    static String prefsNodeName = "/fjwright/runreduce";  // cf. package name
+    // On Windows, the preferences for this app are stored in the registry under the key
+    // Computer\HKEY_CURRENT_USER\Software\JavaSoft\Prefs\fjwright\runreduce
+    static Preferences prefs = Preferences.userRoot().node(prefsNodeName);
+    // Preference keys for this package
+    private static final String REDUCE_ROOT_DIR = "REDUCE_root_dir";
     static Path reduceRootPath = null;
 
     static void findREDUCERootDir() {
-        String reduce = System.getenv("REDUCE");
+        String reduce = prefs.get(REDUCE_ROOT_DIR, System.getenv("REDUCE"));
         if (reduce != null) {
             try {
                 reduceRootPath = Path.of(reduce);

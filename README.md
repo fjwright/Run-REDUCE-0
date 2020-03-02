@@ -35,9 +35,6 @@ top-level directory.
 * Select REDUCE version to run.
 * Remember user choices, such as default REDUCE version, commands to
   run REDUCE, window configurations.
-* Select font size.
-* Horizontal scrolling of REDUCE I/O windows, essential to support long lines of
- output.
 
 ### To do later
 

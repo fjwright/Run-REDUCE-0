@@ -23,8 +23,9 @@ The main window consists of two panes one above the other.  The top
 pane displays a log of all the REDUCE input and output in the current
 session.  This pane is read-only.  The bottom pane is an input editor,
 which supports all the standard keyboard and mouse-based editing
-facilities normally provided by the platform.  Both panes display a
-vertical scroll bar when appropriate.  The horizontal divider
+facilities normally provided by the platform.  Both panes display
+vertical and horizontal scroll bars when appropriate; text does not wrap.
+The horizontal divider
 separating the two panes can be dragged up and down, and it can be
 moved all the way up or down by clicking on one of the two triangular
 icons at the left-hand side.
