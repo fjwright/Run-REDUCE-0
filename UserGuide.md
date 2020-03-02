@@ -13,9 +13,19 @@ mathematical notation.
 ## Installation
 
 Download the file
-[Run-REDUCE.jar](out/artifacts/Run_REDUCE_jar/Run-REDUCE.jar)
-and run it from the directory to which you downloaded it using the command
+[Run-REDUCE.jar](out/artifacts/Run_REDUCE_jar/Run-REDUCE.jar) and run
+it from the directory to which you downloaded it using the command
 `java -jar Run-REDUCE.jar`.
+
+## General Information
+
+Run-REDUCE remembers user preferences and uses them the next time it
+runs.  It uses the standard Java package
+[java.util.prefs](https://docs.oracle.com/javase/8/docs/technotes/guides/preferences/),
+which stores data persistently in an implementation-dependent backing
+store.  For example, on Microsoft Windows, the preferences for this
+app are stored in the registry under the key
+`Computer\HKEY_CURRENT_USER\Software\JavaSoft\Prefs\fjwright\runreduce`.
 
 ## The Main Window
 
@@ -24,11 +34,10 @@ pane displays a log of all the REDUCE input and output in the current
 session.  This pane is read-only.  The bottom pane is an input editor,
 which supports all the standard keyboard and mouse-based editing
 facilities normally provided by the platform.  Both panes display
-vertical and horizontal scroll bars when appropriate; text does not wrap.
-The horizontal divider
-separating the two panes can be dragged up and down, and it can be
-moved all the way up or down by clicking on one of the two triangular
-icons at the left-hand side.
+vertical and horizontal scroll bars when appropriate; text does not
+wrap.  The horizontal divider separating the two panes can be dragged
+up and down, and it can be moved all the way up or down by clicking on
+one of the two triangular icons at the left-hand side.
 
 You type (or paste) REDUCE input into the input editor pane, edit it
 as necessary, and then click on the `Send Input` button, which sends
@@ -129,9 +138,21 @@ selected file; otherwise, it overwrites any previous file content.
 This terminates both REDUCE and the Run-REDUCE GUI, as does the close
 widget at the top right-hand corner of the main window frame.
 
+## The Preferences Menu
+
+The Preferences menu provides the following items.
+
+## Font Size...
+
+This item brings up a dialogue that allows you to change the font size
+used in the `Input/Output Display` and `Input Editor` panes.  The
+selected size is remembered and will be used the next time Run-REDUCE
+runs.
+
 ## The Help Menu
+
+The Help menu provides the following items.
 
 ### About RunREDUCE
 
-This pops up a dialogue displaying brief information about this
-version of Run-REDUCE.
+This pops up a dialogue displaying brief information about Run-REDUCE.

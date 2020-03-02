@@ -129,29 +129,55 @@ class FontSizeDialog extends JDialog implements ActionListener, ChangeListener {
     private JTextField currentSizeValueTextField;
     private JTextField newSizeDemoTextField;
     private JSpinner newSizeValueSpinner;
-    private Font currentFont = RunREDUCE.outputTextArea.getFont();
-    private Font newFont = currentFont;
+    private Font currentFont;
+    private Font newFont;
+    private float newFontSize;
 
     FontSizeDialog(Frame frame) {
         // Create a modal dialog:
         super(frame, "Font Size...", true);
         this.frame = frame;
 
-        JLabel defaultFontSize = new JLabel("Default font size is 12.");
+        JPanel fontPane = new JPanel(new GridBagLayout()); // Layout(2, 2, 5, 5));
+        GridBagConstraints c = new GridBagConstraints();
+        c.fill = GridBagConstraints.HORIZONTAL;
+        c.weightx = 0.5;
+        c.weighty = 0.5;
+        c.insets = new Insets(5,5,5,5);
 
-        JPanel fontPane = new JPanel(new GridLayout(2, 2, 5, 5));
-        currentSizeDemoTextField = new JTextField("Current size demo");
+        JTextField defaultFontSizeTextField = new JTextField("Default font size is 12.");
+        defaultFontSizeTextField.setEditable(false);
+        defaultFontSizeTextField.setHorizontalAlignment(JTextField.CENTER);
+        c.gridx = 0;
+        c.gridy = 0;
+        c.gridwidth = 2;
+        fontPane.add(defaultFontSizeTextField, c);
+
+        currentSizeDemoTextField = new JTextField("Text at current size");
         currentSizeDemoTextField.setEditable(false);
-        fontPane.add(currentSizeDemoTextField);
-        currentSizeValueTextField = new JTextField("10");
+        c.gridx = 0;
+        c.gridy = 1;
+        c.gridwidth = 1;
+        fontPane.add(currentSizeDemoTextField, c);
+
+        currentSizeValueTextField = new JTextField("12");
         currentSizeValueTextField.setEditable(false);
-        fontPane.add(currentSizeValueTextField);
-        newSizeDemoTextField = new JTextField("New size demo");
+        currentSizeValueTextField.setHorizontalAlignment(JTextField.CENTER);
+        c.gridx = 1;
+        c.gridy = 1;
+        fontPane.add(currentSizeValueTextField, c);
+
+        newSizeDemoTextField = new JTextField("Text at new size");
         newSizeDemoTextField.setEditable(false);
-        fontPane.add(newSizeDemoTextField);
+        c.gridx = 0;
+        c.gridy = 2;
+        fontPane.add(newSizeDemoTextField, c);
+
         SpinnerModel spinnerModel = new SpinnerNumberModel(10, 5, 30, 1);
         newSizeValueSpinner = new JSpinner(spinnerModel);
-        fontPane.add(newSizeValueSpinner);
+        c.gridx = 1;
+        c.gridy = 2;
+        fontPane.add(newSizeValueSpinner, c);
         fontPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // Create and initialize the control buttons:
@@ -171,16 +197,16 @@ class FontSizeDialog extends JDialog implements ActionListener, ChangeListener {
         buttonPane.add(cancelButton);
 
         // Lay out the dialog contents:
-        add(defaultFontSize, BorderLayout.PAGE_START);
         add(fontPane, BorderLayout.CENTER);
         add(buttonPane, BorderLayout.PAGE_END);
     }
 
     void showDialog() {
+        currentFont = RunREDUCE.outputTextArea.getFont();
         int currentSize = currentFont.getSize();
         currentSizeDemoTextField.setFont(currentFont);
         currentSizeValueTextField.setText(String.valueOf(currentSize));
-        newSizeDemoTextField.setFont(newFont);
+        newSizeDemoTextField.setFont(currentFont);
         newSizeValueSpinner.setValue(currentSize);
         //Listen for changes on the spinner.
         newSizeValueSpinner.addChangeListener(this);
@@ -190,8 +216,8 @@ class FontSizeDialog extends JDialog implements ActionListener, ChangeListener {
     }
 
     public void stateChanged(ChangeEvent e) {
-        float newSize = (int) newSizeValueSpinner.getValue();
-        newFont = currentFont.deriveFont(newSize);
+        newFontSize = (int) newSizeValueSpinner.getValue();
+        newFont = currentFont.deriveFont(newFontSize);
         newSizeDemoTextField.setFont(newFont);
         pack();
     }
@@ -201,6 +227,7 @@ class FontSizeDialog extends JDialog implements ActionListener, ChangeListener {
         if ("OK".equals(e.getActionCommand())) {
             RunREDUCE.outputTextArea.setFont(newFont);
             RunREDUCE.inputTextArea.setFont(newFont);
+            FindREDUCE.prefs.putFloat("fontSize", newFontSize);
         }
         setVisible(false);
     }

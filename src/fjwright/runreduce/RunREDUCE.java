@@ -34,6 +34,9 @@ public class RunREDUCE extends JPanel implements ActionListener {
 
         // Create the non-editable vertically-scrollable output text area:
         outputTextArea = new JTextArea();
+        Font font = outputTextArea.getFont().
+                deriveFont(FindREDUCE.prefs.getFloat("fontSize", 12));
+        outputTextArea.setFont(font);
         outputTextArea.setEditable(false);
         JScrollPane outputScrollPane = new JScrollPane(outputTextArea);
         JPanel outputPane = new JPanel(new BorderLayout(0, 3));
@@ -44,10 +47,11 @@ public class RunREDUCE extends JPanel implements ActionListener {
 
         // Create the editable vertically-scrollable input text area:
         inputTextArea = new JTextArea();
+        inputTextArea.setFont(font);
         JScrollPane inputScrollPane = new JScrollPane(inputTextArea);
         JPanel inputPane = new JPanel(new BorderLayout(0, 3));
         inputPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JLabel inputLabel = new JLabel("Input editor");
+        JLabel inputLabel = new JLabel("Input Editor");
         inputPane.add(inputLabel, BorderLayout.PAGE_START);
         inputPane.add(inputScrollPane);
 
