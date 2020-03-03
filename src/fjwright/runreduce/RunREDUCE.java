@@ -125,8 +125,8 @@ public class RunREDUCE extends JPanel implements ActionListener {
         outputTextArea.setCaretPosition
                 (outputTextArea.getDocument().getLength());
         // Send the input to the REDUCE input pipe:
-        RunREDUCEProcess.reduceInputPrintWriter.print(text);
-        RunREDUCEProcess.reduceInputPrintWriter.flush();
+        RunREDUCECommand.reduceInputPrintWriter.print(text);
+        RunREDUCECommand.reduceInputPrintWriter.flush();
     }
 
     /**
@@ -156,7 +156,9 @@ public class RunREDUCE extends JPanel implements ActionListener {
         // Schedule jobs for the event-dispatching thread.
         // Create and show this application's GUI:
         SwingUtilities.invokeLater(RunREDUCE::createAndShowGUI);
+        // Auto-run REDUCE here if appropriate.
         // Run REDUCE.  (A direct call hangs the GUI!)
-        SwingUtilities.invokeLater(RunREDUCEProcess::reduce);
+//        RunREDUCECommands runREDUCECommands = new RunREDUCECommands();
+//        SwingUtilities.invokeLater(runREDUCECommands.get(1)::run);
     }
 }

@@ -30,6 +30,7 @@ class RunREDUCEMenubar extends JMenuBar {
     static final List<File> outputFileList = new ArrayList<>();
     static LoadPackagesDialog loadPackagesDialog;
     static List<String> packageList;
+    static RunREDUCECommands runREDUCECommands = new RunREDUCECommands();
     static FontSizeDialog fontSizeDialog;
 
     RunREDUCEMenubar(JFrame frame) {
@@ -192,6 +193,28 @@ class RunREDUCEMenubar extends JMenuBar {
         quitMenuItem.setToolTipText("Quit REDUCE and this GUI.");
         quitMenuItem.addActionListener(e -> System.exit(0));
 
+
+        /* *************** *
+         * The REDUCE menu *
+         * *************** */
+        JMenu reduceMenu = new JMenu("REDUCE");
+        this.add(reduceMenu);
+
+        // Create a menu to run the selected version of REDUCE:
+        // Allow space in the title string for the submenu indicator.
+        JMenu runREDUCESubmenu = new JMenu("Run REDUCE...  ");
+        reduceMenu.add(runREDUCESubmenu);
+
+        for (RunREDUCECommand cmd : runREDUCECommands) {
+            JMenuItem item = new JMenuItem(cmd.version);
+            runREDUCESubmenu.add(item);
+            item.setToolTipText("Select a version of REDUCE and run it.");
+            item.addActionListener(e -> {
+                // Run REDUCE.  (A direct call hangs the GUI!)
+                SwingUtilities.invokeLater(cmd::run);
+                runREDUCESubmenu.setEnabled(false);
+            });
+        }
 
         /* ******************** *
          * The Preferences menu *

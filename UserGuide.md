@@ -138,6 +138,18 @@ selected file; otherwise, it overwrites any previous file content.
 This terminates both REDUCE and the Run-REDUCE GUI, as does the close
 widget at the top right-hand corner of the main window frame.
 
+## The REDUCE Menu
+
+The REDUCE menu provides the following items.
+
+### The Run REDUCE... Sub-menu
+
+This sub-menu provides an item for each configured version of REDUCE
+(based on different versions of Lisp, namely CSL, PSL and possibly
+others, such as versions of Common Lisp).  Clicking on a version of
+REDUCE runs it.  (Currently, no other version of REDUCE can be run
+without restarting Run-REDUCE.)
+
 ## The Preferences Menu
 
 The Preferences menu provides the following items.

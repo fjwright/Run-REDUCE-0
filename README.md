@@ -32,7 +32,6 @@ top-level directory.
 ### To do soon
 
 * Multiple tabs that each run an independent invocation of REDUCE.
-* Select REDUCE version to run.
 * Remember user choices, such as default REDUCE version, commands to
   run REDUCE, window configurations.
 

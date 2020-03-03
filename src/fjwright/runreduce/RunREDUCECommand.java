@@ -2,10 +2,7 @@ package fjwright.runreduce;
 
 import javax.swing.*;
 import java.io.*;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.prefs.Preferences;
@@ -13,33 +10,41 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * This class runs the REDUCE sub-process.
+ * This class defines a command to run REDUCE and checks that it is executable.
+ * The run method runs REDUCE as a sub-process.
  */
-class RunREDUCEProcess {
+class RunREDUCECommand {
+    String version; // e.g. "CSL" or "PSL"
+    String[] command; // absolute executable pathname followed by arguments
+
+    RunREDUCECommand(String version, String... command) {
+        this.version = version;
+        this.command = command;
+    }
+
+    // Merge this method into the constructor?
+    String[] buildCommand() {
+        if (FindREDUCE.reduceRootPath == null) FindREDUCE.findREDUCERootDir();
+        String[] command = new String[this.command.length];
+        // Replace a leading occurrence of $REDUCE/ in any element by reduceRootPath:
+        for (int i = 0; i < this.command.length; i++) {
+            String element = this.command[i];
+            if (element.startsWith("$REDUCE/"))
+                element = FindREDUCE.reduceRootPath.resolve(element.substring(8)).toString();
+            command[i] = element;
+        }
+        if (!Files.isExecutable(Paths.get(command[0]))) {
+            System.err.println("Fatal error: " + command[0] + " is not executable!");
+            System.exit(1);
+        }
+        return command;
+    }
+
     static PrintWriter reduceInputPrintWriter;
 
-    public static void reduce() {
-        if (FindREDUCE.reduceRootPath == null) FindREDUCE.findREDUCERootDir();
-        Path CSLRootPath = FindREDUCE.reduceRootPath.resolve("lib").resolve("csl");
-        if (!Files.isReadable(CSLRootPath)) {
-            System.err.println("Fatal error: CSL directory " + CSLRootPath + " does not exist!");
-            System.exit(1);
-        }
-        String[] CSLProcessBuilderArgs =
-                {CSLRootPath.resolve("reduce.exe").toString(), "--nogui"};
-
-        Path PSLRootPath = FindREDUCE.reduceRootPath.resolve("lib").resolve("psl");
-        if (!Files.isReadable(PSLRootPath)) {
-            System.err.println("Fatal error: PSL directory " + PSLRootPath + " does not exist!");
-            System.exit(1);
-        }
-        String[] PSLProcessBuilderArgs =
-                {PSLRootPath.resolve("psl").resolve("bpsl.exe").toString(),
-                        "-td", "1000", "-f",
-                        PSLRootPath.resolve("red").resolve("reduce.img").toString()};
-
+    void run() {
         try {
-            ProcessBuilder pb = new ProcessBuilder(CSLProcessBuilderArgs);
+            ProcessBuilder pb = new ProcessBuilder(buildCommand());
             pb.redirectErrorStream(true);
             // pb.redirectInput(ProcessBuilder.Redirect.INHERIT); // Works!
             Process p = pb.start();
@@ -55,10 +60,26 @@ class RunREDUCEProcess {
             outputGobbler.start();
 
         } catch (Exception exc) {
-//            exc.printStackTrace();
             System.err.println("Fatal error running REDUCE -- " + exc);
             System.exit(1);
         }
+    }
+}
+
+/*
+ * This class defines a list of commands to run different versions of REDUCE.
+ */
+class RunREDUCECommands extends ArrayList<RunREDUCECommand> {
+    RunREDUCECommands() {
+        // $REDUCE will be replaced by the root of the REDUCE installation
+        // before attempting to run REDUCE.
+        add(new RunREDUCECommand("CSL REDUCE",
+                "$REDUCE/lib/csl/reduce.exe",
+                "--nogui"));
+        add(new RunREDUCECommand("PSL REDUCE",
+                "$REDUCE/lib/psl/psl/bpsl.exe",
+                "-td", "1000", "-f",
+                "$REDUCE/lib/psl/red/reduce.img"));
     }
 }
 
