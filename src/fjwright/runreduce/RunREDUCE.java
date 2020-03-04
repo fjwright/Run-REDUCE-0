@@ -24,6 +24,9 @@ import java.util.List;
 public class RunREDUCE extends JPanel implements ActionListener {
     static JTextArea inputTextArea;
     static JTextArea outputTextArea;
+    // Use the logical Monospaced font for REDUCE I/O:
+    static Font reduceFont = new Font(Font.MONOSPACED, Font.PLAIN,
+            (int) FindREDUCE.prefs.getFloat("fontSize", 12));
     private final static String NEWLINE = "\n";
     private final static List<String> inputList = new ArrayList<>();
     private static int inputListIndex = 0;
@@ -34,9 +37,7 @@ public class RunREDUCE extends JPanel implements ActionListener {
 
         // Create the non-editable vertically-scrollable output text area:
         outputTextArea = new JTextArea();
-        Font font = outputTextArea.getFont().
-                deriveFont(FindREDUCE.prefs.getFloat("fontSize", 12));
-        outputTextArea.setFont(font);
+        outputTextArea.setFont(reduceFont);
         outputTextArea.setEditable(false);
         JScrollPane outputScrollPane = new JScrollPane(outputTextArea);
         JPanel outputPane = new JPanel(new BorderLayout(0, 3));
@@ -47,7 +48,7 @@ public class RunREDUCE extends JPanel implements ActionListener {
 
         // Create the editable vertically-scrollable input text area:
         inputTextArea = new JTextArea();
-        inputTextArea.setFont(font);
+        inputTextArea.setFont(reduceFont);
         JScrollPane inputScrollPane = new JScrollPane(inputTextArea);
         JPanel inputPane = new JPanel(new BorderLayout(0, 3));
         inputPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));

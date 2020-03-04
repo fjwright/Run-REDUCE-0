@@ -21,7 +21,7 @@ class RunREDUCEMenubar extends JMenuBar {
 
     static final JFileChooser fileChooser = new JFileChooser();
     static final FileNameExtensionFilter inputFileFilter =
-            new FileNameExtensionFilter("REDUCE Input Files (*.red, *.txt)", "red", "txt");
+            new FileNameExtensionFilter("REDUCE Input Files (*.red, *.tst, *.txt)", "red", "tst", "txt");
     static final FileNameExtensionFilter outputFileFilter =
             new FileNameExtensionFilter("REDUCE Output Files (*.rlg, *.txt)", "rlg", "txt");
     static final JCheckBox echoButton = new JCheckBox("Echo");

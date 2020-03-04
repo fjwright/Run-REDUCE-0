@@ -129,7 +129,6 @@ class FontSizeDialog extends JDialog implements ActionListener, ChangeListener {
     private JTextField currentSizeValueTextField;
     private JTextField newSizeDemoTextField;
     private JSpinner newSizeValueSpinner;
-    private Font currentFont;
     private Font newFont;
     private float newFontSize;
 
@@ -202,11 +201,10 @@ class FontSizeDialog extends JDialog implements ActionListener, ChangeListener {
     }
 
     void showDialog() {
-        currentFont = RunREDUCE.outputTextArea.getFont();
-        int currentSize = currentFont.getSize();
-        currentSizeDemoTextField.setFont(currentFont);
+        int currentSize = RunREDUCE.reduceFont.getSize();
+        currentSizeDemoTextField.setFont(RunREDUCE.reduceFont);
         currentSizeValueTextField.setText(String.valueOf(currentSize));
-        newSizeDemoTextField.setFont(currentFont);
+        newSizeDemoTextField.setFont(RunREDUCE.reduceFont);
         newSizeValueSpinner.setValue(currentSize);
         //Listen for changes on the spinner.
         newSizeValueSpinner.addChangeListener(this);
@@ -217,7 +215,7 @@ class FontSizeDialog extends JDialog implements ActionListener, ChangeListener {
 
     public void stateChanged(ChangeEvent e) {
         newFontSize = (int) newSizeValueSpinner.getValue();
-        newFont = currentFont.deriveFont(newFontSize);
+        newFont = RunREDUCE.reduceFont.deriveFont(newFontSize);
         newSizeDemoTextField.setFont(newFont);
         pack();
     }
@@ -225,6 +223,7 @@ class FontSizeDialog extends JDialog implements ActionListener, ChangeListener {
     public void actionPerformed(ActionEvent e) {
         // Update the font size
         if ("OK".equals(e.getActionCommand())) {
+            RunREDUCE.reduceFont = newFont;
             RunREDUCE.outputTextArea.setFont(newFont);
             RunREDUCE.inputTextArea.setFont(newFont);
             FindREDUCE.prefs.putFloat("fontSize", newFontSize);

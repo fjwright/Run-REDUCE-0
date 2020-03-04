@@ -95,13 +95,13 @@ The File menu provides the following items.
 
 This brings up a file selector dialogue that allows you to input one
 or more source code files into REDUCE using the REDUCE `IN` command.
-By default, the file selector only shows `*.red` and `*.txt` files,
-but you can reset it to show all files.  (Note that the recommended
-extension for REDUCE source files is `.red`.)  There is a check box
-labelled `Echo` on the right-hand side of the file window, which is
-selected by default.  Selecting this option causes file input to be
-echoed to the `Input/Output Display` pane.  (Note that a REDUCE source
-code file should end with `;end;` to avoid an error message.)
+By default, the file selector only shows `*.red`, `*.tst` and `*.txt`
+files, but you can reset it to show all files.  (Note that the
+recommended extension for REDUCE source files is `.red`.)  There is a
+check box labelled `Echo` on the right-hand side of the file window,
+which is selected by default.  Selecting this option causes file input
+to be echoed to the `Input/Output Display` pane.  (Note that a REDUCE
+source code file should end with `;end;` to avoid an error message.)
 
 ### Output to File...
 
