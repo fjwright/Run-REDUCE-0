@@ -31,6 +31,8 @@ class RunREDUCEMenubar extends JMenuBar {
     static LoadPackagesDialog loadPackagesDialog;
     static List<String> packageList;
     static RunREDUCECommands runREDUCECommands = new RunREDUCECommands();
+    static boolean autoRunState;
+    static String autoRunVersion;
     static FontSizeDialog fontSizeDialog;
 
     RunREDUCEMenubar(JFrame frame) {
@@ -200,11 +202,13 @@ class RunREDUCEMenubar extends JMenuBar {
         JMenu reduceMenu = new JMenu("REDUCE");
         this.add(reduceMenu);
 
+        autoRunState = FindREDUCE.prefs.getBoolean(FindREDUCE.AUTORUN, false);
+
         // Create a menu to run the selected version of REDUCE:
         // Allow space in the title string for the submenu indicator.
         JMenu runREDUCESubmenu = new JMenu("Run REDUCE...  ");
         reduceMenu.add(runREDUCESubmenu);
-
+        runREDUCESubmenu.setEnabled(!autoRunState);
         for (RunREDUCECommand cmd : runREDUCECommands) {
             JMenuItem item = new JMenuItem(cmd.version);
             runREDUCESubmenu.add(item);
@@ -215,6 +219,33 @@ class RunREDUCEMenubar extends JMenuBar {
                 runREDUCESubmenu.setEnabled(false);
             });
         }
+
+        JCheckBoxMenuItem autoRun = new JCheckBoxMenuItem("Auto-run REDUCE?");
+        reduceMenu.add(autoRun);
+        autoRun.setState(autoRunState);
+        autoRun.addItemListener(e -> {
+            autoRunState = autoRun.isSelected();
+            FindREDUCE.prefs.putBoolean(FindREDUCE.AUTORUN, autoRunState);
+            runREDUCESubmenu.setEnabled(!autoRunState);
+        });
+
+        // Create a menu to select the version of REDUCE to auto-run:
+        // Allow space in the title string for the submenu indicator.
+        JMenu autoRunREDUCESubmenu = new JMenu("Auto-run REDUCE...  ");
+        reduceMenu.add(autoRunREDUCESubmenu);
+        ButtonGroup autoRunButtonGroup = new ButtonGroup();
+        autoRunVersion = FindREDUCE.prefs.get(FindREDUCE.AUTORUNVERSION,
+                runREDUCECommands.get(0).version);
+        for (RunREDUCECommand cmd : runREDUCECommands) {
+            JRadioButtonMenuItem item = new JRadioButtonMenuItem(cmd.version);
+            if (autoRunVersion.equals(cmd.version)) item.setSelected(true);
+            autoRunREDUCESubmenu.add(item);
+            autoRunButtonGroup.add(item);
+            item.setToolTipText("Select a version of REDUCE to auto-run.");
+            item.addItemListener(e ->
+                    FindREDUCE.prefs.put(FindREDUCE.AUTORUNVERSION, cmd.version));
+        }
+
 
         /* ******************** *
          * The Preferences menu *
@@ -238,8 +269,8 @@ class RunREDUCEMenubar extends JMenuBar {
         JMenu helpMenu = new JMenu("Help");
         this.add(helpMenu);
 
-        // Create an About RunREDUCE item in the Help menu that pops up a dialogue:
-        JMenuItem aboutMenuItem = new JMenuItem("About RunREDUCE");
+        // Create an About Run-REDUCE item in the Help menu that pops up a dialogue:
+        JMenuItem aboutMenuItem = new JMenuItem("About Run-REDUCE");
         helpMenu.add(aboutMenuItem);
         aboutMenuItem.setToolTipText("Information about this app.");
         aboutMenuItem.addActionListener(e -> JOptionPane.showMessageDialog
@@ -247,7 +278,7 @@ class RunREDUCEMenubar extends JMenuBar {
                         new String[]{"Run CLI REDUCE in a Java Swing GUI.",
                                 "Prototype version 0.2",
                                 "Francis Wright, March 2020"},
-                        "About RunREDUCE",
+                        "About Run-REDUCE",
                         JOptionPane.PLAIN_MESSAGE));
     }
 }

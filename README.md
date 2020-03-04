@@ -4,14 +4,13 @@
 
 ### Francis Wright, March 2020
 
-This is the first prototype that does anything useful and my first
-ever GitHub repository, which is currently private.  I will make it
-public when I have developed it a bit further.
+This is the first public release of a very incomplete and unfinished
+prototype!
 
 This version uses the Java Swing library, but at some future date I
 will probably switch to using JavaFX.  Swing has the advantage that it
 is still a standard component of the latest Java SE SDK.  I am using
-Java 13 and the command line to compile and run.
+Java 13.
 
 This version only runs on Microsoft Windows, but I plan to add support
 for Linux.  (Whilst Java is portable, filesystem structures and
@@ -31,15 +30,18 @@ top-level directory.
 
 ### To do soon
 
+* Make the commands to run REDUCE configurable.
+* Remember all user choices, including commands to run REDUCE and
+  window configurations.
+* Support platforms other than Microsoft Windows, in particular Ubuntu
+  Linux.
 * Multiple tabs that each run an independent invocation of REDUCE.
-* Remember user choices, such as default REDUCE version, commands to
-  run REDUCE, window configurations.
 
 ### To do later
 
 * Typeset output supporting copy and paste. Could parse `off nat`
   output, or use it together with TeX or MathML output.
 * Merge input region into output region (maybe).
-* Integrated plotting support; maybe plots in a new tab or in a
-  horizontally split window (maybe).
+* Integrated plotting support, perhaps with plots in a new tab or in a
+  vertically split window (maybe).
 * A calculator-style interface option (maybe).

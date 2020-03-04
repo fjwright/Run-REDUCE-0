@@ -3,12 +3,16 @@
 ### Francis Wright, March 2020
 
 Run-REDUCE is an open-source Java GUI to run the REDUCE Computer
-Algebra System, which must be installed separately from
-[SourceForge](https://sourceforge.net/projects/reduce-algebra/).
-Run-REDUCE should find a normal REDUCE installation automatically.
+Algebra System, which must be obtained from
+[SourceForge](https://sourceforge.net/projects/reduce-algebra/) and
+installed separately.  Run-REDUCE should find a normal REDUCE
+installation automatically and not **require** any initial
+configuration.
 
 Run-REDUCE does **not** (yet) provide typeset-quality display of
 mathematical notation.
+
+Run-REDUCE currently runs only on Microsoft Windows.
 
 ## Installation
 
@@ -23,17 +27,33 @@ Run-REDUCE remembers user preferences and uses them the next time it
 runs.  It uses the standard Java package
 [java.util.prefs](https://docs.oracle.com/javase/8/docs/technotes/guides/preferences/),
 which stores data persistently in an implementation-dependent backing
-store.  For example, on Microsoft Windows, the preferences for this
-app are stored in the registry under the key
+store.  For example, on Microsoft Windows the preferences for this app
+are stored in the registry under the key
 `Computer\HKEY_CURRENT_USER\Software\JavaSoft\Prefs\fjwright\runreduce`.
+
+Run-REDUCE currently assumes a standard installation of REDUCE and
+uses commands based on that assumption to run REDUCE.  If the
+environment variable named `REDUCE` is set then Run-REDUCE uses its
+value as the root of the REDUCE installation; a final directory
+separator is optional.  On Microsoft Windows, you can use either a
+backward or a forward slash as directory separator and case is not
+significant.  For example, the following input to `cmd.exe` works
+(although it is unnecessary) if you have installed REDUCE on your `D`
+drive:
+
+`set REDUCE=D:/Program Files/Reduce`
+
+Otherwise, Run-REDUCE looks in the standard places for a REDUCE
+installation.  On Microsoft Windows, it looks for the folder `\Program
+Files\Reduce` on all accessible drives.
 
 ## The Main Window
 
 The main window consists of two panes one above the other.  The top
 pane displays a log of all the REDUCE input and output in the current
-session.  This pane is read-only.  The bottom pane is an input editor,
-which supports all the standard keyboard and mouse-based editing
-facilities normally provided by the platform.  Both panes display
+session.  This pane is read-only.  The bottom pane is an input editor
+that supports all the standard keyboard and mouse-based editing
+facilities normally provided by your platform.  Both panes display
 vertical and horizontal scroll bars when appropriate; text does not
 wrap.  The horizontal divider separating the two panes can be dragged
 up and down, and it can be moved all the way up or down by clicking on
@@ -43,8 +63,8 @@ You type (or paste) REDUCE input into the input editor pane, edit it
 as necessary, and then click on the `Send Input` button, which sends
 the input to REDUCE and echos it in the top pane.  This clears the
 input editor, but you can scroll through the previous input using the
-`Earlier Input` and `Later Input` buttons.  Previous input recalled
-into the input editor can be edited as necessary and then sent to
+`Earlier Input` and `Later Input` buttons.  You can edit previous
+input recalled into the input editor as necessary and then send it to
 REDUCE.  Input can be multi-line, in which case Run-REDUCE processes
 all the lines together.
 
@@ -53,10 +73,11 @@ all the lines together.
 Some items in this menu pop up a dialogue that allows you to select
 one or more items, such as filenames.  This dialog supports all the
 standard keyboard and mouse-based selection facilities normally
-provided by the platform.  In particular, holding the `Control` key
-down while clicking on an item selects or deselects it without
-affecting any other selections, and holding a `Shift` key down while
-clicking on an item extends the selection to that item.
+provided by your platform.  In particular, in dialogues that allow
+selection of multiple items, holding the `Control` key down while
+clicking on an item selects or deselects it without affecting any
+other selections, and holding a `Shift` key down while clicking on an
+item extends the selection to that item.
 
 Most of the menu items run a REDUCE command, which is echoed in the
 display pane but does not appear in the input editor.  The file
@@ -65,7 +86,8 @@ initially your home directory, but the last directory you used will be
 the default directory the next time you use a file selector dialogue.
 
 This default directory is independent of REDUCE's default directory,
-which is irrelevant because this GUI always uses absolute file paths.
+which is irrelevant because Run-REDUCE always uses absolute file
+paths.
 
 The File menu provides the following items.
 
@@ -74,21 +96,21 @@ The File menu provides the following items.
 This brings up a file selector dialogue that allows you to input one
 or more source code files into REDUCE using the REDUCE `IN` command.
 By default, the file selector only shows `*.red` and `*.txt` files,
-but you can reset it to show all files.  Note that the recommended
-extension for REDUCE source files is `.red`.  There is a check box
-labelled `Echo` on the right hand side of the file window, which is
+but you can reset it to show all files.  (Note that the recommended
+extension for REDUCE source files is `.red`.)  There is a check box
+labelled `Echo` on the right-hand side of the file window, which is
 selected by default.  Selecting this option causes file input to be
-echoed to the `Input/Output Display` pane.  Note that a REDUCE source
-code file should end with `;end;` to avoid an error message.
+echoed to the `Input/Output Display` pane.  (Note that a REDUCE source
+code file should end with `;end;` to avoid an error message.)
 
 ### Output to File...
 
 This brings up a file selector dialogue that allows you to send output
 to a file instead of the GUI using the REDUCE `OUT` command.  By
 default, the file selector only shows `*.rlg` and `*.txt` files, but
-you can reset it to show all files.  Note that the recommended
-extension for REDUCE output files is `.rlg`.  Only one output file can
-be selected at a time, but selecting a new output file redirects
+you can reset it to show all files.  (Note that the recommended
+extension for REDUCE output files is `.rlg`.)  Only one output file
+can be selected at a time, but selecting a new output file redirects
 output to that file without shutting the previous output file.  The
 GUI remember all the open output files to facilitate shutting them
 &ndash; see below.
@@ -103,7 +125,7 @@ output file using the REDUCE `OUT T` command.
 This item is inactive unless there are open output files, in which
 case it brings up a dialogue that allows you to select and shut one or
 more of the open output files using the REDUCE `SHUT` command.  It
-uses a special dialogue, not a file selector, that only shows open
+uses a special dialogue, not a file selector, and only shows open
 output files.
 
 ### Shut Last Output File
@@ -116,10 +138,10 @@ command.
 
 This item brings up a dialogue that allows you to select and load one
 or more REDUCE packages using the REDUCE `LOAD_PACKAGE` command.  It
-uses a special dialogue, not a file selector, that only shows standard
+uses a special dialogue, not a file selector, and only shows standard
 REDUCE packages, excluding those that are pre-loaded, sorted
 alphabetically.  Run-REDUCE determines the list of packages each time
-it start up by reading the `package.map` file in the REDUCE
+it starts up by reading the `package.map` file in the REDUCE
 installation directory.
 
 ### Save Session Log...
@@ -144,11 +166,22 @@ The REDUCE menu provides the following items.
 
 ### The Run REDUCE... Sub-menu
 
-This sub-menu provides an item for each configured version of REDUCE
-(based on different versions of Lisp, namely CSL, PSL and possibly
-others, such as versions of Common Lisp).  Clicking on a version of
-REDUCE runs it.  (Currently, no other version of REDUCE can be run
-without restarting Run-REDUCE.)
+This provides an item for each configured version of REDUCE (based on
+different versions of Lisp, namely CSL and PSL).  Clicking on a
+version of REDUCE runs it.  (Currently, another version of REDUCE
+cannot be run without restarting Run-REDUCE.)
+
+### The Auto-run REDUCE? Checkbox
+
+Selecting this option causes Run-REDUCE to run the selected version of
+REDUCE (see below) automatically when it starts.  Run-REDUCE remembers
+this option value and uses it the next time it runs.
+
+### The Auto-run REDUCE... Sub-menu
+
+This allows you to select the version of REDUCE to auto-run when
+auto-run is enabled.  Run-REDUCE remembers this selection and uses it
+the next time it runs.
 
 ## The Preferences Menu
 
@@ -156,15 +189,15 @@ The Preferences menu provides the following items.
 
 ## Font Size...
 
-This item brings up a dialogue that allows you to change the font size
-used in the `Input/Output Display` and `Input Editor` panes.  The
-selected size is remembered and will be used the next time Run-REDUCE
-runs.
+This brings up a dialogue box that allows you to change the font size
+used in the `Input/Output Display` and `Input Editor` panes.
+Run-REDUCE remembers the selected size and uses it the next time
+Run-REDUCE runs.
 
 ## The Help Menu
 
 The Help menu provides the following items.
 
-### About RunREDUCE
+### About Run-REDUCE
 
 This pops up a dialogue displaying brief information about Run-REDUCE.

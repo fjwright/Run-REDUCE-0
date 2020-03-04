@@ -120,12 +120,15 @@ class ReduceOutputThread extends Thread {
  * This class attempts to locate the REDUCE installation directory.
  */
 class FindREDUCE {
-    static String prefsNodeName = "/fjwright/runreduce";  // cf. package name
+    static Preferences prefs = Preferences.userRoot().node("/fjwright/runreduce");  // cf. package name
     // On Windows, the preferences for this app are stored in the registry under the key
     // Computer\HKEY_CURRENT_USER\Software\JavaSoft\Prefs\fjwright\runreduce
-    static Preferences prefs = Preferences.userRoot().node(prefsNodeName);
+
     // Preference keys for this package
     private static final String REDUCE_ROOT_DIR = "REDUCE_root_dir";
+    static final String AUTORUN = "autoRun";
+    static final String AUTORUNVERSION = "autoRunVersion";
+
     static Path reduceRootPath = null;
 
     static void findREDUCERootDir() {
@@ -141,8 +144,8 @@ class FindREDUCE {
             if (Files.exists(reduceRootPath)) return;
         }
 
-        if (!"Windows 10".equals(System.getProperty("os.name"))) {
-            System.err.println("Fatal error: Only Windows 10 currently supported!");
+        if (!System.getProperty("os.name").startsWith("Windows")) {
+            System.err.println("Fatal error: Only Microsoft Windows currently supported!");
             System.exit(1);
         }
         boolean reduceRootPathFound = false;

@@ -150,15 +150,20 @@ public class RunREDUCE extends JPanel implements ActionListener {
         // Give the input text area the initial focus:
         inputTextArea.requestFocusInWindow();
         frame.setVisible(true);
+
+        // Auto-run REDUCE if appropriate:
+        if (RunREDUCEMenubar.autoRunState)
+            for (RunREDUCECommand cmd : RunREDUCEMenubar.runREDUCECommands)
+                if (RunREDUCEMenubar.autoRunVersion.equals(cmd.version)) {
+                    // Run REDUCE.  (A direct call hangs the GUI!)
+                    SwingUtilities.invokeLater(cmd::run);
+                    break;
+                }
     }
 
     public static void main(String... args) {
         // Schedule jobs for the event-dispatching thread.
         // Create and show this application's GUI:
         SwingUtilities.invokeLater(RunREDUCE::createAndShowGUI);
-        // Auto-run REDUCE here if appropriate.
-        // Run REDUCE.  (A direct call hangs the GUI!)
-//        RunREDUCECommands runREDUCECommands = new RunREDUCECommands();
-//        SwingUtilities.invokeLater(runREDUCECommands.get(1)::run);
     }
 }
