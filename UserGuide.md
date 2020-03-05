@@ -16,10 +16,22 @@ Run-REDUCE currently runs only on Microsoft Windows.
 
 ## Installation
 
-Download the file
-[Run-REDUCE.jar](out/artifacts/Run_REDUCE_jar/Run-REDUCE.jar) and run
-it from the directory to which you downloaded it using the command
-`java -jar Run-REDUCE.jar`.
+You need to have a Java Runtime Environment, version 8 or later,
+installed.  If you don't already have this, you can install it from
+[java.com](java.com).  You also need to download the file
+`Run-REDUCE.jar` for the latest release and save it somewhere
+convenient, such as your home directory or the directory in which you
+store your REDUCE projects.  You can then run Run-REDUCE from this
+directory using the command `java -jar Run-REDUCE.jar`.  Here is a bit
+more detail of how to do this:
+
+### On Microsoft Windows
+
+Open File Explorer and navigate to the folder to which you downloaded
+`Run-REDUCE.jar`.  In the address bar, type `cmd` and then press the
+*Return* key.  This will open a Command Prompt window in the current
+folder.  Type (or copy and paste) the command `java -jar
+Run-REDUCE.jar` and then press the *Return* key.
 
 ## General Information
 

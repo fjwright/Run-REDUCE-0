@@ -4,8 +4,10 @@
 
 ### Francis Wright, March 2020
 
-This is the first public release of a very incomplete and unfinished
-prototype!
+This is the first release of a very incomplete prototype!
+
+For information about how to install and run Run-REDUCE please see the
+[User Guide](UserGuide.md).
 
 This version uses the Java Swing library, but at some future date I
 will probably switch to using JavaFX.  Swing has the advantage that it
