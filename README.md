@@ -11,8 +11,9 @@ For information about how to install and run Run-REDUCE please see the
 
 This version uses the Java Swing library, but at some future date I
 will probably switch to using JavaFX.  Swing has the advantage that it
-is still a standard component of the latest Java SE SDK.  I am using
-Java 13.
+is still a standard component of the latest Java SE SDK.  I am
+developing using Java 13, but compiling for Java 8 to support running
+a jar file using the latest readily available JRE.
 
 This version only runs on Microsoft Windows, but I plan to add support
 for Linux.  (Whilst Java is portable, filesystem structures and

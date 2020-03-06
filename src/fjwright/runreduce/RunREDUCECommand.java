@@ -135,7 +135,7 @@ class FindREDUCE {
         String reduce = prefs.get(REDUCE_ROOT_DIR, System.getenv("REDUCE"));
         if (reduce != null) {
             try {
-                reduceRootPath = Path.of(reduce);
+                reduceRootPath = Paths.get(reduce);
             } catch (InvalidPathException exc) {
                 System.err.println("Fatal error processing environment variable $REDUCE = " + reduce);
                 System.err.println(exc);
@@ -149,7 +149,7 @@ class FindREDUCE {
             System.exit(1);
         }
         boolean reduceRootPathFound = false;
-        Path targetPath = Path.of("Program Files", "Reduce");
+        Path targetPath = Paths.get("Program Files", "Reduce");
         for (Path root : FileSystems.getDefault().getRootDirectories()) {
             reduceRootPath = root.resolve(targetPath);
             if (Files.exists(reduceRootPath)) {

@@ -16,28 +16,37 @@ Run-REDUCE currently runs only on Microsoft Windows.
 
 ## Installation
 
-You need to have a Java Runtime Environment, version 8 or later,
+You need to have a Java Runtime Environment, version 8 (or later),
 installed.  If you don't already have this, you can install it from
-[java.com](java.com).  You also need to download the file
-`Run-REDUCE.jar` for the latest release and save it somewhere
-convenient, such as your home directory or the directory in which you
-store your REDUCE projects.  You can then run Run-REDUCE from this
-directory using the command `java -jar Run-REDUCE.jar`.  Here is a bit
-more detail of how to do this:
+[java.com](https://www.java.com/).  You also need to download the file
+`Run-REDUCE.jar` by clicking on the `release` tab on the GitHub
+project page, expanding `Assets`, clicking on `Run-REDUCE.jar` and
+saving it somewhere convenient, such as your home directory or the
+directory in which you store your REDUCE projects.  You should then be
+able to run Run-REDUCE as an executable file, e.g. by double-clicking
+on it.  Alternatively, you can run Run-REDUCE by executing the command
+
+    java -jar Run-REDUCE.jar
+
+in the directory containing the file.  Here is a
+bit more detail of how to do this:
 
 ### On Microsoft Windows
 
 Open File Explorer and navigate to the folder to which you downloaded
 `Run-REDUCE.jar`.  In the address bar, type `cmd` and then press the
 *Return* key.  This will open a Command Prompt window in the current
-folder.  Type (or copy and paste) the command `java -jar
-Run-REDUCE.jar` and then press the *Return* key.
+folder.  Type (or copy and paste) the command
+
+    java -jar Run-REDUCE.jar
+
+and then press the *Return* key.
 
 ## General Information
 
 Run-REDUCE remembers user preferences and uses them the next time it
 runs.  It uses the standard Java package
-[java.util.prefs](https://docs.oracle.com/javase/8/docs/technotes/guides/preferences/),
+[java.util.prefs](https://docs.oracle.com/en/java/javase/13/docs/api/java.prefs/java/util/prefs/package-summary.html),
 which stores data persistently in an implementation-dependent backing
 store.  For example, on Microsoft Windows the preferences for this app
 are stored in the registry under the key
@@ -53,7 +62,7 @@ significant.  For example, the following input to `cmd.exe` works
 (although it is unnecessary) if you have installed REDUCE on your `D`
 drive:
 
-`set REDUCE=D:/Program Files/Reduce`
+    set REDUCE=D:/Program Files/Reduce
 
 Otherwise, Run-REDUCE looks in the standard places for a REDUCE
 installation.  On Microsoft Windows, it looks for the folder `\Program
