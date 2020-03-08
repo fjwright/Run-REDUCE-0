@@ -111,6 +111,10 @@ input recalled into the input editor as necessary and then send it to
 REDUCE.  Input can be multi-line, in which case Run-REDUCE processes
 all the lines together.
 
+Sending input to REDUCE strips any trailing white space, adds a
+semicolon if there was no final terminator, and then adds a final
+newline.
+
 ## The File Menu
 
 Some items in this menu pop up a dialogue that allows you to select

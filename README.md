@@ -53,3 +53,4 @@ top-level directory.
 ## Release Notes: Updates since v0.2
 
 * Initial (inelegant) support for Ubuntu Linux.
+* Add a semicolon to the end of input if there is no terminator.

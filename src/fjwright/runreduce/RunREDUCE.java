@@ -27,7 +27,6 @@ public class RunREDUCE extends JPanel implements ActionListener {
     // Use the logical Monospaced font for REDUCE I/O:
     static Font reduceFont = new Font(Font.MONOSPACED, Font.PLAIN,
             (int) FindREDUCE.prefs.getFloat("fontSize", 12));
-    private final static String NEWLINE = "\n";
     private final static List<String> inputList = new ArrayList<>();
     private static int inputListIndex = 0;
     private static int maxInputListIndex = 0;
@@ -71,7 +70,7 @@ public class RunREDUCE extends JPanel implements ActionListener {
         JButton sendButton = new JButton("Send Input");
         sendButton.setActionCommand("Send");
         sendButton.addActionListener(this);
-        sendButton.setToolTipText("Send the input above to REDUCE. It is terminated with a newline if necessary.");
+        sendButton.setToolTipText("Send the input above to REDUCE, adding a semicolon and/or newline if necessary.");
         JButton laterButton = new JButton("\u25bc Later Input");
         laterButton.setActionCommand("Later");
         laterButton.addActionListener(this);
@@ -119,7 +118,12 @@ public class RunREDUCE extends JPanel implements ActionListener {
     }
 
     static void sendStringToREDUCE(String text) {
-        if (!text.endsWith(NEWLINE)) text += NEWLINE;
+        int i;
+        char c = 0;
+        for (i = text.length() - 1; i > 0 && Character.isWhitespace(c = text.charAt(i)); i--) ;
+        text = text.substring(0, i + 1);
+        if (c == ';' || c == '$') text += "\n";
+        else text += ";\n";
         outputTextArea.append(text);
         // Make sure the new input text is visible, even if there was
         // a selection in the output text area:
