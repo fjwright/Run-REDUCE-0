@@ -3,44 +3,62 @@
 ### Francis Wright, March 2020
 
 Run-REDUCE is an open-source Java GUI to run the REDUCE Computer
-Algebra System, which must be obtained from
+Algebra System.  REDUCE must be obtained from
 [SourceForge](https://sourceforge.net/projects/reduce-algebra/) and
-installed separately.  Run-REDUCE should find a normal REDUCE
+installed separately.  Run-REDUCE should find a standard REDUCE
 installation automatically and not **require** any initial
 configuration.
 
 Run-REDUCE does **not** (yet) provide typeset-quality display of
 mathematical notation.
 
-Run-REDUCE currently runs only on Microsoft Windows.
+Run-REDUCE currently runs on Microsoft Windows and Ubuntu Linux.  It
+may run on other platforms, in particular other versions of Linux that
+are similar to Ubuntu, but I can only test on 64-bit Windows 10 and
+Ubuntu 18.
 
-## Installation
+## Install and Run
 
-You need to have a Java Runtime Environment, version 8 (or later),
-installed.  If you don't already have this, you can install it from
-[java.com](https://www.java.com/).  You also need to download the file
-`Run-REDUCE.jar` by clicking on the `release` tab on the GitHub
-project page, expanding `Assets`, clicking on `Run-REDUCE.jar` and
-saving it somewhere convenient, such as your home directory or the
+You need to have a Java Runtime Environment (JRE), version 8 (or
+later), installed.  You also need to download the file
+`Run-REDUCE.jar`.  To do this, click on the `release` tab on the
+GitHub project page, expand `Assets`, then click on `Run-REDUCE.jar`
+and save it somewhere convenient, such as your home directory or the
 directory in which you store your REDUCE projects.  You should then be
 able to run Run-REDUCE as an executable file, e.g. by double-clicking
-on it.  Alternatively, you can run Run-REDUCE by executing the command
+on it.  Alternatively, you can run Run-REDUCE by executing the shell
+command
 
     java -jar Run-REDUCE.jar
 
-in the directory containing the file.  Here is a
-bit more detail of how to do this:
+in the directory containing the file.  This approach has the advantage
+that any error messages will be displayed in the shell window.
+
+Here is a bit more detail:
 
 ### On Microsoft Windows
 
-Open File Explorer and navigate to the folder to which you downloaded
+You can install a suitable JRE from [java.com](https://www.java.com/).
+
+An easy way to run Run-REDUCE using a shell command is first to open
+File Explorer and navigate to the folder to which you downloaded
 `Run-REDUCE.jar`.  In the address bar, type `cmd` and then press the
 *Return* key.  This will open a Command Prompt window in the current
-folder.  Type (or copy and paste) the command
+folder.
 
-    java -jar Run-REDUCE.jar
+### On Ubuntu Linux
 
-and then press the *Return* key.
+You can install a suitable JRE by opening a terminal window and
+executing the command
+
+    sudo apt install openjdk-8-jre
+
+If you set `Run-REDUCE.jar` to be executable then you should be able
+to run Run-REDUCE as an executable file, e.g. by double-clicking on
+it.  An easy way to run Run-REDUCE using a shell command is first to
+open Files and navigate to the directory to which you downloaded
+`Run-REDUCE.jar`.  Right-click on this directory and select `Open in
+Terminal`.
 
 ## General Information
 
@@ -48,9 +66,11 @@ Run-REDUCE remembers user preferences and uses them the next time it
 runs.  It uses the standard Java package
 [java.util.prefs](https://docs.oracle.com/en/java/javase/13/docs/api/java.prefs/java/util/prefs/package-summary.html),
 which stores data persistently in an implementation-dependent backing
-store.  For example, on Microsoft Windows the preferences for this app
-are stored in the registry under the key
-`Computer\HKEY_CURRENT_USER\Software\JavaSoft\Prefs\fjwright\runreduce`.
+store.  For example, on Microsoft Windows the preferences for this
+application are stored in the registry under the key
+`Computer\HKEY_CURRENT_USER\Software\JavaSoft\Prefs\fjwright\runreduce`
+and on Ubuntu Linux they are stored in the XML file
+`~/.java/.userPrefs/fjwright/runreduce/prefs.xml`.
 
 Run-REDUCE currently assumes a standard installation of REDUCE and
 uses commands based on that assumption to run REDUCE.  If the
@@ -65,8 +85,10 @@ drive:
     set REDUCE=D:/Program Files/Reduce
 
 Otherwise, Run-REDUCE looks in the standard places for a REDUCE
-installation.  On Microsoft Windows, it looks for the folder `\Program
-Files\Reduce` on all accessible drives.
+installation.  On Microsoft Windows it looks for the folder `\Program
+Files\Reduce` on all accessible drives.  On Ubuntu Linux it assumes
+that package information is under `/usr/share/reduce` and executable
+files are under `/usr/lib/reduce`.
 
 ## The Main Window
 

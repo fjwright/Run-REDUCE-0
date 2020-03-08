@@ -33,11 +33,12 @@ top-level directory.
 
 ### To do soon
 
+* Support redfront font colouring to distinguish input and output in
+  the IO display pane.
 * Make the commands to run REDUCE configurable.
 * Remember all user choices, including commands to run REDUCE and
   window configurations.
-* Support platforms other than Microsoft Windows, in particular Ubuntu
-  Linux.
+* Better scrolling facilities in the IO display pane.
 * Multiple tabs that each run an independent invocation of REDUCE.
 
 ### To do later
@@ -48,3 +49,7 @@ top-level directory.
 * Integrated plotting support, perhaps with plots in a new tab or in a
   vertically split window (maybe).
 * A calculator-style interface option (maybe).
+
+## Release Notes: Updates since v0.2
+
+* Initial (inelegant) support for Ubuntu Linux.
