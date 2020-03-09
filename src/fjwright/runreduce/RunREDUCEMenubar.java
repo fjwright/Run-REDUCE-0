@@ -2,6 +2,8 @@ package fjwright.runreduce;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.StyleConstants;
+import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +34,7 @@ class RunREDUCEMenubar extends JMenuBar {
     static List<String> packageList;
     static RunREDUCECommands runREDUCECommands = new RunREDUCECommands();
     static boolean autoRunState;
+    static boolean colouredIOState;
     static String autoRunVersion;
     static FontSizeDialog fontSizeDialog;
 
@@ -182,7 +185,7 @@ class RunREDUCEMenubar extends JMenuBar {
                 File file = fileChooser.getSelectedFile();
                 try (Writer out = new BufferedWriter
                         (new FileWriter(file, appendButton.isSelected()))) {
-                    RunREDUCE.outputTextArea.write(out);
+                    RunREDUCE.outputTextPane.write(out);
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
                 }
@@ -203,6 +206,7 @@ class RunREDUCEMenubar extends JMenuBar {
         this.add(reduceMenu);
 
         autoRunState = FindREDUCE.prefs.getBoolean(FindREDUCE.AUTORUN, false);
+        colouredIOState = FindREDUCE.prefs.getBoolean(FindREDUCE.COLOUREDIO, false);
 
         // Create a menu to run the selected version of REDUCE:
         // Allow space in the title string for the submenu indicator.
@@ -260,6 +264,22 @@ class RunREDUCEMenubar extends JMenuBar {
         fontSizeMenuItem.addActionListener(e -> {
             if (fontSizeDialog == null) fontSizeDialog = new FontSizeDialog(frame);
             fontSizeDialog.showDialog();
+        });
+
+        JCheckBoxMenuItem colouredIO = new JCheckBoxMenuItem("Coloured I/O?");
+        preferencesMenu.add(colouredIO);
+        colouredIO.setToolTipText("Use redfront-style red input and blue output?");
+        colouredIO.setState(colouredIOState);
+        colouredIO.addItemListener(e -> {
+            colouredIOState = colouredIO.isSelected();
+            FindREDUCE.prefs.putBoolean(FindREDUCE.COLOUREDIO, colouredIOState);
+            if (colouredIOState) {
+                StyleConstants.setForeground(RunREDUCE.inputSimpleAttributeSet, Color.red);
+                StyleConstants.setForeground(ReduceOutputThread.outputSimpleAttributeSet, Color.blue);
+            } else {
+                StyleConstants.setForeground(RunREDUCE.inputSimpleAttributeSet, Color.black);
+                StyleConstants.setForeground(ReduceOutputThread.outputSimpleAttributeSet, Color.black);
+            }
         });
 
 

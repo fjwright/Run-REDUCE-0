@@ -12,6 +12,9 @@
 package fjwright.runreduce;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -23,22 +26,23 @@ import java.util.List;
  */
 public class RunREDUCE extends JPanel implements ActionListener {
     static JTextArea inputTextArea;
-    static JTextArea outputTextArea;
+    static JTextPane outputTextPane;
     // Use the logical Monospaced font for REDUCE I/O:
     static Font reduceFont = new Font(Font.MONOSPACED, Font.PLAIN,
             (int) FindREDUCE.prefs.getFloat("fontSize", 12));
     private final static List<String> inputList = new ArrayList<>();
     private static int inputListIndex = 0;
     private static int maxInputListIndex = 0;
+    static SimpleAttributeSet inputSimpleAttributeSet = new SimpleAttributeSet();
 
     public RunREDUCE() {
         super(new BorderLayout()); // JPanel defaults to FlowLayout!
 
         // Create the non-editable vertically-scrollable output text area:
-        outputTextArea = new JTextArea();
-        outputTextArea.setFont(reduceFont);
-        outputTextArea.setEditable(false);
-        JScrollPane outputScrollPane = new JScrollPane(outputTextArea);
+        outputTextPane = new JTextPane();
+        outputTextPane.setFont(reduceFont);
+        outputTextPane.setEditable(false);
+        JScrollPane outputScrollPane = new JScrollPane(outputTextPane);
         JPanel outputPane = new JPanel(new BorderLayout(0, 3));
         outputPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         JLabel outputLabel = new JLabel("Input/Output Display");
@@ -118,17 +122,24 @@ public class RunREDUCE extends JPanel implements ActionListener {
     }
 
     static void sendStringToREDUCE(String text) {
+        // Strip trailing white space and ensure the input end with a terminator:
         int i;
         char c = 0;
         for (i = text.length() - 1; i > 0 && Character.isWhitespace(c = text.charAt(i)); i--) ;
         text = text.substring(0, i + 1);
         if (c == ';' || c == '$') text += "\n";
         else text += ";\n";
-        outputTextArea.append(text);
+
+        StyledDocument styledDoc = outputTextPane.getStyledDocument();
+        try {
+            styledDoc.insertString(styledDoc.getLength(), text, inputSimpleAttributeSet);
+        } catch (BadLocationException exc) {
+            exc.printStackTrace();
+        }
         // Make sure the new input text is visible, even if there was
         // a selection in the output text area:
-        outputTextArea.setCaretPosition
-                (outputTextArea.getDocument().getLength());
+        outputTextPane.setCaretPosition(styledDoc.getLength());
+
         // Send the input to the REDUCE input pipe:
         RunREDUCECommand.reduceInputPrintWriter.print(text);
         RunREDUCECommand.reduceInputPrintWriter.flush();

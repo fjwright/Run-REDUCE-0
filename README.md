@@ -33,8 +33,6 @@ top-level directory.
 
 ### To do soon
 
-* Support redfront font colouring to distinguish input and output in
-  the IO display pane.
 * Make the commands to run REDUCE configurable.
 * Remember all user choices, including commands to run REDUCE and
   window configurations.
@@ -54,3 +52,5 @@ top-level directory.
 
 * Initial (inelegant) support for Ubuntu Linux.
 * Add a semicolon to the end of input if there is no terminator.
+* Support redfront font colouring to distinguish input and output in
+  the IO display pane.

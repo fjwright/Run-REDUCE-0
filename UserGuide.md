@@ -241,6 +241,11 @@ used in the `Input/Output Display` and `Input Editor` panes.
 Run-REDUCE remembers the selected size and uses it the next time
 Run-REDUCE runs.
 
+## Coloured I/O? Checkbox
+
+Selecting this option causes Run-REDUCE to use redfront-style text
+colouring with red input and blue output.
+
 ## The Help Menu
 
 The Help menu provides the following items.

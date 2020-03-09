@@ -1,6 +1,8 @@
 package fjwright.runreduce;
 
 import javax.swing.*;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyledDocument;
 import java.io.*;
 import java.nio.file.*;
 import java.util.ArrayList;
@@ -64,7 +66,7 @@ class RunREDUCECommand {
             // Start a thread to handle the REDUCE output stream
             // (assigned to a global variable):
             ReduceOutputThread outputGobbler = new
-                    ReduceOutputThread(p.getInputStream(), RunREDUCE.outputTextArea);
+                    ReduceOutputThread(p.getInputStream(), RunREDUCE.outputTextPane);
             outputGobbler.start();
 
         } catch (Exception exc) {
@@ -116,26 +118,27 @@ class RunREDUCECommandDefaults extends ArrayList<RunREDUCECommand> {
  */
 class ReduceOutputThread extends Thread {
     InputStream input;        // REDUCE pipe output (buffered)
-    JTextArea outputTextArea; // GUI output pane
+    JTextPane outputTextPane; // GUI output pane
+    static SimpleAttributeSet outputSimpleAttributeSet = new SimpleAttributeSet();
 
-    ReduceOutputThread(InputStream input, JTextArea outputTextArea) {
+    ReduceOutputThread(InputStream input, JTextPane outputTextPane) {
         this.input = input;
-        this.outputTextArea = outputTextArea;
+        this.outputTextPane = outputTextPane;
     }
 
     public void run() {
+        StyledDocument styledDoc = outputTextPane.getStyledDocument();
         // Must output characters rather than lines so that prompt appears!
         try (InputStreamReader isr = new InputStreamReader(input);
              BufferedReader br = new BufferedReader(isr)) {
             int c;
             for (; ; ) {
                 if (!br.ready()) {
-                    outputTextArea.setCaretPosition
-                            (outputTextArea.getDocument().getLength());
+                    outputTextPane.setCaretPosition(styledDoc.getLength());
                     Thread.sleep(10);
                 } else if ((c = br.read()) != -1) {
                     if ((char) c != '\r') // ignore CRs
-                        outputTextArea.append(String.valueOf((char) c));
+                        styledDoc.insertString(styledDoc.getLength(), String.valueOf((char) c), outputSimpleAttributeSet);
                 } else break;
             }
         } catch (Exception exc) {
@@ -156,6 +159,7 @@ class FindREDUCE {
     private static final String REDUCE_ROOT_DIR = "REDUCE_root_dir";
     static final String AUTORUN = "autoRun";
     static final String AUTORUNVERSION = "autoRunVersion";
+    static final String COLOUREDIO = "colouredIOState";
 
     static boolean windowsOS = System.getProperty("os.name").startsWith("Windows");
     static Path reduceRootPath = null;
