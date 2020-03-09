@@ -205,9 +205,6 @@ class RunREDUCEMenubar extends JMenuBar {
         JMenu reduceMenu = new JMenu("REDUCE");
         this.add(reduceMenu);
 
-        autoRunState = FindREDUCE.prefs.getBoolean(FindREDUCE.AUTORUN, false);
-        colouredIOState = FindREDUCE.prefs.getBoolean(FindREDUCE.COLOUREDIO, false);
-
         // Create a menu to run the selected version of REDUCE:
         // Allow space in the title string for the submenu indicator.
         JMenu runREDUCESubmenu = new JMenu("Run REDUCE...  ");
@@ -226,6 +223,7 @@ class RunREDUCEMenubar extends JMenuBar {
 
         JCheckBoxMenuItem autoRun = new JCheckBoxMenuItem("Auto-run REDUCE?");
         reduceMenu.add(autoRun);
+        autoRunState = FindREDUCE.prefs.getBoolean(FindREDUCE.AUTORUN, false);
         autoRun.setState(autoRunState);
         autoRun.addItemListener(e -> {
             autoRunState = autoRun.isSelected();
@@ -269,17 +267,15 @@ class RunREDUCEMenubar extends JMenuBar {
         JCheckBoxMenuItem colouredIO = new JCheckBoxMenuItem("Coloured I/O?");
         preferencesMenu.add(colouredIO);
         colouredIO.setToolTipText("Use redfront-style red input and blue output?");
+        colouredIOState = FindREDUCE.prefs.getBoolean(FindREDUCE.COLOUREDIO, false);
+        StyleConstants.setForeground(RunREDUCE.inputSimpleAttributeSet, colouredIOState ? Color.red : null);
+        StyleConstants.setForeground(ReduceOutputThread.outputSimpleAttributeSet, colouredIOState ? Color.blue : null);
         colouredIO.setState(colouredIOState);
         colouredIO.addItemListener(e -> {
             colouredIOState = colouredIO.isSelected();
             FindREDUCE.prefs.putBoolean(FindREDUCE.COLOUREDIO, colouredIOState);
-            if (colouredIOState) {
-                StyleConstants.setForeground(RunREDUCE.inputSimpleAttributeSet, Color.red);
-                StyleConstants.setForeground(ReduceOutputThread.outputSimpleAttributeSet, Color.blue);
-            } else {
-                StyleConstants.setForeground(RunREDUCE.inputSimpleAttributeSet, Color.black);
-                StyleConstants.setForeground(ReduceOutputThread.outputSimpleAttributeSet, Color.black);
-            }
+            StyleConstants.setForeground(RunREDUCE.inputSimpleAttributeSet, colouredIOState ? Color.red : null);
+            StyleConstants.setForeground(ReduceOutputThread.outputSimpleAttributeSet, colouredIOState ? Color.blue : null);
         });
 
 

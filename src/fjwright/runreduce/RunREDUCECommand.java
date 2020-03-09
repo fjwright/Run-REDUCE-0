@@ -128,17 +128,22 @@ class ReduceOutputThread extends Thread {
 
     public void run() {
         StyledDocument styledDoc = outputTextPane.getStyledDocument();
+        StringBuilder text = new StringBuilder();
         // Must output characters rather than lines so that prompt appears!
         try (InputStreamReader isr = new InputStreamReader(input);
              BufferedReader br = new BufferedReader(isr)) {
             int c;
             for (; ; ) {
                 if (!br.ready()) {
-                    outputTextPane.setCaretPosition(styledDoc.getLength());
+                    if (text.length() > 0) {
+                        styledDoc.insertString(styledDoc.getLength(), text.toString(), outputSimpleAttributeSet);
+                        text.setLength(0);
+                        outputTextPane.setCaretPosition(styledDoc.getLength());
+                    }
                     Thread.sleep(10);
                 } else if ((c = br.read()) != -1) {
                     if ((char) c != '\r') // ignore CRs
-                        styledDoc.insertString(styledDoc.getLength(), String.valueOf((char) c), outputSimpleAttributeSet);
+                        text.append((char) c);
                 } else break;
             }
         } catch (Exception exc) {
