@@ -28,12 +28,12 @@ public class RunREDUCE extends JPanel implements ActionListener {
     static JTextArea inputTextArea;
     static JTextPane outputTextPane;
     // Use the logical Monospaced font for REDUCE I/O:
-    static Font reduceFont = new Font(Font.MONOSPACED, Font.PLAIN,
-            (int) FindREDUCE.prefs.getFloat("fontSize", 12));
+    static Font reduceFont = new Font(Font.MONOSPACED, Font.PLAIN, RunREDUCEPrefs.fontSize);
     private final static List<String> inputList = new ArrayList<>();
     private static int inputListIndex = 0;
     private static int maxInputListIndex = 0;
     static SimpleAttributeSet inputSimpleAttributeSet = new SimpleAttributeSet();
+    static RunREDUCECommands runREDUCECommands = new RunREDUCECommands();
 
     public RunREDUCE() {
         super(new BorderLayout()); // JPanel defaults to FlowLayout!
@@ -168,9 +168,9 @@ public class RunREDUCE extends JPanel implements ActionListener {
         frame.setVisible(true);
 
         // Auto-run REDUCE if appropriate:
-        if (RunREDUCEMenubar.autoRunState)
-            for (RunREDUCECommand cmd : RunREDUCEMenubar.runREDUCECommands)
-                if (RunREDUCEMenubar.autoRunVersion.equals(cmd.version)) {
+        if (RunREDUCEPrefs.autoRunState)
+            for (RunREDUCECommand cmd : runREDUCECommands)
+                if (RunREDUCEPrefs.autoRunVersion.equals(cmd.version)) {
                     // Run REDUCE.  (A direct call hangs the GUI!)
                     SwingUtilities.invokeLater(cmd::run);
                     break;

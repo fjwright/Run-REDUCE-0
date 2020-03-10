@@ -7,7 +7,6 @@ import java.io.*;
 import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -81,35 +80,7 @@ class RunREDUCECommand {
  */
 class RunREDUCECommands extends ArrayList<RunREDUCECommand> {
     RunREDUCECommands() {
-        super(new RunREDUCECommandDefaults());
-    }
-}
-
-class RunREDUCECommandDefaults extends ArrayList<RunREDUCECommand> {
-    RunREDUCECommandDefaults() {
-        // $REDUCE will be replaced by the root of the REDUCE installation
-        // before attempting to run REDUCE.
-        if (FindREDUCE.windowsOS) {
-            add(new RunREDUCECommand("CSL REDUCE",
-                    null,
-                    "$REDUCE/lib/csl/reduce.exe",
-                    "--nogui"));
-            add(new RunREDUCECommand("PSL REDUCE",
-                    null,
-                    "$REDUCE/lib/psl/psl/bpsl.exe",
-                    "-td", "1000", "-f",
-                    "$REDUCE/lib/psl/red/reduce.img"));
-        } else {
-            add(new RunREDUCECommand("CSL REDUCE",
-                    "/usr/lib/reduce",
-                    "$REDUCE/cslbuild/csl/reduce",
-                    "--nogui"));
-            add(new RunREDUCECommand("PSL REDUCE",
-                    "/usr/lib/reduce",
-                    "$REDUCE/pslbuild/psl/bpsl",
-                    "-td", "1000", "-f",
-                    "$REDUCE/pslbuild/red/reduce.img"));
-        }
+        super(RunREDUCEPrefs.runREDUCECommandDefaults);
     }
 }
 
@@ -156,21 +127,10 @@ class ReduceOutputThread extends Thread {
  * This class attempts to locate the REDUCE installation directory.
  */
 class FindREDUCE {
-    static Preferences prefs = Preferences.userRoot().node("/fjwright/runreduce");  // cf. package name
-    // On Windows, the preferences for this app are stored in the registry under the key
-    // Computer\HKEY_CURRENT_USER\Software\JavaSoft\Prefs\fjwright\runreduce
-
-    // Preference keys for this package
-    private static final String REDUCE_ROOT_DIR = "REDUCE_root_dir";
-    static final String AUTORUN = "autoRun";
-    static final String AUTORUNVERSION = "autoRunVersion";
-    static final String COLOUREDIO = "colouredIOState";
-
-    static boolean windowsOS = System.getProperty("os.name").startsWith("Windows");
     static Path reduceRootPath = null;
 
     static void findREDUCERootDir() {
-        String reduce = prefs.get(REDUCE_ROOT_DIR, System.getenv("REDUCE"));
+        String reduce = RunREDUCEPrefs.reduceRootDir;
         if (reduce != null) {
             try {
                 reduceRootPath = Paths.get(reduce);
@@ -208,7 +168,7 @@ class REDUCEPackageList extends ArrayList<String> {
 
     REDUCEPackageList() {
         Path reducePackagesRootPath;
-        if (FindREDUCE.windowsOS) {
+        if (RunREDUCEPrefs.windowsOS) {
             // On Windows, packages is in "/Program Files/Reduce".
             if (FindREDUCE.reduceRootPath == null) FindREDUCE.findREDUCERootDir();
             reducePackagesRootPath = FindREDUCE.reduceRootPath;

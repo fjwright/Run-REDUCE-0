@@ -226,7 +226,7 @@ class FontSizeDialog extends JDialog implements ActionListener, ChangeListener {
             RunREDUCE.reduceFont = newFont;
             RunREDUCE.outputTextPane.setFont(newFont);
             RunREDUCE.inputTextArea.setFont(newFont);
-            FindREDUCE.prefs.putFloat("fontSize", newFontSize);
+            RunREDUCEPrefs.save(RunREDUCEPrefs.FONTSIZE, newFontSize);
         }
         setVisible(false);
     }

@@ -32,10 +32,6 @@ class RunREDUCEMenubar extends JMenuBar {
     static final List<File> outputFileList = new ArrayList<>();
     static LoadPackagesDialog loadPackagesDialog;
     static List<String> packageList;
-    static RunREDUCECommands runREDUCECommands = new RunREDUCECommands();
-    static boolean autoRunState;
-    static boolean colouredIOState;
-    static String autoRunVersion;
     static FontSizeDialog fontSizeDialog;
 
     RunREDUCEMenubar(JFrame frame) {
@@ -209,8 +205,8 @@ class RunREDUCEMenubar extends JMenuBar {
         // Allow space in the title string for the submenu indicator.
         JMenu runREDUCESubmenu = new JMenu("Run REDUCE...  ");
         reduceMenu.add(runREDUCESubmenu);
-        runREDUCESubmenu.setEnabled(!autoRunState);
-        for (RunREDUCECommand cmd : runREDUCECommands) {
+        runREDUCESubmenu.setEnabled(!RunREDUCEPrefs.autoRunState);
+        for (RunREDUCECommand cmd : RunREDUCE.runREDUCECommands) {
             JMenuItem item = new JMenuItem(cmd.version);
             runREDUCESubmenu.add(item);
             item.setToolTipText("Select a version of REDUCE and run it.");
@@ -223,12 +219,11 @@ class RunREDUCEMenubar extends JMenuBar {
 
         JCheckBoxMenuItem autoRun = new JCheckBoxMenuItem("Auto-run REDUCE?");
         reduceMenu.add(autoRun);
-        autoRunState = FindREDUCE.prefs.getBoolean(FindREDUCE.AUTORUN, false);
-        autoRun.setState(autoRunState);
+        autoRun.setState(RunREDUCEPrefs.autoRunState);
         autoRun.addItemListener(e -> {
-            autoRunState = autoRun.isSelected();
-            FindREDUCE.prefs.putBoolean(FindREDUCE.AUTORUN, autoRunState);
-            runREDUCESubmenu.setEnabled(!autoRunState);
+            RunREDUCEPrefs.autoRunState = autoRun.isSelected();
+            RunREDUCEPrefs.save(RunREDUCEPrefs.AUTORUN);
+            runREDUCESubmenu.setEnabled(!RunREDUCEPrefs.autoRunState);
         });
 
         // Create a menu to select the version of REDUCE to auto-run:
@@ -236,16 +231,14 @@ class RunREDUCEMenubar extends JMenuBar {
         JMenu autoRunREDUCESubmenu = new JMenu("Auto-run REDUCE...  ");
         reduceMenu.add(autoRunREDUCESubmenu);
         ButtonGroup autoRunButtonGroup = new ButtonGroup();
-        autoRunVersion = FindREDUCE.prefs.get(FindREDUCE.AUTORUNVERSION,
-                runREDUCECommands.get(0).version);
-        for (RunREDUCECommand cmd : runREDUCECommands) {
+        for (RunREDUCECommand cmd : RunREDUCE.runREDUCECommands) {
             JRadioButtonMenuItem item = new JRadioButtonMenuItem(cmd.version);
-            if (autoRunVersion.equals(cmd.version)) item.setSelected(true);
+            if (RunREDUCEPrefs.autoRunVersion.equals(cmd.version)) item.setSelected(true);
             autoRunREDUCESubmenu.add(item);
             autoRunButtonGroup.add(item);
             item.setToolTipText("Select a version of REDUCE to auto-run.");
             item.addItemListener(e ->
-                    FindREDUCE.prefs.put(FindREDUCE.AUTORUNVERSION, cmd.version));
+                    RunREDUCEPrefs.save(RunREDUCEPrefs.AUTORUNVERSION, cmd.version));
         }
 
 
@@ -267,15 +260,12 @@ class RunREDUCEMenubar extends JMenuBar {
         JCheckBoxMenuItem colouredIO = new JCheckBoxMenuItem("Coloured I/O?");
         preferencesMenu.add(colouredIO);
         colouredIO.setToolTipText("Use redfront-style red input and blue output?");
-        colouredIOState = FindREDUCE.prefs.getBoolean(FindREDUCE.COLOUREDIO, false);
-        StyleConstants.setForeground(RunREDUCE.inputSimpleAttributeSet, colouredIOState ? Color.red : null);
-        StyleConstants.setForeground(ReduceOutputThread.outputSimpleAttributeSet, colouredIOState ? Color.blue : null);
-        colouredIO.setState(colouredIOState);
+        setFontColour();
+        colouredIO.setState(RunREDUCEPrefs.colouredIOState);
         colouredIO.addItemListener(e -> {
-            colouredIOState = colouredIO.isSelected();
-            FindREDUCE.prefs.putBoolean(FindREDUCE.COLOUREDIO, colouredIOState);
-            StyleConstants.setForeground(RunREDUCE.inputSimpleAttributeSet, colouredIOState ? Color.red : null);
-            StyleConstants.setForeground(ReduceOutputThread.outputSimpleAttributeSet, colouredIOState ? Color.blue : null);
+            RunREDUCEPrefs.colouredIOState = colouredIO.isSelected();
+            RunREDUCEPrefs.save(RunREDUCEPrefs.COLOUREDIO);
+            setFontColour();
         });
 
 
@@ -296,6 +286,13 @@ class RunREDUCEMenubar extends JMenuBar {
                                 "Francis Wright, March 2020"},
                         "About Run-REDUCE",
                         JOptionPane.PLAIN_MESSAGE));
+    }
+
+    static void setFontColour() {
+        StyleConstants.setForeground(RunREDUCE.inputSimpleAttributeSet,
+                RunREDUCEPrefs.colouredIOState ? Color.red : Color.black);
+        StyleConstants.setForeground(ReduceOutputThread.outputSimpleAttributeSet,
+                RunREDUCEPrefs.colouredIOState ? Color.blue : Color.black);
     }
 }
 
