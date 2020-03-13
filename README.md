@@ -54,3 +54,7 @@ top-level directory.
 * Add a semicolon to the end of input if there is no terminator.
 * Support redfront font colouring to distinguish input and output in
   the IO display pane.
+* Rename Preferences menu to View.
+* Add a new item at the bottom of the REDUCE menu that opens a substantial
+  dialogue box to configure REDUCE directories and commands. Using this should
+  allow Run-REDUCE to run on any platform.

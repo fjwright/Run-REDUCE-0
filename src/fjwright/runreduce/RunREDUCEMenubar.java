@@ -33,6 +33,7 @@ class RunREDUCEMenubar extends JMenuBar {
     static LoadPackagesDialog loadPackagesDialog;
     static List<String> packageList;
     static FontSizeDialog fontSizeDialog;
+    static REDUCEConfigDialog reduceConfigDialog;
 
     RunREDUCEMenubar(JFrame frame) {
         frame.setJMenuBar(this);
@@ -241,16 +242,27 @@ class RunREDUCEMenubar extends JMenuBar {
                     RunREDUCEPrefs.save(RunREDUCEPrefs.AUTORUNVERSION, cmd.version));
         }
 
+        reduceMenu.addSeparator();
 
-        /* ******************** *
-         * The Preferences menu *
-         * ******************** */
-        JMenu preferencesMenu = new JMenu("Preferences");
-        this.add(preferencesMenu);
+        // Configure REDUCE.
+        JMenuItem configureREDUCEMenuItem = new JMenuItem("Configure REDUCE...");
+        reduceMenu.add(configureREDUCEMenuItem);
+        configureREDUCEMenuItem.setToolTipText("Configure REDUCE directories and commands.");
+        configureREDUCEMenuItem.addActionListener(e -> {
+            if (reduceConfigDialog == null) reduceConfigDialog = new REDUCEConfigDialog(frame);
+            reduceConfigDialog.showDialog();
+        });
 
-        // Create a Font Size... item in the Preferences menu that pops up a dialogue:
+
+        /* ************* *
+         * The View menu *
+         * ************* */
+        JMenu viewMenu = new JMenu("View");
+        this.add(viewMenu);
+
+        // Create a Font Size... item in the View menu that pops up a dialogue:
         JMenuItem fontSizeMenuItem = new JMenuItem("Font Size...");
-        preferencesMenu.add(fontSizeMenuItem);
+        viewMenu.add(fontSizeMenuItem);
         fontSizeMenuItem.setToolTipText("Change the font size used for REDUCE input and output.");
         fontSizeMenuItem.addActionListener(e -> {
             if (fontSizeDialog == null) fontSizeDialog = new FontSizeDialog(frame);
@@ -258,7 +270,7 @@ class RunREDUCEMenubar extends JMenuBar {
         });
 
         JCheckBoxMenuItem colouredIO = new JCheckBoxMenuItem("Coloured I/O?");
-        preferencesMenu.add(colouredIO);
+        viewMenu.add(colouredIO);
         colouredIO.setToolTipText("Use redfront-style red input and blue output?");
         setFontColour();
         colouredIO.setState(RunREDUCEPrefs.colouredIOState);
