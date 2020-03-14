@@ -4,29 +4,34 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class REDUCEConfigDialog extends JDialog {
     private JPanel contentPane;
-    private JButton buttonOK;
+    private JButton buttonSave;
     private JButton buttonCancel;
     private JButton resetAllDefaultsButton;
     private JTextField defaultRootDirTextField;
     private JTextField packagesRootDirTextField;
-    private JList versionsJList;
+    private JList<String> versionsJList;
     private JButton deleteVersionButton;
     private JButton addVersionButton;
     private JTextField versionNameTextField;
     private JTextField specificRootDirTextField;
     private JTextField commandPathNameTextField;
+    int nArgs = 5;
+    final JLabel[] argLabels = new JLabel[nArgs];
+    final JTextField[] args = new JTextField[nArgs];
 
     public REDUCEConfigDialog(Frame frame) {
         super(frame, "Configure REDUCE Directories and Commands", true);
         createUIComponents();
         setContentPane(contentPane);
-        getRootPane().setDefaultButton(buttonOK);
+        getRootPane().setDefaultButton(buttonSave);
 
-        buttonOK.addActionListener(e -> onOK());
+        buttonSave.addActionListener(e -> onSave());
 
         buttonCancel.addActionListener(e -> onCancel());
 
@@ -44,20 +49,9 @@ public class REDUCEConfigDialog extends JDialog {
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
-    private void onOK() {
-        // add your code here
-        dispose();
-    }
-
     private void onCancel() {
         // add your code here if necessary
         dispose();
-    }
-
-    public void showDialog() {
-        // TODO Populate the fields here!!!
-        this.pack();
-        this.setVisible(true);
     }
 
     // Only for testing!
@@ -76,19 +70,19 @@ public class REDUCEConfigDialog extends JDialog {
         GridBagConstraints mainPaneGBC, gbc;
         Insets insets = new Insets(5, 5, 5, 5);
 
-        // buttonPane contains the OK and Cancel buttons.
+        // buttonPane contains the Save and Cancel buttons.
         final JPanel buttonPane = new JPanel();
         contentPane.add(buttonPane, BorderLayout.PAGE_END);
         buttonPane.setBorder(BorderFactory.createEmptyBorder(5, 10, 10, 10));
         buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
         buttonPane.add(Box.createHorizontalGlue());
-        buttonOK = new JButton("OK");
-        buttonPane.add(buttonOK);
+        buttonSave = new JButton("Save");
+        buttonPane.add(buttonSave);
         buttonPane.add(Box.createRigidArea(new Dimension(10, 0)));
         buttonCancel = new JButton("Cancel");
         buttonPane.add(buttonCancel);
 
-        // mainPane contains everything above the OK and Cancel buttons:
+        // mainPane contains everything above the Save and Cancel buttons:
         final JPanel mainPane = new JPanel(new GridBagLayout());
         contentPane.add(mainPane, BorderLayout.CENTER);
         mainPane.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -206,8 +200,10 @@ public class REDUCEConfigDialog extends JDialog {
         versionsLabel.setLabelFor(versionsJList);
         versionsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         versionsPane.add(versionsLabel);
-        versionsJList = new JList();
-        versionsJList.setEnabled(true);
+        versionsPane.add(Box.createVerticalGlue());
+        versionsJList = new JList<>();
+        versionsJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        versionsJList.setVisibleRowCount(0);
         versionsJList.setAlignmentX(Component.CENTER_ALIGNMENT);
         versionsPane.add(versionsJList);
         versionsPane.add(Box.createVerticalGlue());
@@ -311,11 +307,8 @@ public class REDUCEConfigDialog extends JDialog {
         gbc.insets = insets;
         commandPane.add(commandPathNameTextField, gbc);
 
-        int nArgs = 3;
-        final JLabel[] argLabels = new JLabel[nArgs];
-        final JTextField[] args = new JTextField[nArgs];
         for (int i = 0; i < nArgs; i++) {
-            argLabels[i] = new JLabel("Argument " + (i+1));
+            argLabels[i] = new JLabel("Argument " + (i + 1));
             argLabels[i].setLabelFor(args[i]);
             gbc = new GridBagConstraints();
             gbc.gridx = 0;
@@ -336,5 +329,61 @@ public class REDUCEConfigDialog extends JDialog {
             gbc.insets = insets;
             commandPane.add(args[i], gbc);
         }
+    }
+
+    public void showDialog() {
+        REDUCEConfigData reduceConfigData = new REDUCEConfigData();
+        defaultRootDirTextField.setText(reduceConfigData.reduceRootDir);
+        packagesRootDirTextField.setText(reduceConfigData.packagesRootDir);
+        RunREDUCECommands runREDUCECommands = reduceConfigData.runREDUCECommands;
+
+        int listDataLength = runREDUCECommands.size();
+        String[] listData = new String[listDataLength];
+        for (int i = 0; i < listDataLength; i++)
+            listData[i] = runREDUCECommands.get(i).version;
+        versionsJList.setListData(listData);
+        versionsJList.setSelectedIndex(0);
+        showREDUCECommand(runREDUCECommands.get(0));
+        versionsJList.addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting())  // user has finished selecting
+                showREDUCECommand(runREDUCECommands.get(versionsJList.getSelectedIndex()));
+        });
+        this.pack(); // must be here!
+        /*
+         * setVisible(true): If a modal dialog is not already visible, this call will *not return*
+         * until the dialog is hidden by calling setVisible(false) or dispose.
+         * So it must be last in this method!
+         */
+        this.setVisible(true);
+    }
+
+    private void showREDUCECommand(RunREDUCECommand cmd) {
+        versionNameTextField.setText(cmd.version);
+        specificRootDirTextField.setText(cmd.specificREDUCERoot);
+        String[] command = cmd.command;
+        commandPathNameTextField.setText(command[0]);
+        int i;
+        for (i = 0; i < command.length - 1; i++) args[i].setText(command[i + 1]);
+        for (; i < nArgs; i++) args[i].setText(null);
+    }
+
+    private void onSave() {
+        // add your code here
+        dispose();
+    }
+}
+
+/*
+ * The constructor initialises this class to represent the current status, editing the above dialogue updates it, and
+ * closing the dialogue via the Save button copies it back to the relevant data structures.
+ */
+class REDUCEConfigData {
+    String reduceRootDir;
+    String packagesRootDir;
+    RunREDUCECommands runREDUCECommands;
+
+    REDUCEConfigData() {
+        packagesRootDir = reduceRootDir = RunREDUCEPrefs.reduceRootDir;
+        runREDUCECommands = new RunREDUCECommands();
     }
 }
