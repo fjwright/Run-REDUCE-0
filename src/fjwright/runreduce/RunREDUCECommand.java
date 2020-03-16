@@ -15,27 +15,22 @@ import java.util.regex.Pattern;
  * The run method runs REDUCE as a sub-process.
  */
 class RunREDUCECommand {
-    String version; // e.g. "CSL" or "PSL"
-    String specificREDUCERoot; // version-specific equivalent of $REDUCE.
-    String[] command; // absolute executable pathname followed by arguments
+    String version; // e.g. "CSL REDUCE" or "PSL REDUCE"
+    String versionRootDir; // version-specific reduceRootDir.
+    String[] command; // executable pathname followed by arguments
 
-    RunREDUCECommand(String version, String specificREDUCERoot, String... command) {
+    RunREDUCECommand(String version, String versionRootDir, String... command) {
         this.version = version;
-        this.specificREDUCERoot = specificREDUCERoot;
+        this.versionRootDir = versionRootDir;
         this.command = command;
     }
 
     // Merge this method into the constructor?
     String[] buildCommand() {
-        Path reduceRootPath;
-        if (specificREDUCERoot != null)
-            reduceRootPath = Paths.get(specificREDUCERoot);
-        else {
-            if (FindREDUCE.reduceRootPath == null) FindREDUCE.findREDUCERootDir();
-            reduceRootPath = FindREDUCE.reduceRootPath;
-        }
+        // Replace $REDUCE by versionRootDir if non-null else by reduceRootDir.
+        Path reduceRootPath = Paths.get(
+                versionRootDir != null ? versionRootDir : REDUCEConfiguration.reduceRootDir);
         String[] command = new String[this.command.length];
-        // Replace a leading occurrence of $REDUCE/ in any element by reduceRootPath:
         for (int i = 0; i < this.command.length; i++) {
             String element = this.command[i];
             if (element.startsWith("$REDUCE/"))
@@ -72,15 +67,6 @@ class RunREDUCECommand {
             System.err.println("Fatal error running REDUCE -- " + exc);
             System.exit(1);
         }
-    }
-}
-
-/*
- * This class defines a list of commands to run different versions of REDUCE.
- */
-class RunREDUCECommands extends ArrayList<RunREDUCECommand> {
-    RunREDUCECommands() {
-        super(RunREDUCEPrefs.runREDUCECommandDefaults);
     }
 }
 
@@ -124,58 +110,14 @@ class ReduceOutputThread extends Thread {
 }
 
 /**
- * This class attempts to locate the REDUCE installation directory.
- */
-class FindREDUCE {
-    static Path reduceRootPath = null;
-
-    static void findREDUCERootDir() {
-        String reduce = RunREDUCEPrefs.reduceRootDir;
-        if (reduce != null) {
-            try {
-                reduceRootPath = Paths.get(reduce);
-            } catch (InvalidPathException exc) {
-                System.err.println("Fatal error processing environment variable $REDUCE = " + reduce);
-                System.err.println(exc);
-                System.exit(1);
-            }
-            if (Files.exists(reduceRootPath)) return;
-        }
-
-        boolean reduceRootPathFound = false;
-        Path targetPath = Paths.get("Program Files", "Reduce");
-        for (Path root : FileSystems.getDefault().getRootDirectories()) {
-            reduceRootPath = root.resolve(targetPath);
-            if (Files.exists(reduceRootPath)) {
-                reduceRootPathFound = true;
-                break;
-            }
-        }
-        if (!reduceRootPathFound) {
-            System.err.println("Fatal error: REDUCE installation directory not found!");
-            System.exit(1);
-        }
-    }
-}
-
-/**
- * This class provides a list of all REDUCE packages by finding the
- * REDUCE packages directory in a standard installation and parsing
- * the package.map file.
+ * This class provides a list of all REDUCE packages by parsing the package.map file.
  * The list excludes preloaded packages, and it is sorted alphabetically.
  */
 class REDUCEPackageList extends ArrayList<String> {
 
     REDUCEPackageList() {
-        Path reducePackagesRootPath;
-        if (RunREDUCEPrefs.windowsOS) {
-            // On Windows, packages is in "/Program Files/Reduce".
-            if (FindREDUCE.reduceRootPath == null) FindREDUCE.findREDUCERootDir();
-            reducePackagesRootPath = FindREDUCE.reduceRootPath;
-        } else
-            // On Ubuntu, packages is in /usr/share/reduce.
-            reducePackagesRootPath = Paths.get("/usr/share/reduce");
-        Path packageMapFile = reducePackagesRootPath.resolve("packages/package.map");
+        Path packagesRootPath = Paths.get(REDUCEConfiguration.packagesRootDir);
+        Path packageMapFile = packagesRootPath.resolve("packages/package.map");
         if (!Files.isReadable(packageMapFile)) {
             System.err.println("REDUCE package map file is not available!");
             return;

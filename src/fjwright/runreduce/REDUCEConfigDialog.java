@@ -19,7 +19,7 @@ public class REDUCEConfigDialog extends JDialog {
     private JButton deleteVersionButton;
     private JButton addVersionButton;
     private JTextField versionNameTextField;
-    private JTextField specificRootDirTextField;
+    private JTextField versionRootDirTextField;
     private JTextField commandPathNameTextField;
     int nArgs = 5;
     final JLabel[] argLabels = new JLabel[nArgs];
@@ -112,9 +112,9 @@ public class REDUCEConfigDialog extends JDialog {
         mainPane.add(rootDirsPane, mainPaneGBC);
         rootDirsPane.setBorder(border);
 
-        final JTextArea textArea1 = new JTextArea("If 'Default Root Dir' is empty, " +
-                "it is replaced by the value of the environment variable named REDUCE if it is set, " +
-                "otherwise on Windows Run-REDUCE searches for a standard installation folder.");
+        final JTextArea textArea1 = new JTextArea("'Default Root Dir' defaults " +
+                "to the value of the environment variable named REDUCE if it is set. " +
+                "Otherwise, on Windows only, Run-REDUCE searches for a standard installation folder.");
         textArea1.setBackground(backgroundColor);
         textArea1.setEditable(false);
         textArea1.setLineWrap(true);
@@ -246,8 +246,8 @@ public class REDUCEConfigDialog extends JDialog {
         gbc.insets = insets;
         commandPane.add(versionNameTextField, gbc);
 
-        final JLabel specificRootDirLabel = new JLabel("Specific Root Dir");
-        specificRootDirLabel.setLabelFor(specificRootDirTextField);
+        final JLabel versionRootDirLabel = new JLabel("Version Root Dir");
+        versionRootDirLabel.setLabelFor(versionRootDirTextField);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 1;
@@ -255,9 +255,9 @@ public class REDUCEConfigDialog extends JDialog {
         gbc.weighty = 1.0;
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = insets;
-        commandPane.add(specificRootDirLabel, gbc);
-        specificRootDirTextField = new JTextField(textFieldColumns);
-        specificRootDirTextField.setToolTipText("As an optional convenience, " +
+        commandPane.add(versionRootDirLabel, gbc);
+        versionRootDirTextField = new JTextField(textFieldColumns);
+        versionRootDirTextField.setToolTipText("As an optional convenience, " +
                 "specify a root directory path that can be referenced as $REDUCE in the command path name and arguments below.");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
@@ -267,9 +267,9 @@ public class REDUCEConfigDialog extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = insets;
-        commandPane.add(specificRootDirTextField, gbc);
+        commandPane.add(versionRootDirTextField, gbc);
 
-        final JTextArea textArea3 = new JTextArea("$REDUCE below is replaced by 'Specific Root Dir' " +
+        final JTextArea textArea3 = new JTextArea("$REDUCE below is replaced by 'Version Root Dir' " +
                 "if it is set, otherwise by 'Default Root Dir'.");
         textArea3.setBackground(backgroundColor);
         textArea3.setEditable(false);
@@ -296,7 +296,7 @@ public class REDUCEConfigDialog extends JDialog {
         gbc.insets = insets;
         commandPane.add(commandPathNameLabel, gbc);
         commandPathNameTextField = new JTextField(textFieldColumns);
-        commandPathNameTextField.setToolTipText("The file name part of the command to run REDUCE, which can optionally begin with $REDUCE.");
+        commandPathNameTextField.setToolTipText("The filename part of the command to run REDUCE, which can optionally begin with $REDUCE.");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
         gbc.gridy = 3;
@@ -359,7 +359,7 @@ public class REDUCEConfigDialog extends JDialog {
 
     private void showREDUCECommand(RunREDUCECommand cmd) {
         versionNameTextField.setText(cmd.version);
-        specificRootDirTextField.setText(cmd.specificREDUCERoot);
+        versionRootDirTextField.setText(cmd.versionRootDir);
         String[] command = cmd.command;
         commandPathNameTextField.setText(command[0]);
         int i;
@@ -369,7 +369,8 @@ public class REDUCEConfigDialog extends JDialog {
 
     private void onSave() {
         // add your code here
-        dispose();
+//        dispose();
+        this.setVisible(false);
     }
 }
 
@@ -383,7 +384,9 @@ class REDUCEConfigData {
     RunREDUCECommands runREDUCECommands;
 
     REDUCEConfigData() {
-        packagesRootDir = reduceRootDir = RunREDUCEPrefs.reduceRootDir;
-        runREDUCECommands = new RunREDUCECommands();
+        // TODO This should make a deep copy that can be edited without affecting REDUCEConfiguration!
+        reduceRootDir = REDUCEConfiguration.reduceRootDir;
+        packagesRootDir = REDUCEConfiguration.packagesRootDir;
+        runREDUCECommands = REDUCEConfiguration.runREDUCECommands.copy();
     }
 }

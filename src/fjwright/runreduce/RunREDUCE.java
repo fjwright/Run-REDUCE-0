@@ -22,7 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * This is the main class that runs the whole app.  It also provides the pane that displays REDUCE input and output.
+ * This is the main class that runs the whole application.
+ * It also provides the pane that displays REDUCE input and output.
  */
 public class RunREDUCE extends JPanel implements ActionListener {
     static JTextArea inputTextArea;
@@ -33,7 +34,6 @@ public class RunREDUCE extends JPanel implements ActionListener {
     private static int inputListIndex = 0;
     private static int maxInputListIndex = 0;
     static SimpleAttributeSet inputSimpleAttributeSet = new SimpleAttributeSet();
-    static RunREDUCECommands runREDUCECommands = new RunREDUCECommands();
 
     public RunREDUCE() {
         super(new BorderLayout()); // JPanel defaults to FlowLayout!
@@ -169,7 +169,7 @@ public class RunREDUCE extends JPanel implements ActionListener {
 
         // Auto-run REDUCE if appropriate:
         if (RunREDUCEPrefs.autoRunState)
-            for (RunREDUCECommand cmd : runREDUCECommands)
+            for (RunREDUCECommand cmd : REDUCEConfiguration.runREDUCECommands)
                 if (RunREDUCEPrefs.autoRunVersion.equals(cmd.version)) {
                     // Run REDUCE.  (A direct call hangs the GUI!)
                     SwingUtilities.invokeLater(cmd::run);
@@ -178,6 +178,8 @@ public class RunREDUCE extends JPanel implements ActionListener {
     }
 
     public static void main(String... args) {
+        REDUCEConfigurationDefaults.init();
+        REDUCEConfiguration.init();
         // Schedule jobs for the event-dispatching thread.
         // Create and show this application's GUI:
         SwingUtilities.invokeLater(RunREDUCE::createAndShowGUI);
