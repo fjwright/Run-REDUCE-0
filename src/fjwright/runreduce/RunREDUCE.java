@@ -26,6 +26,7 @@ import java.util.List;
  * It also provides the pane that displays REDUCE input and output.
  */
 public class RunREDUCE extends JPanel implements ActionListener {
+    private static JFrame frame;
     static JTextArea inputTextArea;
     static JTextPane outputTextPane;
     // Use the logical Monospaced font for REDUCE I/O:
@@ -150,7 +151,7 @@ public class RunREDUCE extends JPanel implements ActionListener {
      */
     private static void createAndShowGUI() {
         // Create and set up the window:
-        JFrame frame = new JFrame("RunREDUCE");
+        frame = new JFrame("RunREDUCE");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setPreferredSize(new Dimension(640, 480)); // (960, 720)???
 
@@ -177,8 +178,12 @@ public class RunREDUCE extends JPanel implements ActionListener {
                 }
     }
 
+    static void errorMessageDialog(Object message, String title) {
+        JOptionPane.showMessageDialog(frame, message, title, JOptionPane.ERROR_MESSAGE);
+    }
+
     public static void main(String... args) {
-        REDUCEConfigurationDefaults.init();
+        REDUCEConfigurationDefault.init();
         REDUCEConfiguration.init();
         // Schedule jobs for the event-dispatching thread.
         // Create and show this application's GUI:

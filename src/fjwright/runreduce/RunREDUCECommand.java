@@ -29,7 +29,7 @@ class RunREDUCECommand {
     String[] buildCommand() {
         // Replace $REDUCE by versionRootDir if non-null else by reduceRootDir.
         Path reduceRootPath = Paths.get(
-                versionRootDir != null ? versionRootDir : REDUCEConfiguration.reduceRootDir);
+                !versionRootDir.equals("") ? versionRootDir : REDUCEConfiguration.reduceRootDir);
         String[] command = new String[this.command.length];
         for (int i = 0; i < this.command.length; i++) {
             String element = this.command[i];
@@ -38,8 +38,10 @@ class RunREDUCECommand {
             command[i] = element;
         }
         if (!Files.isExecutable(Paths.get(command[0]))) {
-            System.err.println("Fatal error: " + command[0] + " is not executable!");
-            System.exit(1);
+            RunREDUCE.errorMessageDialog(
+                    command[0] + " is not executable!",
+                    "REDUCE Configuration Error");
+            return null;
         }
         return command;
     }
@@ -47,8 +49,10 @@ class RunREDUCECommand {
     static PrintWriter reduceInputPrintWriter;
 
     void run() {
+        String[] command = buildCommand();
+        if (command == null) return;
         try {
-            ProcessBuilder pb = new ProcessBuilder(buildCommand());
+            ProcessBuilder pb = new ProcessBuilder(command);
             pb.redirectErrorStream(true);
             // pb.redirectInput(ProcessBuilder.Redirect.INHERIT); // Works!
             Process p = pb.start();
@@ -64,8 +68,9 @@ class RunREDUCECommand {
             outputGobbler.start();
 
         } catch (Exception exc) {
-            System.err.println("Fatal error running REDUCE -- " + exc);
-            System.exit(1);
+            RunREDUCE.errorMessageDialog(
+                    "Error running REDUCE -- " + exc,
+                    "REDUCE Process Error");
         }
     }
 }

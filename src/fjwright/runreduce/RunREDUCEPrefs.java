@@ -22,7 +22,7 @@ public class RunREDUCEPrefs {
 
     static int fontSize = (int) prefs.getFloat(FONTSIZE, 12);
     static boolean autoRunState = prefs.getBoolean(AUTORUN, false);
-    static String autoRunVersion = prefs.get(AUTORUNVERSION, REDUCEConfigurationDefaults.CSL_REDUCE);
+    static String autoRunVersion = prefs.get(AUTORUNVERSION, REDUCEConfigurationDefault.CSL_REDUCE);
     static boolean colouredIOState = prefs.getBoolean(COLOUREDIO, false);
 
     static void save(String key, Object... values) {
@@ -58,17 +58,23 @@ class RunREDUCECommands extends ArrayList<RunREDUCECommand> {
 /**
  * This class defines a template for REDUCEConfigurationDefaults and REDUCEConfiguration.
  */
-abstract class REDUCEConfigurationTemplate {
+abstract class REDUCEConfigurationType {
+    // Each subclass must have its own copy of these fields:
     static String reduceRootDir;
     static String packagesRootDir;
-    static RunREDUCECommands runREDUCECommands = new RunREDUCECommands();
+    static RunREDUCECommands runREDUCECommands;
 }
 
 /*
  * This class represents the application default REDUCE directory and command configuration.
  * It is initialised when the application starts.
+ * **Note that no value can be null because preference values cannot be null.**
  */
-class REDUCEConfigurationDefaults extends REDUCEConfigurationTemplate {
+class REDUCEConfigurationDefault extends REDUCEConfigurationType {
+    static String reduceRootDir;
+    static String packagesRootDir;
+    static RunREDUCECommands runREDUCECommands = new RunREDUCECommands();
+
     static final String CSL_REDUCE = "CSL REDUCE";
     static final String PSL_REDUCE = "PSL REDUCE";
 
@@ -79,13 +85,14 @@ class REDUCEConfigurationDefaults extends REDUCEConfigurationTemplate {
         if (RunREDUCEPrefs.windowsOS) {
             // On Windows, all REDUCE directories should be found automatically in "/Program Files/Reduce".
             if (reduceRootDir == null) reduceRootDir = findREDUCERootDir();
+            if (reduceRootDir == null) reduceRootDir = "";
             packagesRootDir = reduceRootDir;
             runREDUCECommands.add(new RunREDUCECommand(CSL_REDUCE,
-                    null,
+                    "",
                     "$REDUCE/lib/csl/reduce.exe",
                     "--nogui"));
             runREDUCECommands.add(new RunREDUCECommand(PSL_REDUCE,
-                    null,
+                    "",
                     "$REDUCE/lib/psl/psl/bpsl.exe",
                     "-td", "1000", "-f",
                     "$REDUCE/lib/psl/red/reduce.img"));
@@ -94,11 +101,11 @@ class REDUCEConfigurationDefaults extends REDUCEConfigurationTemplate {
             reduceRootDir = "/usr/lib/reduce";
             packagesRootDir = "/usr/share/reduce";
             runREDUCECommands.add(new RunREDUCECommand(CSL_REDUCE,
-                    null,
+                    "",
                     "$REDUCE/cslbuild/csl/reduce",
                     "--nogui"));
             runREDUCECommands.add(new RunREDUCECommand(PSL_REDUCE,
-                    null,
+                    "",
                     "$REDUCE/pslbuild/psl/bpsl",
                     "-td", "1000", "-f",
                     "$REDUCE/pslbuild/red/reduce.img"));
@@ -122,7 +129,11 @@ class REDUCEConfigurationDefaults extends REDUCEConfigurationTemplate {
  * This class represents the current REDUCE directory and command configuration.
  * It is initialised when the application starts and can be updated and saved using the REDUCEConfigDialog class.
  */
-class REDUCEConfiguration extends REDUCEConfigurationTemplate {
+class REDUCEConfiguration extends REDUCEConfigurationType {
+    static String reduceRootDir;
+    static String packagesRootDir;
+    static RunREDUCECommands runREDUCECommands = new RunREDUCECommands();
+
     // Preference keys:
     static final String REDUCE_ROOT_DIR = "reduceRootDir";
     static final String PACKAGES_ROOT_DIR = "packagesRootDir";
@@ -137,8 +148,8 @@ class REDUCEConfiguration extends REDUCEConfigurationTemplate {
      */
     static void init() {
         Preferences prefs = RunREDUCEPrefs.prefs;
-        reduceRootDir = prefs.get(REDUCE_ROOT_DIR, REDUCEConfigurationDefaults.reduceRootDir);
-        packagesRootDir = prefs.get(PACKAGES_ROOT_DIR, REDUCEConfigurationDefaults.packagesRootDir);
+        reduceRootDir = prefs.get(REDUCE_ROOT_DIR, REDUCEConfigurationDefault.reduceRootDir);
+        packagesRootDir = prefs.get(PACKAGES_ROOT_DIR, REDUCEConfigurationDefault.packagesRootDir);
 
         try {
             if (prefs.nodeExists(REDUCE_VERSIONS)) {
@@ -146,7 +157,7 @@ class REDUCEConfiguration extends REDUCEConfigurationTemplate {
                 for (String version : prefs.childrenNames()) {
                     // Get defaults:
                     RunREDUCECommand cmdDefault = null;
-                    for (RunREDUCECommand cmd : REDUCEConfigurationDefaults.runREDUCECommands)
+                    for (RunREDUCECommand cmd : REDUCEConfigurationDefault.runREDUCECommands)
                         if (version.equals(cmd.version)) {
                             cmdDefault = cmd;
                             break;
@@ -154,18 +165,18 @@ class REDUCEConfiguration extends REDUCEConfigurationTemplate {
                     if (cmdDefault == null)
                         cmdDefault = new RunREDUCECommand("", "", "");
                     prefs = prefs.node(version);
-                    String specificREDUCERoot = prefs.get(REDUCE_ROOT_DIR, cmdDefault.versionRootDir);
+                    String versionRootDir = prefs.get(REDUCE_ROOT_DIR, cmdDefault.versionRootDir);
                     int commandLength = prefs.getInt(COMMAND_LENGTH, cmdDefault.command.length);
                     String[] command = new String[commandLength];
                     command[0] = prefs.get(COMMAND, cmdDefault.command[0]);
                     for (int i = 1; i < commandLength; i++) {
                         command[i] = prefs.get(ARG + i, cmdDefault.command[i]);
                     }
-                    runREDUCECommands.add(new RunREDUCECommand(version, specificREDUCERoot, command));
+                    runREDUCECommands.add(new RunREDUCECommand(version, versionRootDir, command));
                     prefs = prefs.parent();
                 }
             } else
-                runREDUCECommands = REDUCEConfigurationDefaults.runREDUCECommands.copy();
+                runREDUCECommands = REDUCEConfigurationDefault.runREDUCECommands.copy();
         } catch (BackingStoreException e) {
             e.printStackTrace();
         }

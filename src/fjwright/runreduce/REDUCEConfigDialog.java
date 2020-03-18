@@ -3,6 +3,7 @@ package fjwright.runreduce;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.ListSelectionListener;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
@@ -21,9 +22,10 @@ public class REDUCEConfigDialog extends JDialog {
     private JTextField versionNameTextField;
     private JTextField versionRootDirTextField;
     private JTextField commandPathNameTextField;
-    int nArgs = 5;
-    final JLabel[] argLabels = new JLabel[nArgs];
-    final JTextField[] args = new JTextField[nArgs];
+    private int nArgs = 5;
+    private final JLabel[] argLabels = new JLabel[nArgs];
+    private final JTextField[] args = new JTextField[nArgs];
+    private RunREDUCECommands runREDUCECommands;
 
     public REDUCEConfigDialog(Frame frame) {
         super(frame, "Configure REDUCE Directories and Commands", true);
@@ -47,11 +49,12 @@ public class REDUCEConfigDialog extends JDialog {
         contentPane.registerKeyboardAction(e -> onCancel(),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+        resetAllDefaultsButton.addActionListener(e -> resetAllDefaults());
     }
 
     private void onCancel() {
-        // add your code here if necessary
-        dispose();
+        setVisible(false);
     }
 
     // Only for testing!
@@ -332,15 +335,29 @@ public class REDUCEConfigDialog extends JDialog {
     }
 
     public void showDialog() {
-        REDUCEConfigData reduceConfigData = new REDUCEConfigData();
+        updateDialog(new REDUCEConfigData());
+        pack(); // must be here!
+        /*
+         * setVisible(true): If a modal dialog is not already visible, this call will *not return*
+         * until the dialog is hidden by calling setVisible(false) or dispose.
+         * So it must be last in this method!
+         */
+        setVisible(true);
+    }
+
+    public void updateDialog(REDUCEConfigData reduceConfigData) {
         defaultRootDirTextField.setText(reduceConfigData.reduceRootDir);
         packagesRootDirTextField.setText(reduceConfigData.packagesRootDir);
-        RunREDUCECommands runREDUCECommands = reduceConfigData.runREDUCECommands;
-
+        runREDUCECommands = reduceConfigData.runREDUCECommands;
         int listDataLength = runREDUCECommands.size();
         String[] listData = new String[listDataLength];
         for (int i = 0; i < listDataLength; i++)
             listData[i] = runREDUCECommands.get(i).version;
+        // ListSelectionListener gets fired by list update when SelectedIndex is invalid,
+        // so remove it before updating the list data.
+        // Initially, no ListSelectionListener has been added, which this for loop takes care of:
+        for (ListSelectionListener listSelectionListener : versionsJList.getListSelectionListeners())
+            versionsJList.removeListSelectionListener(listSelectionListener);
         versionsJList.setListData(listData);
         versionsJList.setSelectedIndex(0);
         showREDUCECommand(runREDUCECommands.get(0));
@@ -348,13 +365,6 @@ public class REDUCEConfigDialog extends JDialog {
             if (!e.getValueIsAdjusting())  // user has finished selecting
                 showREDUCECommand(runREDUCECommands.get(versionsJList.getSelectedIndex()));
         });
-        this.pack(); // must be here!
-        /*
-         * setVisible(true): If a modal dialog is not already visible, this call will *not return*
-         * until the dialog is hidden by calling setVisible(false) or dispose.
-         * So it must be last in this method!
-         */
-        this.setVisible(true);
     }
 
     private void showREDUCECommand(RunREDUCECommand cmd) {
@@ -368,9 +378,13 @@ public class REDUCEConfigDialog extends JDialog {
     }
 
     private void onSave() {
-        // add your code here
-//        dispose();
-        this.setVisible(false);
+        // TODO Write form data back to REDUCEConfiguration.
+        REDUCEConfiguration.save();
+        setVisible(false);
+    }
+
+    private void resetAllDefaults() {
+        updateDialog(new REDUCEConfigDefaultData());
     }
 }
 
@@ -382,7 +396,6 @@ class REDUCEConfigData {
     String reduceRootDir;
     String packagesRootDir;
     RunREDUCECommands runREDUCECommands;
-
     REDUCEConfigData() {
         // TODO This should make a deep copy that can be edited without affecting REDUCEConfiguration!
         reduceRootDir = REDUCEConfiguration.reduceRootDir;
@@ -390,3 +403,13 @@ class REDUCEConfigData {
         runREDUCECommands = REDUCEConfiguration.runREDUCECommands.copy();
     }
 }
+
+class REDUCEConfigDefaultData extends REDUCEConfigData {
+    REDUCEConfigDefaultData() {
+        // TODO This should make a deep copy that can be edited without affecting REDUCEConfigurationDefault!
+        reduceRootDir = REDUCEConfigurationDefault.reduceRootDir;
+        packagesRootDir = REDUCEConfigurationDefault.packagesRootDir;
+        runREDUCECommands = REDUCEConfigurationDefault.runREDUCECommands.copy();
+    }
+}
+
