@@ -195,10 +195,12 @@ class REDUCEConfiguration extends REDUCEConfigurationType {
             prefs.put(REDUCE_ROOT_DIR, cmd.versionRootDir);
             prefs.putInt(COMMAND_LENGTH, cmd.command.length);
             prefs.put(COMMAND, cmd.command[0]);
-            for (int i = 1; i < cmd.command.length; i++) {
+            int i;
+            for (i = 1; i < cmd.command.length; i++)
                 prefs.put(ARG + i, cmd.command[i]);
-            }
-            // TODO Delete any redundant saved args here.
+            // Delete any redundant saved args:
+            for (; i < REDUCEConfigDialog.nArgs; i++)
+                prefs.remove(ARG + i);
             prefs = prefs.parent();
         }
     }
