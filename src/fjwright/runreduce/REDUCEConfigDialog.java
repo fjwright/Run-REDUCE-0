@@ -22,7 +22,7 @@ public class REDUCEConfigDialog extends JDialog {
     private JTextField versionNameTextField;
     private JTextField versionRootDirTextField;
     private JTextField commandPathNameTextField;
-    private int nArgs = 5;
+    static final int nArgs = 5;
     private final JLabel[] argLabels = new JLabel[nArgs];
     private final JTextField[] args = new JTextField[nArgs];
     private RunREDUCECommands runREDUCECommands;
