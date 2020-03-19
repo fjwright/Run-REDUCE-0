@@ -400,21 +400,21 @@ public class REDUCEConfigDialog extends JDialog {
             REDUCECommandDocumentsList reduceCommandDocumentsList = reduceConfigData.reduceCommandDocumentsList;
             int reduceCommandDocumentsListSize = reduceCommandDocumentsList.size();
             int i = 0;
-            for (RunREDUCECommand cmd : REDUCEConfigurationDefault.runREDUCECommandList) {
+            for (RunREDUCECommand cmdDefault : REDUCEConfigurationDefault.runREDUCECommandList) {
                 if (i < reduceCommandDocumentsListSize) {
                     REDUCECommandDocuments reduceCommandDocuments = reduceCommandDocumentsList.get(i++);
-                    reduceCommandDocuments.version.replace(cmd.version);
-                    reduceCommandDocuments.versionRootDir.replace(cmd.versionRootDir);
+                    reduceCommandDocuments.version.replace(cmdDefault.version);
+                    reduceCommandDocuments.versionRootDir.replace(cmdDefault.versionRootDir);
                     int j;
-                    for (j = 0; j < cmd.command.length; j++)
-                        reduceCommandDocuments.command[j].replace(cmd.command[j]);
-                    for (; j < REDUCEConfigDialog.nArgs; j++)
+                    for (j = 0; j < cmdDefault.command.length; j++)
+                        reduceCommandDocuments.command[j].replace(cmdDefault.command[j]);
+                    for (; j <= REDUCEConfigDialog.nArgs; j++)
                         reduceCommandDocuments.command[j].replace(null);
                 } else {
                     reduceCommandDocumentsList.add(new REDUCECommandDocuments(
-                            cmd.version,
-                            cmd.versionRootDir,
-                            cmd.command));
+                            cmdDefault.version,
+                            cmdDefault.versionRootDir,
+                            cmdDefault.command));
                 }
             }
             // FixMe Probably need to update versionsJList here!
