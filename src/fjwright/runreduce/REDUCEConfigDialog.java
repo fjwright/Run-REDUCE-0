@@ -430,9 +430,11 @@ class PlainDocument extends javax.swing.text.PlainDocument {
     String getText() throws BadLocationException {
         return getText(0, getLength());
     }
+
     void insertString(String str) throws BadLocationException {
         insertString(0, str, null);
     }
+
     void replace(String text) throws BadLocationException {
         replace(0, getLength(), text, null);
     }
@@ -497,17 +499,20 @@ class REDUCEConfigData {
     void save() {
         // Write form data back to REDUCEConfiguration:
         try {
-            REDUCEConfiguration.reduceRootDir = reduceRootDir.getText();
-            REDUCEConfiguration.packagesRootDir = packagesRootDir.getText();
+            REDUCEConfiguration.reduceRootDir = reduceRootDir.getText().trim();
+            REDUCEConfiguration.packagesRootDir = packagesRootDir.getText().trim();
             REDUCEConfiguration.runREDUCECommandList = new RunREDUCECommandList();
             for (REDUCECommandDocuments cmd : reduceCommandDocumentsList) {
-                String[] command = new String[cmd.command.length];
-                for (int i = 0; i < cmd.command.length; i++)
-                    command[i] = cmd.command[i].getText();
+                // Do not save blank arguments:
+                ArrayList<String> commandList = new ArrayList<>();
+                for (int i = 0; i < cmd.command.length; i++) {
+                    String s = cmd.command[i].getText().trim();
+                    if (! s.isEmpty()) commandList.add(s);
+                }
                 REDUCEConfiguration.runREDUCECommandList.add(new RunREDUCECommand(
-                        cmd.version.getText(),
-                        cmd.versionRootDir.getText(),
-                        command));
+                        cmd.version.getText().trim(),
+                        cmd.versionRootDir.getText().trim(),
+                        commandList.toArray(new String[0])));
             }
         } catch (BadLocationException e) {
             e.printStackTrace();

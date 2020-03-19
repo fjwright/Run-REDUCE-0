@@ -195,7 +195,7 @@ class REDUCEConfiguration extends REDUCEConfigurationType {
             for (i = 1; i < cmd.command.length; i++)
                 prefs.put(ARG + i, cmd.command[i]);
             // Delete any redundant saved args:
-            for (; i < REDUCEConfigDialog.nArgs; i++)
+            for (; i <= REDUCEConfigDialog.nArgs; i++)
                 prefs.remove(ARG + i);
             prefs = prefs.parent();
         }
