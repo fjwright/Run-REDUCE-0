@@ -170,7 +170,7 @@ public class RunREDUCE extends JPanel implements ActionListener {
 
         // Auto-run REDUCE if appropriate:
         if (RunREDUCEPrefs.autoRunState)
-            for (RunREDUCECommand cmd : REDUCEConfiguration.runREDUCECommands)
+            for (RunREDUCECommand cmd : REDUCEConfiguration.runREDUCECommandList)
                 if (RunREDUCEPrefs.autoRunVersion.equals(cmd.version)) {
                     // Run REDUCE.  (A direct call hangs the GUI!)
                     SwingUtilities.invokeLater(cmd::run);

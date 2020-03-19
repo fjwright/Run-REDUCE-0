@@ -207,7 +207,7 @@ class RunREDUCEMenubar extends JMenuBar {
         JMenu runREDUCESubmenu = new JMenu("Run REDUCE...  ");
         reduceMenu.add(runREDUCESubmenu);
         runREDUCESubmenu.setEnabled(!RunREDUCEPrefs.autoRunState);
-        for (RunREDUCECommand cmd : REDUCEConfiguration.runREDUCECommands) {
+        for (RunREDUCECommand cmd : REDUCEConfiguration.runREDUCECommandList) {
             JMenuItem item = new JMenuItem(cmd.version);
             runREDUCESubmenu.add(item);
             item.setToolTipText("Select a version of REDUCE and run it.");
@@ -232,7 +232,7 @@ class RunREDUCEMenubar extends JMenuBar {
         JMenu autoRunREDUCESubmenu = new JMenu("Auto-run REDUCE...  ");
         reduceMenu.add(autoRunREDUCESubmenu);
         ButtonGroup autoRunButtonGroup = new ButtonGroup();
-        for (RunREDUCECommand cmd : REDUCEConfiguration.runREDUCECommands) {
+        for (RunREDUCECommand cmd : REDUCEConfiguration.runREDUCECommandList) {
             JRadioButtonMenuItem item = new JRadioButtonMenuItem(cmd.version);
             if (RunREDUCEPrefs.autoRunVersion.equals(cmd.version)) item.setSelected(true);
             autoRunREDUCESubmenu.add(item);

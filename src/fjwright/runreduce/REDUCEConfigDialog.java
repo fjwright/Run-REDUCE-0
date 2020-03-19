@@ -4,10 +4,12 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.ArrayList;
 
 public class REDUCEConfigDialog extends JDialog {
     private JPanel contentPane;
@@ -25,7 +27,8 @@ public class REDUCEConfigDialog extends JDialog {
     static final int nArgs = 5;
     private final JLabel[] argLabels = new JLabel[nArgs];
     private final JTextField[] args = new JTextField[nArgs];
-    private RunREDUCECommands runREDUCECommands;
+    private REDUCECommandDocumentsList reduceCommandDocumentsList;
+    private REDUCEConfigData reduceConfigData;
 
     public REDUCEConfigDialog(Frame frame) {
         super(frame, "Configure REDUCE Directories and Commands", true);
@@ -335,7 +338,8 @@ public class REDUCEConfigDialog extends JDialog {
     }
 
     public void showDialog() {
-        updateDialog(new REDUCEConfigData());
+        reduceConfigData = new REDUCEConfigData();
+        updateDialog(reduceConfigData);
         pack(); // must be here!
         /*
          * setVisible(true): If a modal dialog is not already visible, this call will *not return*
@@ -346,13 +350,19 @@ public class REDUCEConfigDialog extends JDialog {
     }
 
     public void updateDialog(REDUCEConfigData reduceConfigData) {
-        defaultRootDirTextField.setText(reduceConfigData.reduceRootDir);
-        packagesRootDirTextField.setText(reduceConfigData.packagesRootDir);
-        runREDUCECommands = reduceConfigData.runREDUCECommands;
-        int listDataLength = runREDUCECommands.size();
+        defaultRootDirTextField.setDocument(reduceConfigData.reduceRootDir);
+        packagesRootDirTextField.setDocument(reduceConfigData.packagesRootDir);
+        reduceCommandDocumentsList = reduceConfigData.reduceCommandDocumentsList;
+        int listDataLength = reduceCommandDocumentsList.size();
         String[] listData = new String[listDataLength];
-        for (int i = 0; i < listDataLength; i++)
-            listData[i] = runREDUCECommands.get(i).version;
+        try {
+            for (int i = 0; i < listDataLength; i++) {
+                PlainDocument doc = reduceCommandDocumentsList.get(i).version;
+                listData[i] = doc.getText(0, doc.getLength());
+            }
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
         // ListSelectionListener gets fired by list update when SelectedIndex is invalid,
         // so remove it before updating the list data.
         // Initially, no ListSelectionListener has been added, which this for loop takes care of:
@@ -360,56 +370,147 @@ public class REDUCEConfigDialog extends JDialog {
             versionsJList.removeListSelectionListener(listSelectionListener);
         versionsJList.setListData(listData);
         versionsJList.setSelectedIndex(0);
-        showREDUCECommand(runREDUCECommands.get(0));
+        showREDUCECommand(reduceCommandDocumentsList.get(0));
         versionsJList.addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting())  // user has finished selecting
-                showREDUCECommand(runREDUCECommands.get(versionsJList.getSelectedIndex()));
+                showREDUCECommand(reduceCommandDocumentsList.get(versionsJList.getSelectedIndex()));
         });
     }
 
-    private void showREDUCECommand(RunREDUCECommand cmd) {
-        versionNameTextField.setText(cmd.version);
-        versionRootDirTextField.setText(cmd.versionRootDir);
-        String[] command = cmd.command;
-        commandPathNameTextField.setText(command[0]);
-        int i;
-        for (i = 0; i < command.length - 1; i++) args[i].setText(command[i + 1]);
-        for (; i < nArgs; i++) args[i].setText(null);
+    private void showREDUCECommand(REDUCECommandDocuments cmd) {
+        versionNameTextField.setDocument(cmd.version);
+        versionRootDirTextField.setDocument(cmd.versionRootDir);
+        PlainDocument[] command = cmd.command;
+        commandPathNameTextField.setDocument(command[0]);
+        for (int i = 0; i < nArgs; i++) args[i].setDocument(command[i + 1]);
     }
 
     private void onSave() {
-        // TODO Write form data back to REDUCEConfiguration.
+        // Write form data back to REDUCEConfiguration:
+        reduceConfigData.save();
         REDUCEConfiguration.save();
         setVisible(false);
     }
 
     private void resetAllDefaults() {
-        updateDialog(new REDUCEConfigDefaultData());
+        // Update the document contents but NOT the documents in reduceConfigData.
+        try {
+            reduceConfigData.reduceRootDir.replace(REDUCEConfigurationDefault.reduceRootDir);
+            reduceConfigData.packagesRootDir.replace(REDUCEConfigurationDefault.packagesRootDir);
+            REDUCECommandDocumentsList reduceCommandDocumentsList = reduceConfigData.reduceCommandDocumentsList;
+            int reduceCommandDocumentsListSize = reduceCommandDocumentsList.size();
+            int i = 0;
+            for (RunREDUCECommand cmd : REDUCEConfigurationDefault.runREDUCECommandList) {
+                if (i < reduceCommandDocumentsListSize) {
+                    REDUCECommandDocuments reduceCommandDocuments = reduceCommandDocumentsList.get(i++);
+                    reduceCommandDocuments.version.replace(cmd.version);
+                    reduceCommandDocuments.versionRootDir.replace(cmd.versionRootDir);
+                    int j;
+                    for (j = 0; j < cmd.command.length; j++)
+                        reduceCommandDocuments.command[j].replace(cmd.command[j]);
+                    for (; j < REDUCEConfigDialog.nArgs; j++)
+                        reduceCommandDocuments.command[j].replace(null);
+                } else {
+                    reduceCommandDocumentsList.add(new REDUCECommandDocuments(
+                            cmd.version,
+                            cmd.versionRootDir,
+                            cmd.command));
+                }
+            }
+            // FixMe Probably need to update versionsJList here!
+            versionsJList.setSelectedIndex(0);
+            showREDUCECommand(reduceCommandDocumentsList.get(0));
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
     }
 }
+
+class PlainDocument extends javax.swing.text.PlainDocument {
+    String getText() throws BadLocationException {
+        return getText(0, getLength());
+    }
+    void insertString(String str) throws BadLocationException {
+        insertString(0, str, null);
+    }
+    void replace(String text) throws BadLocationException {
+        replace(0, getLength(), text, null);
+    }
+}
+
+class REDUCECommandDocuments {
+    PlainDocument version;
+    PlainDocument versionRootDir;
+    PlainDocument[] command;
+
+    REDUCECommandDocuments(String version, String versionRootDir, String... command) {
+        try {
+            this.version = new PlainDocument();
+            this.version.insertString(version);
+            this.versionRootDir = new PlainDocument();
+            this.versionRootDir.insertString(versionRootDir);
+            this.command = new PlainDocument[REDUCEConfigDialog.nArgs + 1];
+            int i;
+            for (i = 0; i < command.length; i++) {
+                this.command[i] = new PlainDocument();
+                this.command[i].insertString(command[i]);
+            }
+            for (; i <= REDUCEConfigDialog.nArgs; i++) {
+                this.command[i] = new PlainDocument();
+                this.command[i].insertString(null);
+            }
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+class REDUCECommandDocumentsList extends ArrayList<REDUCECommandDocuments> {
+    REDUCECommandDocumentsList() {
+        for (RunREDUCECommand cmd : REDUCEConfiguration.runREDUCECommandList)
+            add(new REDUCECommandDocuments(cmd.version, cmd.versionRootDir, cmd.command));
+    }
+}
+
 
 /*
  * The constructor initialises this class to represent the current status, editing the above dialogue updates it, and
  * closing the dialogue via the Save button copies it back to the relevant data structures.
  */
 class REDUCEConfigData {
-    String reduceRootDir;
-    String packagesRootDir;
-    RunREDUCECommands runREDUCECommands;
+    PlainDocument reduceRootDir;
+    PlainDocument packagesRootDir;
+    REDUCECommandDocumentsList reduceCommandDocumentsList;
+
     REDUCEConfigData() {
-        // TODO This should make a deep copy that can be edited without affecting REDUCEConfiguration!
-        reduceRootDir = REDUCEConfiguration.reduceRootDir;
-        packagesRootDir = REDUCEConfiguration.packagesRootDir;
-        runREDUCECommands = REDUCEConfiguration.runREDUCECommands.copy();
+        try {
+            reduceRootDir = new PlainDocument();
+            reduceRootDir.insertString(0, REDUCEConfiguration.reduceRootDir, null);
+            packagesRootDir = new PlainDocument();
+            packagesRootDir.insertString(0, REDUCEConfiguration.packagesRootDir, null);
+            reduceCommandDocumentsList = new REDUCECommandDocumentsList();
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void save() {
+        // Write form data back to REDUCEConfiguration:
+        try {
+            REDUCEConfiguration.reduceRootDir = reduceRootDir.getText();
+            REDUCEConfiguration.packagesRootDir = packagesRootDir.getText();
+            REDUCEConfiguration.runREDUCECommandList = new RunREDUCECommandList();
+            for (REDUCECommandDocuments cmd : reduceCommandDocumentsList) {
+                String[] command = new String[cmd.command.length];
+                for (int i = 0; i < cmd.command.length; i++)
+                    command[i] = cmd.command[i].getText();
+                REDUCEConfiguration.runREDUCECommandList.add(new RunREDUCECommand(
+                        cmd.version.getText(),
+                        cmd.versionRootDir.getText(),
+                        command));
+            }
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
     }
 }
-
-class REDUCEConfigDefaultData extends REDUCEConfigData {
-    REDUCEConfigDefaultData() {
-        // TODO This should make a deep copy that can be edited without affecting REDUCEConfigurationDefault!
-        reduceRootDir = REDUCEConfigurationDefault.reduceRootDir;
-        packagesRootDir = REDUCEConfigurationDefault.packagesRootDir;
-        runREDUCECommands = REDUCEConfigurationDefault.runREDUCECommands.copy();
-    }
-}
-

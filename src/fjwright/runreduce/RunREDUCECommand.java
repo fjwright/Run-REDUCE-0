@@ -15,9 +15,11 @@ import java.util.regex.Pattern;
  * The run method runs REDUCE as a sub-process.
  */
 class RunREDUCECommand {
-    String version; // e.g. "CSL REDUCE" or "PSL REDUCE"
-    String versionRootDir; // version-specific reduceRootDir.
-    String[] command; // executable pathname followed by arguments
+    String version = ""; // e.g. "CSL REDUCE" or "PSL REDUCE"
+    String versionRootDir = ""; // version-specific reduceRootDir.
+    String[] command = {"", "", "", "", "", ""}; // executable pathname followed by arguments
+
+    RunREDUCECommand() {}
 
     RunREDUCECommand(String version, String versionRootDir, String... command) {
         this.version = version;

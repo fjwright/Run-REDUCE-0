@@ -46,12 +46,12 @@ public class RunREDUCEPrefs {
 /*
  * This class defines a list of commands to run different versions of REDUCE.
  */
-class RunREDUCECommands extends ArrayList<RunREDUCECommand> {
-    RunREDUCECommands copy() {
-        RunREDUCECommands runREDUCECommands = new RunREDUCECommands();
+class RunREDUCECommandList extends ArrayList<RunREDUCECommand> {
+    RunREDUCECommandList copy() {
+        RunREDUCECommandList runREDUCECommandList = new RunREDUCECommandList();
         for (RunREDUCECommand cmd : this) // Build a deep copy of cmd
-            runREDUCECommands.add(new RunREDUCECommand(cmd.version, cmd.versionRootDir, cmd.command));
-        return runREDUCECommands;
+            runREDUCECommandList.add(new RunREDUCECommand(cmd.version, cmd.versionRootDir, cmd.command));
+        return runREDUCECommandList;
     }
 }
 
@@ -59,10 +59,6 @@ class RunREDUCECommands extends ArrayList<RunREDUCECommand> {
  * This class defines a template for REDUCEConfigurationDefaults and REDUCEConfiguration.
  */
 abstract class REDUCEConfigurationType {
-    // Each subclass must have its own copy of these fields:
-    static String reduceRootDir;
-    static String packagesRootDir;
-    static RunREDUCECommands runREDUCECommands;
 }
 
 /*
@@ -73,7 +69,7 @@ abstract class REDUCEConfigurationType {
 class REDUCEConfigurationDefault extends REDUCEConfigurationType {
     static String reduceRootDir;
     static String packagesRootDir;
-    static RunREDUCECommands runREDUCECommands = new RunREDUCECommands();
+    static RunREDUCECommandList runREDUCECommandList = new RunREDUCECommandList();
 
     static final String CSL_REDUCE = "CSL REDUCE";
     static final String PSL_REDUCE = "PSL REDUCE";
@@ -87,11 +83,11 @@ class REDUCEConfigurationDefault extends REDUCEConfigurationType {
             if (reduceRootDir == null) reduceRootDir = findREDUCERootDir();
             if (reduceRootDir == null) reduceRootDir = "";
             packagesRootDir = reduceRootDir;
-            runREDUCECommands.add(new RunREDUCECommand(CSL_REDUCE,
+            runREDUCECommandList.add(new RunREDUCECommand(CSL_REDUCE,
                     "",
                     "$REDUCE/lib/csl/reduce.exe",
                     "--nogui"));
-            runREDUCECommands.add(new RunREDUCECommand(PSL_REDUCE,
+            runREDUCECommandList.add(new RunREDUCECommand(PSL_REDUCE,
                     "",
                     "$REDUCE/lib/psl/psl/bpsl.exe",
                     "-td", "1000", "-f",
@@ -100,11 +96,11 @@ class REDUCEConfigurationDefault extends REDUCEConfigurationType {
             // This is appropriate for Ubuntu:
             reduceRootDir = "/usr/lib/reduce";
             packagesRootDir = "/usr/share/reduce";
-            runREDUCECommands.add(new RunREDUCECommand(CSL_REDUCE,
+            runREDUCECommandList.add(new RunREDUCECommand(CSL_REDUCE,
                     "",
                     "$REDUCE/cslbuild/csl/reduce",
                     "--nogui"));
-            runREDUCECommands.add(new RunREDUCECommand(PSL_REDUCE,
+            runREDUCECommandList.add(new RunREDUCECommand(PSL_REDUCE,
                     "",
                     "$REDUCE/pslbuild/psl/bpsl",
                     "-td", "1000", "-f",
@@ -132,7 +128,7 @@ class REDUCEConfigurationDefault extends REDUCEConfigurationType {
 class REDUCEConfiguration extends REDUCEConfigurationType {
     static String reduceRootDir;
     static String packagesRootDir;
-    static RunREDUCECommands runREDUCECommands = new RunREDUCECommands();
+    static RunREDUCECommandList runREDUCECommandList = new RunREDUCECommandList();
 
     // Preference keys:
     static final String REDUCE_ROOT_DIR = "reduceRootDir";
@@ -157,26 +153,26 @@ class REDUCEConfiguration extends REDUCEConfigurationType {
                 for (String version : prefs.childrenNames()) {
                     // Get defaults:
                     RunREDUCECommand cmdDefault = null;
-                    for (RunREDUCECommand cmd : REDUCEConfigurationDefault.runREDUCECommands)
+                    for (RunREDUCECommand cmd : REDUCEConfigurationDefault.runREDUCECommandList)
                         if (version.equals(cmd.version)) {
                             cmdDefault = cmd;
                             break;
                         }
-                    if (cmdDefault == null)
-                        cmdDefault = new RunREDUCECommand("", "", "");
+                    if (cmdDefault == null) cmdDefault = new RunREDUCECommand(); // all fields ""
                     prefs = prefs.node(version);
                     String versionRootDir = prefs.get(REDUCE_ROOT_DIR, cmdDefault.versionRootDir);
                     int commandLength = prefs.getInt(COMMAND_LENGTH, cmdDefault.command.length);
                     String[] command = new String[commandLength];
                     command[0] = prefs.get(COMMAND, cmdDefault.command[0]);
                     for (int i = 1; i < commandLength; i++) {
-                        command[i] = prefs.get(ARG + i, cmdDefault.command[i]);
+                        command[i] = prefs.get(ARG + i,
+                                i < cmdDefault.command.length ? cmdDefault.command[i] : "");
                     }
-                    runREDUCECommands.add(new RunREDUCECommand(version, versionRootDir, command));
+                    runREDUCECommandList.add(new RunREDUCECommand(version, versionRootDir, command));
                     prefs = prefs.parent();
                 }
             } else
-                runREDUCECommands = REDUCEConfigurationDefault.runREDUCECommands.copy();
+                runREDUCECommandList = REDUCEConfigurationDefault.runREDUCECommandList.copy();
         } catch (BackingStoreException e) {
             e.printStackTrace();
         }
@@ -190,7 +186,7 @@ class REDUCEConfiguration extends REDUCEConfigurationType {
         prefs.put(REDUCE_ROOT_DIR, reduceRootDir);
         prefs.put(PACKAGES_ROOT_DIR, packagesRootDir);
         prefs = prefs.node(REDUCE_VERSIONS);
-        for (RunREDUCECommand cmd : runREDUCECommands) {
+        for (RunREDUCECommand cmd : runREDUCECommandList) {
             prefs = prefs.node(cmd.version);
             prefs.put(REDUCE_ROOT_DIR, cmd.versionRootDir);
             prefs.putInt(COMMAND_LENGTH, cmd.command.length);
