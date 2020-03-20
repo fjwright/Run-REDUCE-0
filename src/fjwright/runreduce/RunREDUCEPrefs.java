@@ -162,11 +162,16 @@ class REDUCEConfiguration extends REDUCEConfigurationType {
                     prefs = prefs.node(version);
                     String versionRootDir = prefs.get(REDUCE_ROOT_DIR, cmdDefault.versionRootDir);
                     int commandLength = prefs.getInt(COMMAND_LENGTH, cmdDefault.command.length);
-                    String[] command = new String[commandLength];
-                    command[0] = prefs.get(COMMAND, cmdDefault.command[0]);
-                    for (int i = 1; i < commandLength; i++) {
-                        command[i] = prefs.get(ARG + i,
-                                i < cmdDefault.command.length ? cmdDefault.command[i] : "");
+                    String[] command;
+                    if (commandLength == 0) {
+                        command = new String[]{""};
+                    } else {
+                        command = new String[commandLength];
+                        command[0] = prefs.get(COMMAND, cmdDefault.command[0]);
+                        for (int i = 1; i < commandLength; i++) {
+                            command[i] = prefs.get(ARG + i,
+                                    i < cmdDefault.command.length ? cmdDefault.command[i] : "");
+                        }
                     }
                     runREDUCECommandList.add(new RunREDUCECommand(version, versionRootDir, command));
                     prefs = prefs.parent();
@@ -189,8 +194,9 @@ class REDUCEConfiguration extends REDUCEConfigurationType {
         for (RunREDUCECommand cmd : runREDUCECommandList) {
             prefs = prefs.node(cmd.version);
             prefs.put(REDUCE_ROOT_DIR, cmd.versionRootDir);
-            prefs.putInt(COMMAND_LENGTH, cmd.command.length);
-            prefs.put(COMMAND, cmd.command[0]);
+            int commandLength = cmd.command.length;
+            prefs.putInt(COMMAND_LENGTH, commandLength);
+            prefs.put(COMMAND, commandLength > 0 ? cmd.command[0] : "");
             int i;
             for (i = 1; i < cmd.command.length; i++)
                 prefs.put(ARG + i, cmd.command[i]);

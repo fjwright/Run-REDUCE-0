@@ -3,6 +3,8 @@ package fjwright.runreduce;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -17,8 +19,8 @@ public class REDUCEConfigDialog extends JDialog {
     private JButton resetAllDefaultsButton;
     private JTextField defaultRootDirTextField;
     private JTextField packagesRootDirTextField;
-    private DefaultListModel<String> listModel = new DefaultListModel<>();
-    private JList<String> versionsJList;
+    static DefaultListModel<String> listModel;
+    static JList<String> versionsJList;
     private JButton deleteVersionButton;
     private JButton addVersionButton;
     private JTextField versionNameTextField;
@@ -209,7 +211,7 @@ public class REDUCEConfigDialog extends JDialog {
         versionsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         versionsPane.add(versionsLabel);
         versionsPane.add(Box.createVerticalGlue());
-        versionsJList = new JList<>(listModel);
+        versionsJList = new JList<>();
         versionsJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         versionsJList.setVisibleRowCount(0);
         versionsJList.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -355,6 +357,8 @@ public class REDUCEConfigDialog extends JDialog {
         defaultRootDirTextField.setDocument(reduceConfigData.reduceRootDir);
         packagesRootDirTextField.setDocument(reduceConfigData.packagesRootDir);
         reduceCommandDocumentsList = reduceConfigData.reduceCommandDocumentsList;
+        listModel = new DefaultListModel<>();
+        versionsJList.setModel(listModel);
         try {
             for (REDUCECommandDocuments reduceCommandDocuments : reduceCommandDocumentsList)
                 listModel.addElement(reduceCommandDocuments.version.getText());
@@ -437,9 +441,9 @@ public class REDUCEConfigDialog extends JDialog {
     }
 
     private void addVersion() {
-        listModel.addElement(" ");
+        listModel.addElement("NEW VERSION");
         versionsJList.setSelectedIndex(listModel.size() - 1);
-        REDUCECommandDocuments reduceCommandDocuments = new REDUCECommandDocuments();
+        REDUCECommandDocuments reduceCommandDocuments = new REDUCECommandDocuments("NEW VERSION");
         reduceCommandDocumentsList.add(reduceCommandDocuments);
         showREDUCECommand(reduceCommandDocuments);
     }
@@ -464,14 +468,15 @@ class REDUCECommandDocuments {
     PlainDocument versionRootDir;
     PlainDocument[] command;
 
-    REDUCECommandDocuments() {
-        this("", "", "");
+    REDUCECommandDocuments(String version) {
+        this(version, "", "");
     }
 
     REDUCECommandDocuments(String version, String versionRootDir, String... command) {
         try {
             this.version = new PlainDocument();
             this.version.insertString(version);
+            this.version.addDocumentListener(new VersionDocumentListener());
             this.versionRootDir = new PlainDocument();
             this.versionRootDir.insertString(versionRootDir);
             this.command = new PlainDocument[REDUCEConfigDialog.nArgs + 1];
@@ -490,13 +495,34 @@ class REDUCECommandDocuments {
     }
 }
 
+class VersionDocumentListener implements DocumentListener {
+    public void insertUpdate(DocumentEvent e) {
+        updateVersionList(e);
+    }
+    public void removeUpdate(DocumentEvent e) {
+        updateVersionList(e);
+    }
+    public void changedUpdate(DocumentEvent e) {
+        updateVersionList(e);
+    }
+    private void updateVersionList(DocumentEvent e) {
+        // This seems a bit ugly, but it also seems to work!
+        try {
+            String s = ((PlainDocument) e.getDocument()).getText();
+            int selectedIndex = REDUCEConfigDialog.versionsJList.getSelectedIndex();
+            REDUCEConfigDialog.listModel.set(selectedIndex, s);
+        } catch (BadLocationException ex) {
+            ex.printStackTrace();
+        }
+    }
+}
+
 class REDUCECommandDocumentsList extends ArrayList<REDUCECommandDocuments> {
     REDUCECommandDocumentsList() {
         for (RunREDUCECommand cmd : REDUCEConfiguration.runREDUCECommandList)
             add(new REDUCECommandDocuments(cmd.version, cmd.versionRootDir, cmd.command));
     }
 }
-
 
 /*
  * The constructor initialises this class to represent the current status, editing the above dialogue updates it, and
