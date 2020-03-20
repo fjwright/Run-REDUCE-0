@@ -3,7 +3,6 @@ package fjwright.runreduce;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -18,6 +17,7 @@ public class REDUCEConfigDialog extends JDialog {
     private JButton resetAllDefaultsButton;
     private JTextField defaultRootDirTextField;
     private JTextField packagesRootDirTextField;
+    private DefaultListModel<String> listModel = new DefaultListModel<>();
     private JList<String> versionsJList;
     private JButton deleteVersionButton;
     private JButton addVersionButton;
@@ -54,6 +54,8 @@ public class REDUCEConfigDialog extends JDialog {
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         resetAllDefaultsButton.addActionListener(e -> resetAllDefaults());
+        deleteVersionButton.addActionListener(e -> deleteVersion());
+        addVersionButton.addActionListener(e -> addVersion());
     }
 
     private void onCancel() {
@@ -207,7 +209,7 @@ public class REDUCEConfigDialog extends JDialog {
         versionsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         versionsPane.add(versionsLabel);
         versionsPane.add(Box.createVerticalGlue());
-        versionsJList = new JList<>();
+        versionsJList = new JList<>(listModel);
         versionsJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         versionsJList.setVisibleRowCount(0);
         versionsJList.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -353,27 +355,21 @@ public class REDUCEConfigDialog extends JDialog {
         defaultRootDirTextField.setDocument(reduceConfigData.reduceRootDir);
         packagesRootDirTextField.setDocument(reduceConfigData.packagesRootDir);
         reduceCommandDocumentsList = reduceConfigData.reduceCommandDocumentsList;
-        int listDataLength = reduceCommandDocumentsList.size();
-        String[] listData = new String[listDataLength];
         try {
-            for (int i = 0; i < listDataLength; i++) {
-                PlainDocument doc = reduceCommandDocumentsList.get(i).version;
-                listData[i] = doc.getText(0, doc.getLength());
-            }
+            for (REDUCECommandDocuments reduceCommandDocuments : reduceCommandDocumentsList)
+                listModel.addElement(reduceCommandDocuments.version.getText());
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
-        // ListSelectionListener gets fired by list update when SelectedIndex is invalid,
-        // so remove it before updating the list data.
-        // Initially, no ListSelectionListener has been added, which this for loop takes care of:
-        for (ListSelectionListener listSelectionListener : versionsJList.getListSelectionListeners())
-            versionsJList.removeListSelectionListener(listSelectionListener);
-        versionsJList.setListData(listData);
         versionsJList.setSelectedIndex(0);
         showREDUCECommand(reduceCommandDocumentsList.get(0));
         versionsJList.addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting())  // user has finished selecting
-                showREDUCECommand(reduceCommandDocumentsList.get(versionsJList.getSelectedIndex()));
+            if (!e.getValueIsAdjusting()) { // user has finished selecting
+                int selectedIndex = versionsJList.getSelectedIndex();
+                // ListSelectionListener gets fired by list update when SelectedIndex is invalid, so...
+                if (0 <= selectedIndex && selectedIndex < reduceCommandDocumentsList.size())
+                    showREDUCECommand(reduceCommandDocumentsList.get(selectedIndex));
+            }
         });
     }
 
@@ -424,6 +420,29 @@ public class REDUCEConfigDialog extends JDialog {
             e.printStackTrace();
         }
     }
+
+    private void deleteVersion() {
+        int selectedIndex = versionsJList.getSelectedIndex();
+        if (selectedIndex >= 0) {
+            listModel.remove(selectedIndex);
+            reduceCommandDocumentsList.remove(selectedIndex);
+            int size = listModel.size(); // new size!
+            if (size > 0) {
+                if (selectedIndex >= size) selectedIndex = 0;
+                versionsJList.setSelectedIndex(selectedIndex);
+                showREDUCECommand(reduceCommandDocumentsList.get(selectedIndex));
+            } else
+                addVersion();
+        }
+    }
+
+    private void addVersion() {
+        listModel.addElement(" ");
+        versionsJList.setSelectedIndex(listModel.size() - 1);
+        REDUCECommandDocuments reduceCommandDocuments = new REDUCECommandDocuments();
+        reduceCommandDocumentsList.add(reduceCommandDocuments);
+        showREDUCECommand(reduceCommandDocuments);
+    }
 }
 
 class PlainDocument extends javax.swing.text.PlainDocument {
@@ -445,6 +464,10 @@ class REDUCECommandDocuments {
     PlainDocument versionRootDir;
     PlainDocument[] command;
 
+    REDUCECommandDocuments() {
+        this("", "", "");
+    }
+
     REDUCECommandDocuments(String version, String versionRootDir, String... command) {
         try {
             this.version = new PlainDocument();
@@ -459,7 +482,7 @@ class REDUCECommandDocuments {
             }
             for (; i <= REDUCEConfigDialog.nArgs; i++) {
                 this.command[i] = new PlainDocument();
-                this.command[i].insertString(null);
+                this.command[i].insertString("");
             }
         } catch (BadLocationException e) {
             e.printStackTrace();
@@ -507,7 +530,7 @@ class REDUCEConfigData {
                 ArrayList<String> commandList = new ArrayList<>();
                 for (int i = 0; i < cmd.command.length; i++) {
                     String s = cmd.command[i].getText().trim();
-                    if (! s.isEmpty()) commandList.add(s);
+                    if (!s.isEmpty()) commandList.add(s);
                 }
                 REDUCEConfiguration.runREDUCECommandList.add(new RunREDUCECommand(
                         cmd.version.getText().trim(),
