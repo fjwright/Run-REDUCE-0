@@ -342,7 +342,7 @@ public class REDUCEConfigDialog extends JDialog {
     }
 
     public void showDialog() {
-        reduceConfigData = new REDUCEConfigData();
+        reduceConfigData = new REDUCEConfigData(RunREDUCE.reduceConfiguration);
         updateDialog(reduceConfigData);
         pack(); // must be here!
         /*
@@ -351,6 +351,11 @@ public class REDUCEConfigDialog extends JDialog {
          * So it must be last in this method!
          */
         setVisible(true);
+    }
+
+    private void resetAllDefaults() {
+        reduceConfigData = new REDUCEConfigData(RunREDUCE.reduceConfigurationDefault);
+        updateDialog(reduceConfigData);
     }
 
     public void updateDialog(REDUCEConfigData reduceConfigData) {
@@ -388,41 +393,8 @@ public class REDUCEConfigDialog extends JDialog {
     private void onSave() {
         // Write form data back to REDUCEConfiguration:
         reduceConfigData.save();
-        REDUCEConfiguration.save();
+        RunREDUCE.reduceConfiguration.save();
         setVisible(false);
-    }
-
-    private void resetAllDefaults() {
-        // Update the document contents but NOT the documents in reduceConfigData.
-        try {
-            reduceConfigData.reduceRootDir.replace(REDUCEConfigurationDefault.reduceRootDir);
-            reduceConfigData.packagesRootDir.replace(REDUCEConfigurationDefault.packagesRootDir);
-            REDUCECommandDocumentsList reduceCommandDocumentsList = reduceConfigData.reduceCommandDocumentsList;
-            int reduceCommandDocumentsListSize = reduceCommandDocumentsList.size();
-            int i = 0;
-            for (RunREDUCECommand cmdDefault : REDUCEConfigurationDefault.runREDUCECommandList) {
-                if (i < reduceCommandDocumentsListSize) {
-                    REDUCECommandDocuments reduceCommandDocuments = reduceCommandDocumentsList.get(i++);
-                    reduceCommandDocuments.version.replace(cmdDefault.version);
-                    reduceCommandDocuments.versionRootDir.replace(cmdDefault.versionRootDir);
-                    int j;
-                    for (j = 0; j < cmdDefault.command.length; j++)
-                        reduceCommandDocuments.command[j].replace(cmdDefault.command[j]);
-                    for (; j <= REDUCEConfigDialog.nArgs; j++)
-                        reduceCommandDocuments.command[j].replace(null);
-                } else {
-                    reduceCommandDocumentsList.add(new REDUCECommandDocuments(
-                            cmdDefault.version,
-                            cmdDefault.versionRootDir,
-                            cmdDefault.command));
-                }
-            }
-            // FixMe Probably need to update versionsJList here!
-            versionsJList.setSelectedIndex(0);
-            showREDUCECommand(reduceCommandDocumentsList.get(0));
-        } catch (BadLocationException e) {
-            e.printStackTrace();
-        }
     }
 
     private void deleteVersion() {
@@ -458,9 +430,9 @@ class PlainDocument extends javax.swing.text.PlainDocument {
         insertString(0, str, null);
     }
 
-    void replace(String text) throws BadLocationException {
-        replace(0, getLength(), text, null);
-    }
+//    void replace(String text) throws BadLocationException {
+//        replace(0, getLength(), text, null);
+//    }
 }
 
 class REDUCECommandDocuments {
@@ -518,8 +490,8 @@ class VersionDocumentListener implements DocumentListener {
 }
 
 class REDUCECommandDocumentsList extends ArrayList<REDUCECommandDocuments> {
-    REDUCECommandDocumentsList() {
-        for (RunREDUCECommand cmd : REDUCEConfiguration.runREDUCECommandList)
+    REDUCECommandDocumentsList(REDUCEConfigurationType reduceConfiguration) {
+        for (RunREDUCECommand cmd : reduceConfiguration.runREDUCECommandList)
             add(new REDUCECommandDocuments(cmd.version, cmd.versionRootDir, cmd.command));
     }
 }
@@ -533,13 +505,13 @@ class REDUCEConfigData {
     PlainDocument packagesRootDir;
     REDUCECommandDocumentsList reduceCommandDocumentsList;
 
-    REDUCEConfigData() {
+    REDUCEConfigData(REDUCEConfigurationType reduceConfiguration) {
         try {
             reduceRootDir = new PlainDocument();
-            reduceRootDir.insertString(0, REDUCEConfiguration.reduceRootDir, null);
+            reduceRootDir.insertString(0, reduceConfiguration.reduceRootDir, null);
             packagesRootDir = new PlainDocument();
-            packagesRootDir.insertString(0, REDUCEConfiguration.packagesRootDir, null);
-            reduceCommandDocumentsList = new REDUCECommandDocumentsList();
+            packagesRootDir.insertString(0, reduceConfiguration.packagesRootDir, null);
+            reduceCommandDocumentsList = new REDUCECommandDocumentsList(reduceConfiguration);
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
@@ -548,9 +520,9 @@ class REDUCEConfigData {
     void save() {
         // Write form data back to REDUCEConfiguration:
         try {
-            REDUCEConfiguration.reduceRootDir = reduceRootDir.getText().trim();
-            REDUCEConfiguration.packagesRootDir = packagesRootDir.getText().trim();
-            REDUCEConfiguration.runREDUCECommandList = new RunREDUCECommandList();
+            RunREDUCE.reduceConfiguration.reduceRootDir = reduceRootDir.getText().trim();
+            RunREDUCE.reduceConfiguration.packagesRootDir = packagesRootDir.getText().trim();
+            RunREDUCE.reduceConfiguration.runREDUCECommandList = new RunREDUCECommandList();
             for (REDUCECommandDocuments cmd : reduceCommandDocumentsList) {
                 // Do not save blank arguments:
                 ArrayList<String> commandList = new ArrayList<>();
@@ -558,7 +530,7 @@ class REDUCEConfigData {
                     String s = cmd.command[i].getText().trim();
                     if (!s.isEmpty()) commandList.add(s);
                 }
-                REDUCEConfiguration.runREDUCECommandList.add(new RunREDUCECommand(
+                RunREDUCE.reduceConfiguration.runREDUCECommandList.add(new RunREDUCECommand(
                         cmd.version.getText().trim(),
                         cmd.versionRootDir.getText().trim(),
                         commandList.toArray(new String[0])));

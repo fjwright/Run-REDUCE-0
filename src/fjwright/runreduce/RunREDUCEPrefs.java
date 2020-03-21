@@ -59,6 +59,9 @@ class RunREDUCECommandList extends ArrayList<RunREDUCECommand> {
  * This class defines a template for REDUCEConfigurationDefaults and REDUCEConfiguration.
  */
 abstract class REDUCEConfigurationType {
+    String reduceRootDir;
+    String packagesRootDir;
+    RunREDUCECommandList runREDUCECommandList;
 }
 
 /*
@@ -67,14 +70,11 @@ abstract class REDUCEConfigurationType {
  * **Note that no value can be null because preference values cannot be null.**
  */
 class REDUCEConfigurationDefault extends REDUCEConfigurationType {
-    static String reduceRootDir;
-    static String packagesRootDir;
-    static RunREDUCECommandList runREDUCECommandList = new RunREDUCECommandList();
-
     static final String CSL_REDUCE = "CSL REDUCE";
     static final String PSL_REDUCE = "PSL REDUCE";
 
-    static void init() {
+    REDUCEConfigurationDefault() {
+        runREDUCECommandList = new RunREDUCECommandList();
         reduceRootDir = System.getenv("REDUCE");
         // $REDUCE below will be replaced by versionRootDir if set or reduceRootDir otherwise
         // before attempting to run REDUCE.
@@ -126,10 +126,6 @@ class REDUCEConfigurationDefault extends REDUCEConfigurationType {
  * It is initialised when the application starts and can be updated and saved using the REDUCEConfigDialog class.
  */
 class REDUCEConfiguration extends REDUCEConfigurationType {
-    static String reduceRootDir;
-    static String packagesRootDir;
-    static RunREDUCECommandList runREDUCECommandList = new RunREDUCECommandList();
-
     // Preference keys:
     static final String REDUCE_ROOT_DIR = "reduceRootDir";
     static final String PACKAGES_ROOT_DIR = "packagesRootDir";
@@ -142,10 +138,11 @@ class REDUCEConfiguration extends REDUCEConfigurationType {
      * This method initialises the reduceRootDir, packagesRootDir and runREDUCECommands fields from saved preferences
      * or application defaults.
      */
-    static void init() {
+    REDUCEConfiguration() {
+        runREDUCECommandList = new RunREDUCECommandList();
         Preferences prefs = RunREDUCEPrefs.prefs;
-        reduceRootDir = prefs.get(REDUCE_ROOT_DIR, REDUCEConfigurationDefault.reduceRootDir);
-        packagesRootDir = prefs.get(PACKAGES_ROOT_DIR, REDUCEConfigurationDefault.packagesRootDir);
+        reduceRootDir = prefs.get(REDUCE_ROOT_DIR, RunREDUCE.reduceConfigurationDefault.reduceRootDir);
+        packagesRootDir = prefs.get(PACKAGES_ROOT_DIR, RunREDUCE.reduceConfigurationDefault.packagesRootDir);
 
         try {
             if (prefs.nodeExists(REDUCE_VERSIONS)) {
@@ -153,7 +150,7 @@ class REDUCEConfiguration extends REDUCEConfigurationType {
                 for (String version : prefs.childrenNames()) {
                     // Get defaults:
                     RunREDUCECommand cmdDefault = null;
-                    for (RunREDUCECommand cmd : REDUCEConfigurationDefault.runREDUCECommandList)
+                    for (RunREDUCECommand cmd : RunREDUCE.reduceConfigurationDefault.runREDUCECommandList)
                         if (version.equals(cmd.version)) {
                             cmdDefault = cmd;
                             break;
@@ -177,7 +174,7 @@ class REDUCEConfiguration extends REDUCEConfigurationType {
                     prefs = prefs.parent();
                 }
             } else
-                runREDUCECommandList = REDUCEConfigurationDefault.runREDUCECommandList.copy();
+                runREDUCECommandList = RunREDUCE.reduceConfigurationDefault.runREDUCECommandList.copy();
         } catch (BackingStoreException e) {
             e.printStackTrace();
         }
@@ -186,7 +183,7 @@ class REDUCEConfiguration extends REDUCEConfigurationType {
     /**
      * This method saves the reduceRootDir, packagesRootDir and runREDUCECommands fields as preferences.
      */
-    static void save() {
+    void save() {
         Preferences prefs = RunREDUCEPrefs.prefs;
         prefs.put(REDUCE_ROOT_DIR, reduceRootDir);
         prefs.put(PACKAGES_ROOT_DIR, packagesRootDir);

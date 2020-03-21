@@ -35,6 +35,8 @@ public class RunREDUCE extends JPanel implements ActionListener {
     private static int inputListIndex = 0;
     private static int maxInputListIndex = 0;
     static SimpleAttributeSet inputSimpleAttributeSet = new SimpleAttributeSet();
+    static REDUCEConfigurationDefault reduceConfigurationDefault;
+    static REDUCEConfiguration reduceConfiguration;
 
     public RunREDUCE() {
         super(new BorderLayout()); // JPanel defaults to FlowLayout!
@@ -170,7 +172,7 @@ public class RunREDUCE extends JPanel implements ActionListener {
 
         // Auto-run REDUCE if appropriate:
         if (RunREDUCEPrefs.autoRunState)
-            for (RunREDUCECommand cmd : REDUCEConfiguration.runREDUCECommandList)
+            for (RunREDUCECommand cmd : reduceConfiguration.runREDUCECommandList)
                 if (RunREDUCEPrefs.autoRunVersion.equals(cmd.version)) {
                     // Run REDUCE.  (A direct call hangs the GUI!)
                     SwingUtilities.invokeLater(cmd::run);
@@ -183,8 +185,8 @@ public class RunREDUCE extends JPanel implements ActionListener {
     }
 
     public static void main(String... args) {
-        REDUCEConfigurationDefault.init();
-        REDUCEConfiguration.init();
+        reduceConfigurationDefault = new REDUCEConfigurationDefault();
+        reduceConfiguration = new REDUCEConfiguration();
         // Schedule jobs for the event-dispatching thread.
         // Create and show this application's GUI:
         SwingUtilities.invokeLater(RunREDUCE::createAndShowGUI);

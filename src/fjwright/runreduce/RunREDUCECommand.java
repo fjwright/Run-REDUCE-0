@@ -31,7 +31,7 @@ class RunREDUCECommand {
     String[] buildCommand() {
         // Replace $REDUCE by versionRootDir if non-null else by reduceRootDir.
         Path reduceRootPath = Paths.get(
-                !versionRootDir.equals("") ? versionRootDir : REDUCEConfiguration.reduceRootDir);
+                !versionRootDir.equals("") ? versionRootDir : RunREDUCE.reduceConfiguration.reduceRootDir);
         String[] command = new String[this.command.length];
         for (int i = 0; i < this.command.length; i++) {
             String element = this.command[i];
@@ -123,7 +123,7 @@ class ReduceOutputThread extends Thread {
 class REDUCEPackageList extends ArrayList<String> {
 
     REDUCEPackageList() {
-        Path packagesRootPath = Paths.get(REDUCEConfiguration.packagesRootDir);
+        Path packagesRootPath = Paths.get(RunREDUCE.reduceConfiguration.packagesRootDir);
         Path packageMapFile = packagesRootPath.resolve("packages/package.map");
         if (!Files.isReadable(packageMapFile)) {
             System.err.println("REDUCE package map file is not available!");
