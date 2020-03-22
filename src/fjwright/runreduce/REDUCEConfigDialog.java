@@ -122,9 +122,10 @@ public class REDUCEConfigDialog extends JDialog {
         mainPane.add(rootDirsPane, mainPaneGBC);
         rootDirsPane.setBorder(border);
 
-        final JTextArea textArea1 = new JTextArea("'Default Root Dir' defaults " +
-                "to the value of the environment variable named REDUCE if it is set. " +
-                "Otherwise, on Windows only, Run-REDUCE searches for a standard installation folder.");
+        final JTextArea textArea1 = new JTextArea("If 'Default Root Dir' is empty on start-up, it " +
+                "takes the value of the environment variable named REDUCE if it is set." +
+                (RunREDUCEPrefs.windowsOS ?
+                        " Otherwise, Run-REDUCE searches for a standard installation folder (on Windows only)." : null));
         textArea1.setBackground(backgroundColor);
         textArea1.setEditable(false);
         textArea1.setLineWrap(true);
@@ -162,7 +163,7 @@ public class REDUCEConfigDialog extends JDialog {
         gbc.insets = insets;
         rootDirsPane.add(defaultRootDirTextField, gbc);
 
-        final JTextArea textArea2 = new JTextArea("If 'Packages Root Dir' is empty, it is replaced by 'Default Root Dir'.");
+        final JTextArea textArea2 = new JTextArea("If 'Packages Root Dir' is empty on start-up, it takes the value of 'Default Root Dir'.");
         textArea2.setBackground(backgroundColor);
         textArea2.setEditable(false);
         textArea2.setLineWrap(true);
@@ -205,13 +206,15 @@ public class REDUCEConfigDialog extends JDialog {
         mainPaneGBC.gridx = 0;
         mainPaneGBC.gridy = 1;
         mainPane.add(versionsPane, mainPaneGBC);
-        versionsPane.setBorder(border);
+//        versionsPane.setBorder(border);
+        versionsPane.add(Box.createVerticalGlue());
         final JLabel versionsLabel = new JLabel("Select REDUCE Version:");
         versionsLabel.setLabelFor(versionsJList);
         versionsLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
         versionsPane.add(versionsLabel);
         versionsPane.add(Box.createVerticalGlue());
         versionsJList = new JList<>();
+        versionsJList.setBorder(border);
         versionsJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         versionsJList.setVisibleRowCount(0);
         versionsJList.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -221,10 +224,12 @@ public class REDUCEConfigDialog extends JDialog {
         deleteVersionButton.setToolTipText("Delete the configuration for the selected version of REDUCE.");
         deleteVersionButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         versionsPane.add(deleteVersionButton);
+        versionsPane.add(Box.createVerticalStrut(10));
         addVersionButton = new JButton("Add a New Version");
         addVersionButton.setToolTipText("Add a configuration for a new version of REDUCE.");
         addVersionButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         versionsPane.add(addVersionButton);
+        versionsPane.add(Box.createVerticalGlue());
 
         // commandPane contains the command for a version of REDUCE:
         final JPanel commandPane = new JPanel();

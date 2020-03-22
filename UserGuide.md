@@ -7,15 +7,12 @@ Algebra System.  REDUCE must be obtained from
 [SourceForge](https://sourceforge.net/projects/reduce-algebra/) and
 installed separately.  Run-REDUCE should find a standard REDUCE
 installation automatically and not **require** any initial
-configuration.
+configuration, at least on Microsoft Windows and Ubuntu Linux. But
+with suitable configuration is **should** run on any platform that
+supports Java 8, but I can only test on 64-bit Windows 10 and Ubuntu 18.
 
 Run-REDUCE does **not** (yet) provide typeset-quality display of
 mathematical notation.
-
-Run-REDUCE currently runs on Microsoft Windows and Ubuntu Linux.  It
-may run on other platforms, in particular other versions of Linux that
-are similar to Ubuntu, but I can only test on 64-bit Windows 10 and
-Ubuntu 18.
 
 ## Install and Run
 
@@ -72,7 +69,7 @@ application are stored in the registry under the key
 and on Ubuntu Linux they are stored in the XML file
 `~/.java/.userPrefs/fjwright/runreduce/prefs.xml`.
 
-Run-REDUCE currently assumes a standard installation of REDUCE and
+By default, Run-REDUCE assumes a standard installation of REDUCE and
 uses commands based on that assumption to run REDUCE.  If the
 environment variable named `REDUCE` is set then Run-REDUCE uses its
 value as the root of the REDUCE installation; a final directory
@@ -211,28 +208,94 @@ widget at the top right-hand corner of the main window frame.
 
 The REDUCE menu provides the following items.
 
-### The Run REDUCE... Sub-menu
+### Run REDUCE...
 
-This provides an item for each configured version of REDUCE (based on
-different versions of Lisp, namely CSL and PSL).  Clicking on a
-version of REDUCE runs it.  (Currently, another version of REDUCE
-cannot be run without restarting Run-REDUCE.)
+This sub-menu provides an item for each configured version of REDUCE
+(typically based on different versions of Lisp &ndash; by default CSL
+and PSL).  Clicking on a version of REDUCE runs it.  (Currently,
+another version of REDUCE cannot be run without restarting
+Run-REDUCE.)
 
-### The Auto-run REDUCE? Checkbox
+### Auto-run REDUCE?
 
-Selecting this option causes Run-REDUCE to run the selected version of
-REDUCE (see below) automatically when it starts.  Run-REDUCE remembers
-this option value and uses it the next time it runs.
+Selecting this checkbox causes Run-REDUCE to run the selected version
+of REDUCE (see below) automatically when it starts.  Run-REDUCE
+remembers this option value and uses it the next time it runs.
 
-### The Auto-run REDUCE... Sub-menu
+### Auto-run REDUCE...
 
-This allows you to select the version of REDUCE to auto-run when
-auto-run is enabled.  Run-REDUCE remembers this selection and uses it
-the next time it runs.
+This sub-menu allows you to select the version of REDUCE to auto-run
+when auto-run is enabled.  Run-REDUCE remembers this selection and
+uses it the next time it runs.
 
-## The Preferences Menu
+### Configure REDUCE...
 
-The Preferences menu provides the following items.
+This item brings up a dialogue box that allows you to configure the
+versions of REDUCE available and how they are run.  Defaults are
+preset that should work for Microsoft Windows and Ubuntu Linux.
+Run-REDUCE currently assumes that if it is not running on Windows then
+the Ubuntu default configuration is appropriate, so that is what you
+will see by default on (say) Apple MacOS. There is a button to reset
+the REDUCE configuration to the application defaults.
+
+Changes to the dialogue fields are only saved if you click on the
+`Save` button, in which case the new configuration is used within
+Run-REDUCE and saved as preferences.  Clicking on the `Cancel` button
+causes all changes made since the dialogue box opened to be forgotten.
+
+Clicking on the `Add a New Version` button adds a new version of
+REDUCE, which is initially called `NEW VERSION`, with all other fields
+empty.  Changes to the `Version Name` field are immediately reflected
+in the list of REDUCE versions.  You could, for example, add a second
+version of PSL REDUCE with a different memory size, or a version of
+REDUCE running on Common Lisp.  (There is currently no option to
+duplicate an existing REDUCE version to be modified, but that might be
+a useful future addition!)
+
+Clicking on the `Delete Selected Version` button deletes the
+configuration for the selected version of REDUCE.  If you delete all
+available versions then a new (blank) version is automatically
+created.
+
+The full command to run a particular REDUCE version must be split into
+an executable command filename and a sequence of up to 5 command
+arguments.  (It would be easy to increase this limit, but I hope 5
+arguments is enough!)  The components of the command that would be
+separated by white space as a shell command must be entered into
+separate fields on this form.  Run-REDUCE does not currently use a
+shell to run REDUCE and the command specified is used directly to
+create a separate process to run REDUCE.  So do not include any shell
+escapes or other shell syntax!  You can use absolute file pathnames if
+you want, but often (as with the PSL REDUCE executable and image file
+names) command components share the same root segment.  This root
+segment can be specified as `$REDUCE`, which Run-REDUCE will replace
+with the value of the `Version Root Dir` field if it is set, or with
+the value of the `Default Root Dir` field if it is set, or by the
+value of the environment variable named `REDUCE` if that is set.  (I
+have borrowed environment variable syntax, but `$REDUCE` here is not
+necessarily related to an environment variable.)
+
+The two versions of REDUCE that are distributed, namely CSL and PSL
+REDUCE, share the same root directory, which is why the default
+configuration uses `Default Root Dir` and leaves `Version Root Dir`
+empty.  But a version of REDUCE running on Common Lisp would probably
+use a different root directory.
+
+The `Load Packages...` facility in the `File` menu requires a standard
+REDUCE packages directory and the information used is independent of
+the REDUCE implementation, so this directory is fixed for all REDUCE
+versions.  It is normally associated with the portable REDUCE source
+code.  If this directory does not exist (or is mis-configured) then
+the `Load Packages...` facility will just fail in some reasonably
+obvious and graceful way; it is not necessary for the rest of
+Run-REDUCE.
+
+All field values are stripped of leading and trailing space before
+they are used or saved.
+
+## The View Menu
+
+The View menu provides the following items.
 
 ## Font Size...
 
@@ -241,9 +304,9 @@ used in the `Input/Output Display` and `Input Editor` panes.
 Run-REDUCE remembers the selected size and uses it the next time
 Run-REDUCE runs.
 
-## Coloured I/O? Checkbox
+## Coloured I/O?
 
-Selecting this option causes Run-REDUCE to use redfront-style text
+Selecting this checkbox causes Run-REDUCE to use redfront-style text
 colouring with red input and blue output.
 
 ## The Help Menu
@@ -252,4 +315,5 @@ The Help menu provides the following items.
 
 ### About Run-REDUCE
 
-This pops up a dialogue displaying brief information about Run-REDUCE.
+This item pops up a dialogue displaying brief information about
+Run-REDUCE.

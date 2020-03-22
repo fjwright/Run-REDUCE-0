@@ -4,7 +4,7 @@
 
 ### Francis Wright, March 2020
 
-This is the first release of a very incomplete prototype!
+This is an incomplete prototype!
 
 For information about how to install and run Run-REDUCE please see the
 [User Guide](UserGuide.md).
@@ -15,12 +15,10 @@ is still a standard component of the latest Java SE SDK.  I am
 developing using Java 13, but compiling for Java 8 to support running
 a jar file using the latest readily available JRE.
 
-This version only runs on Microsoft Windows, but I plan to add support
-for Linux.  (Whilst Java is portable, filesystem structures and
-installation conventions are not!)
-
-This version only runs PSL and CSL REDUCE, but I plan to add support
-for other versions such as CL REDUCE.
+This version should run on any platform that supports Java 8, but I
+have only tested it on Microsoft Windows and Ubuntu Linux.  (Whilst
+Java is portable, filesystem structures and installation conventions
+are not!)
 
 REDUCE is an open source project available from
 [SourceForge](https://sourceforge.net/projects/reduce-algebra/).  I'm
@@ -33,14 +31,14 @@ top-level directory.
 
 ### To do soon
 
-* Make the commands to run REDUCE configurable.
-* Remember all user choices, including commands to run REDUCE and
-  window configurations.
 * Better scrolling facilities in the IO display pane.
 * Multiple tabs that each run an independent invocation of REDUCE.
 
 ### To do later
 
+* More sophisticated font colouring, including a full emulation of
+  redfront.
+* Remember all user choices, including window configurations (maybe).
 * Typeset output supporting copy and paste. Could parse `off nat`
   output, or use it together with TeX or MathML output.
 * Merge input region into output region (maybe).
@@ -48,13 +46,13 @@ top-level directory.
   vertically split window (maybe).
 * A calculator-style interface option (maybe).
 
-## Release Notes: Updates since v0.2
+## Pre-release Notes: Updates since v0.2
 
-* Initial (inelegant) support for Ubuntu Linux.
 * Add a semicolon to the end of input if there is no terminator.
-* Support redfront font colouring to distinguish input and output in
-  the IO display pane.
+* Optional redfront-style font colouring to distinguish input and
+  output in the IO display pane.
 * Rename Preferences menu to View.
-* Add a new item at the bottom of the REDUCE menu that opens a substantial
-  dialogue box to configure REDUCE directories and commands. Using this should
-  allow Run-REDUCE to run on any platform.
+* Explicit support for Ubuntu Linux.
+* Add a new item at the bottom of the REDUCE menu that opens a
+  dialogue box to configure REDUCE directories and commands. Using
+  this should allow Run-REDUCE to run on any platform.
