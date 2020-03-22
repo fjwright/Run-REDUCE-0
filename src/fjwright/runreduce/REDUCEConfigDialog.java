@@ -535,6 +535,10 @@ class REDUCEConfigData {
                         cmd.versionRootDir.getText().trim(),
                         commandList.toArray(new String[0])));
             }
+            // Rebuild submenus that depend on RunREDUCECommandList.
+            // Only really need to do this if the version list changes in some way!
+            RunREDUCEMenubar.runREDUCESubmenuBuild();
+            RunREDUCEMenubar.autoRunREDUCESubmenuBuild();
         } catch (BadLocationException e) {
             e.printStackTrace();
         }

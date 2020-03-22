@@ -28,13 +28,15 @@ public class RunREDUCEPrefs {
     static void save(String key, Object... values) {
         switch (key) {
             case FONTSIZE:
-                prefs.putFloat(FONTSIZE, (float) values[0]);
+                fontSize = (int) values[0];
+                prefs.putFloat(FONTSIZE, (float) fontSize);
                 break;
             case AUTORUN:
                 prefs.putBoolean(AUTORUN, autoRunState);
                 break;
             case AUTORUNVERSION:
-                prefs.put(AUTORUNVERSION, (String) values[0]);
+                autoRunVersion = (String) values[0];
+                prefs.put(AUTORUNVERSION, autoRunVersion);
                 break;
             case COLOUREDIO:
                 prefs.putBoolean(COLOUREDIO, colouredIOState);
@@ -187,6 +189,12 @@ class REDUCEConfiguration extends REDUCEConfigurationType {
         Preferences prefs = RunREDUCEPrefs.prefs;
         prefs.put(REDUCE_ROOT_DIR, reduceRootDir);
         prefs.put(PACKAGES_ROOT_DIR, packagesRootDir);
+        // Remove all saved versions before saving current versions:
+        try {
+            prefs.node(REDUCE_VERSIONS).removeNode();
+        } catch (BackingStoreException e) {
+            e.printStackTrace();
+        }
         prefs = prefs.node(REDUCE_VERSIONS);
         for (RunREDUCECommand cmd : runREDUCECommandList) {
             prefs = prefs.node(cmd.version);
@@ -194,12 +202,8 @@ class REDUCEConfiguration extends REDUCEConfigurationType {
             int commandLength = cmd.command.length;
             prefs.putInt(COMMAND_LENGTH, commandLength);
             prefs.put(COMMAND, commandLength > 0 ? cmd.command[0] : "");
-            int i;
-            for (i = 1; i < cmd.command.length; i++)
+            for (int i = 1; i < cmd.command.length; i++)
                 prefs.put(ARG + i, cmd.command[i]);
-            // Delete any redundant saved args:
-            for (; i <= REDUCEConfigDialog.nArgs; i++)
-                prefs.remove(ARG + i);
             prefs = prefs.parent();
         }
     }
