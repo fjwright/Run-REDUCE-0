@@ -243,19 +243,25 @@ Changes to the dialogue fields are only saved if you click on the
 Run-REDUCE and saved as preferences.  Clicking on the `Cancel` button
 causes all changes made since the dialogue box opened to be forgotten.
 
-Clicking on the `Add a New Version` button adds a new version of
-REDUCE, which is initially called `NEW VERSION`, with all other fields
-empty.  Changes to the `Version Name` field are immediately reflected
-in the list of REDUCE versions.  You could, for example, add a second
-version of PSL REDUCE with a different memory size, or a version of
-REDUCE running on Common Lisp.  (There is currently no option to
-duplicate an existing REDUCE version to be modified, but that might be
-a useful future addition!)
-
 Clicking on the `Delete Selected Version` button deletes the
 configuration for the selected version of REDUCE.  If you delete all
 available versions then a new (blank) version is automatically
 created.
+
+Clicking on the `Duplicate Selected Version` button duplicates the
+configuration for the selected version of REDUCE immediately below it.
+The name of the duplicate version is the name of the duplicated
+version with ` NEW` appended, which you can edit as you wish.  (But
+keep version names fairly short!).  Changes to the `Version Name`
+field are immediately reflected in the list of REDUCE versions.  This
+provides a convenient way, for example, to add one or more versions of
+REDUCE with a non-standard memory size.
+
+Clicking on the `Add a New Version` button adds a new version of
+REDUCE, which is initially called `NEW VERSION`, with all other fields
+empty.  You could, for example, add one or more versions of REDUCE
+running on Common Lisp.  (At some future date I may include CL REDUCE
+in the default configuration.)
 
 The full command to run a particular REDUCE version must be split into
 an executable command filename and a sequence of up to 5 command

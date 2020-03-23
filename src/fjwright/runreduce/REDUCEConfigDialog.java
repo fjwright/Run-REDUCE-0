@@ -13,6 +13,8 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
 public class REDUCEConfigDialog extends JDialog {
+    private static final String NEW_VERSION = "NEW VERSION";
+    private static final String NEW_DUPLICATE = " NEW";
     private Frame frame;
     private JPanel contentPane;
     private JButton buttonSave;
@@ -23,6 +25,7 @@ public class REDUCEConfigDialog extends JDialog {
     static DefaultListModel<String> listModel;
     static JList<String> versionsJList;
     private JButton deleteVersionButton;
+    private JButton duplicateVersionButton;
     private JButton addVersionButton;
     private JTextField versionNameTextField;
     private JTextField versionRootDirTextField;
@@ -59,6 +62,7 @@ public class REDUCEConfigDialog extends JDialog {
 
         resetAllDefaultsButton.addActionListener(e -> resetAllDefaults());
         deleteVersionButton.addActionListener(e -> deleteVersion());
+        duplicateVersionButton.addActionListener(e -> duplicateVersion());
         addVersionButton.addActionListener(e -> addVersion());
     }
 
@@ -227,6 +231,11 @@ public class REDUCEConfigDialog extends JDialog {
         deleteVersionButton.setToolTipText("Delete the configuration for the selected version of REDUCE.");
         deleteVersionButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         versionsPane.add(deleteVersionButton);
+        versionsPane.add(Box.createVerticalStrut(10));
+        duplicateVersionButton = new JButton("Duplicate Selected Version");
+        duplicateVersionButton.setToolTipText("Duplicate the configuration for the selected version of REDUCE below it.");
+        duplicateVersionButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        versionsPane.add(duplicateVersionButton);
         versionsPane.add(Box.createVerticalStrut(10));
         addVersionButton = new JButton("Add a New Version");
         addVersionButton.setToolTipText("Add a configuration for a new version of REDUCE.");
@@ -421,12 +430,34 @@ public class REDUCEConfigDialog extends JDialog {
         }
     }
 
+    private void duplicateVersion() {
+        try {
+            int selectedIndex = versionsJList.getSelectedIndex();
+            REDUCECommandDocuments oldCmd = reduceCommandDocumentsList.get(selectedIndex++);
+            // selectedIndex is now incremented to the index of the duplicate entry.
+            listModel.add(selectedIndex, oldCmd.version.getText() + NEW_DUPLICATE);
+            versionsJList.setSelectedIndex(selectedIndex);
+            String[] commandStrings = new String[oldCmd.command.length];
+            for (int i = 0; i < oldCmd.command.length; i++) {
+                commandStrings[i] = oldCmd.command[i].getText();
+            }
+            REDUCECommandDocuments newCmd = new REDUCECommandDocuments(
+                    oldCmd.version.getText() + NEW_DUPLICATE,
+                    oldCmd.versionRootDir.getText(),
+                    commandStrings);
+            reduceCommandDocumentsList.add(selectedIndex, newCmd);
+            showREDUCECommand(newCmd);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void addVersion() {
-        listModel.addElement("NEW VERSION");
+        listModel.addElement(NEW_VERSION);
         versionsJList.setSelectedIndex(listModel.size() - 1);
-        REDUCECommandDocuments reduceCommandDocuments = new REDUCECommandDocuments("NEW VERSION");
-        reduceCommandDocumentsList.add(reduceCommandDocuments);
-        showREDUCECommand(reduceCommandDocuments);
+        REDUCECommandDocuments newCmd = new REDUCECommandDocuments(NEW_VERSION);
+        reduceCommandDocumentsList.add(newCmd);
+        showREDUCECommand(newCmd);
     }
 }
 

@@ -63,3 +63,6 @@ top-level directory.
   Run-REDUCE to run on any platform.
 
 ### Pre-release updates since v0.4
+
+* Button to duplicate selected version added to REDUCEConfigDialog.
+
