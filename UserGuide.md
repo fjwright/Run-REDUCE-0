@@ -7,9 +7,9 @@ Algebra System.  REDUCE must be obtained from
 [SourceForge](https://sourceforge.net/projects/reduce-algebra/) and
 installed separately.  Run-REDUCE should find a standard REDUCE
 installation automatically and not **require** any initial
-configuration, at least on Microsoft Windows and Ubuntu Linux. But
-with suitable configuration is **should** run on any platform that
-supports Java 8, but I can only test on 64-bit Windows 10 and Ubuntu 18.
+configuration, at least on Microsoft Windows and Ubuntu Linux.  With
+suitable configuration is **should** run on any platform that supports
+Java 8, but I can only test on 64-bit Windows 10 and Ubuntu 18.
 
 Run-REDUCE does **not** (yet) provide typeset-quality display of
 mathematical notation.
@@ -71,21 +71,21 @@ and on Ubuntu Linux they are stored in the XML file
 
 By default, Run-REDUCE assumes a standard installation of REDUCE and
 uses commands based on that assumption to run REDUCE.  If the
-environment variable named `REDUCE` is set then Run-REDUCE uses its
-value as the root of the REDUCE installation; a final directory
-separator is optional.  On Microsoft Windows, you can use either a
-backward or a forward slash as directory separator and case is not
-significant.  For example, the following input to `cmd.exe` works
-(although it is unnecessary) if you have installed REDUCE on your `D`
-drive:
+environment variable named `REDUCE` is set then optionally (see below)
+Run-REDUCE uses its value as the root of the REDUCE installation; a
+final directory separator is optional.  On Microsoft Windows, you can
+use either a backward or a forward slash as directory separator and
+case is not significant.  For example, the following input to
+`cmd.exe` works (although it is unnecessary) if you have installed
+REDUCE on your `D` drive:
 
     set REDUCE=D:/Program Files/Reduce
 
-Otherwise, Run-REDUCE looks in the standard places for a REDUCE
-installation.  On Microsoft Windows it looks for the folder `\Program
-Files\Reduce` on all accessible drives.  On Ubuntu Linux it assumes
-that package information is under `/usr/share/reduce` and executable
-files are under `/usr/lib/reduce`.
+Otherwise, by default Run-REDUCE looks in the standard places for a
+REDUCE installation.  On Microsoft Windows it looks for the folder
+`\Program Files\Reduce` on all accessible drives.  On Ubuntu Linux it
+assumes that package information is under `/usr/share/reduce` and
+executable files are under `/usr/lib/reduce`.
 
 ## The Main Window
 
@@ -115,7 +115,7 @@ newline.
 ## The File Menu
 
 Some items in this menu pop up a dialogue that allows you to select
-one or more items, such as filenames.  This dialog supports all the
+one or more items, such as filenames.  This dialogue supports all the
 standard keyboard and mouse-based selection facilities normally
 provided by your platform.  In particular, in dialogues that allow
 selection of multiple items, holding the `Control` key down while
@@ -161,32 +161,31 @@ GUI remember all the open output files to facilitate shutting them
 
 ### Output Here
 
-This item redirects output to the GUI without shutting the current
-output file using the REDUCE `OUT T` command.
+This redirects output to the GUI without shutting the current output
+file using the REDUCE `OUT T` command.
 
 ### Shut Output Files...
 
-This item is inactive unless there are open output files, in which
-case it brings up a dialogue that allows you to select and shut one or
-more of the open output files using the REDUCE `SHUT` command.  It
-uses a special dialogue, not a file selector, and only shows open
-output files.
+This is inactive unless there are open output files, in which case it
+brings up a dialogue that allows you to select and shut one or more of
+the open output files using the REDUCE `SHUT` command.  It uses a
+special dialogue, not a file selector, and only shows open output
+files.
 
 ### Shut Last Output File
 
-This item is inactive unless there are open output files, in which
-case it shuts the last used open output file using the REDUCE `SHUT`
-command.
+This is inactive unless there are open output files, in which case it
+shuts the last used open output file using the REDUCE `SHUT` command.
 
 ### Load Packages...
 
-This item brings up a dialogue that allows you to select and load one
-or more REDUCE packages using the REDUCE `LOAD_PACKAGE` command.  It
-uses a special dialogue, not a file selector, and only shows standard
+This brings up a dialogue that allows you to select and load one or
+more REDUCE packages using the REDUCE `LOAD_PACKAGE` command.  It uses
+a special dialogue, not a file selector, and only shows standard
 REDUCE packages, excluding those that are pre-loaded, sorted
 alphabetically.  Run-REDUCE determines the list of packages each time
 it starts up by reading the `package.map` file in the REDUCE
-installation directory.
+installation.
 
 ### Save Session Log...
 
@@ -202,7 +201,8 @@ selected file; otherwise, it overwrites any previous file content.
 ### Quit
 
 This terminates both REDUCE and the Run-REDUCE GUI, as does the close
-widget at the top right-hand corner of the main window frame.
+widget that is normally at the top right-hand corner of the main
+window frame.
 
 ## The REDUCE Menu
 
@@ -230,13 +230,13 @@ uses it the next time it runs.
 
 ### Configure REDUCE...
 
-This item brings up a dialogue box that allows you to configure the
+This brings up a dialogue box that allows you to configure the
 versions of REDUCE available and how they are run.  Defaults are
 preset that should work for Microsoft Windows and Ubuntu Linux.
 Run-REDUCE currently assumes that if it is not running on Windows then
 the Ubuntu default configuration is appropriate, so that is what you
 will see by default on (say) Apple MacOS. There is a button to reset
-the REDUCE configuration to the application defaults.
+the whole REDUCE configuration to the application defaults.
 
 Changes to the dialogue fields are only saved if you click on the
 `Save` button, in which case the new configuration is used within
@@ -261,7 +261,7 @@ The full command to run a particular REDUCE version must be split into
 an executable command filename and a sequence of up to 5 command
 arguments.  (It would be easy to increase this limit, but I hope 5
 arguments is enough!)  The components of the command that would be
-separated by white space as a shell command must be entered into
+separated by white space in a shell command must be entered into
 separate fields on this form.  Run-REDUCE does not currently use a
 shell to run REDUCE and the command specified is used directly to
 create a separate process to run REDUCE.  So do not include any shell
@@ -291,7 +291,7 @@ obvious and graceful way; it is not necessary for the rest of
 Run-REDUCE.
 
 All field values are stripped of leading and trailing space before
-they are used or saved.
+they are used or saved, and empty fields are not saved at all.
 
 ## The View Menu
 
@@ -315,5 +315,4 @@ The Help menu provides the following items.
 
 ### About Run-REDUCE
 
-This item pops up a dialogue displaying brief information about
-Run-REDUCE.
+This pops up a dialogue displaying brief information about Run-REDUCE.

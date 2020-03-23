@@ -35,9 +35,10 @@ abstract class RunREDUCEListDialog<E> extends JDialog implements ActionListener 
         listPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         // Create and initialize the control buttons:
-        JButton shutButton = new JButton(buttonText);
-        shutButton.setActionCommand(buttonText);
-        shutButton.addActionListener(this);
+        JButton okButton = new JButton(buttonText);
+        okButton.setActionCommand(buttonText);
+        okButton.addActionListener(this);
+        getRootPane().setDefaultButton(okButton);
         JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(this);
 
@@ -46,7 +47,7 @@ abstract class RunREDUCEListDialog<E> extends JDialog implements ActionListener 
         buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
         buttonPane.setBorder(BorderFactory.createEmptyBorder(0, 10, 10, 10));
         buttonPane.add(Box.createHorizontalGlue());
-        buttonPane.add(shutButton);
+        buttonPane.add(okButton);
         buttonPane.add(Box.createRigidArea(new Dimension(10, 0)));
         buttonPane.add(cancelButton);
 
@@ -130,7 +131,7 @@ class FontSizeDialog extends JDialog implements ActionListener, ChangeListener {
     private JTextField newSizeDemoTextField;
     private JSpinner newSizeValueSpinner;
     private Font newFont;
-    private float newFontSize;
+    private int newFontSize;
 
     FontSizeDialog(Frame frame) {
         // Create a modal dialog:
@@ -183,6 +184,7 @@ class FontSizeDialog extends JDialog implements ActionListener, ChangeListener {
         JButton okButton = new JButton("OK");
         okButton.setActionCommand("OK");
         okButton.addActionListener(this);
+        getRootPane().setDefaultButton(okButton);
         JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(this);
 
@@ -201,11 +203,13 @@ class FontSizeDialog extends JDialog implements ActionListener, ChangeListener {
     }
 
     void showDialog() {
-        int currentSize = RunREDUCE.reduceFont.getSize();
-        currentSizeDemoTextField.setFont(RunREDUCE.reduceFont);
+        newFont = RunREDUCE.reduceFont;
+        int currentSize = newFont.getSize();
+        newFontSize = currentSize;
+        currentSizeDemoTextField.setFont(newFont);
         currentSizeValueTextField.setText(String.valueOf(currentSize));
-        newSizeDemoTextField.setFont(RunREDUCE.reduceFont);
-        newSizeValueSpinner.setValue(currentSize);
+        newSizeDemoTextField.setFont(newFont);
+        newSizeValueSpinner.setValue(newFontSize);
         //Listen for changes on the spinner.
         newSizeValueSpinner.addChangeListener(this);
         pack();                       // must be done dynamically
@@ -215,7 +219,7 @@ class FontSizeDialog extends JDialog implements ActionListener, ChangeListener {
 
     public void stateChanged(ChangeEvent e) {
         newFontSize = (int) newSizeValueSpinner.getValue();
-        newFont = RunREDUCE.reduceFont.deriveFont(newFontSize);
+        newFont = RunREDUCE.reduceFont.deriveFont((float) newFontSize);
         newSizeDemoTextField.setFont(newFont);
         pack();
     }

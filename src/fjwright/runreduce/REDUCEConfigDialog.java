@@ -13,6 +13,7 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
 public class REDUCEConfigDialog extends JDialog {
+    private Frame frame;
     private JPanel contentPane;
     private JButton buttonSave;
     private JButton buttonCancel;
@@ -34,6 +35,7 @@ public class REDUCEConfigDialog extends JDialog {
 
     public REDUCEConfigDialog(Frame frame) {
         super(frame, "Configure REDUCE Directories and Commands", true);
+        this.frame = frame;
         createUIComponents();
         setContentPane(contentPane);
         getRootPane().setDefaultButton(buttonSave);
@@ -122,10 +124,11 @@ public class REDUCEConfigDialog extends JDialog {
         mainPane.add(rootDirsPane, mainPaneGBC);
         rootDirsPane.setBorder(border);
 
-        final JTextArea textArea1 = new JTextArea("If 'Default Root Dir' is empty on start-up, it " +
-                "takes the value of the environment variable named REDUCE if it is set." +
-                (RunREDUCEPrefs.windowsOS ?
-                        " Otherwise, Run-REDUCE searches for a standard installation folder (on Windows only)." : null));
+        String text1 = "If 'Default Root Dir' is empty on start-up, it takes " +
+                "the value of the environment variable named REDUCE if it is set.";
+        if (RunREDUCEPrefs.windowsOS)
+            text1 += " Otherwise, Run-REDUCE searches for a standard installation folder (on Windows only).";
+        final JTextArea textArea1 = new JTextArea(text1);
         textArea1.setBackground(backgroundColor);
         textArea1.setEditable(false);
         textArea1.setLineWrap(true);
@@ -349,7 +352,8 @@ public class REDUCEConfigDialog extends JDialog {
     public void showDialog() {
         reduceConfigData = new REDUCEConfigData(RunREDUCE.reduceConfiguration);
         updateDialog(reduceConfigData);
-        pack(); // must be here!
+        pack();                       // must be done dynamically
+        setLocationRelativeTo(frame); // ditto
         /*
          * setVisible(true): If a modal dialog is not already visible, this call will *not return*
          * until the dialog is hidden by calling setVisible(false) or dispose.
@@ -476,12 +480,15 @@ class VersionDocumentListener implements DocumentListener {
     public void insertUpdate(DocumentEvent e) {
         updateVersionList(e);
     }
+
     public void removeUpdate(DocumentEvent e) {
         updateVersionList(e);
     }
+
     public void changedUpdate(DocumentEvent e) {
         updateVersionList(e);
     }
+
     private void updateVersionList(DocumentEvent e) {
         // This seems a bit ugly, but it also seems to work!
         try {
