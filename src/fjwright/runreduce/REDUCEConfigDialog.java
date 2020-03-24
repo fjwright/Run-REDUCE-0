@@ -5,7 +5,6 @@ import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.event.ListDataListener;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -29,6 +28,9 @@ public class REDUCEConfigDialog extends JDialog {
     private JTextField versionNameTextField;
     private JTextField versionRootDirTextField;
     private JTextField commandPathNameTextField;
+    private Color backgroundColor;
+    private Insets textInsets = new Insets(0, 0, 3, 0);
+
     static final int nArgs = 5;
     private final JLabel[] argLabels = new JLabel[nArgs];
     private final JTextField[] args = new JTextField[nArgs];
@@ -71,11 +73,12 @@ public class REDUCEConfigDialog extends JDialog {
 
     private void createUIComponents() {
         contentPane = new JPanel(new BorderLayout());
-        Color backgroundColor = contentPane.getBackground();
+        backgroundColor = contentPane.getBackground();
 
         int textFieldColumns = 40;
         GridBagConstraints mainPaneGBC, gbc;
         Insets insets = new Insets(5, 5, 5, 5);
+        // Preserve descenders in JTextArea and JTextField components:
 
         // buttonPane contains the Save and Cancel buttons.
         final JPanel buttonPane = new JPanel();
@@ -123,11 +126,7 @@ public class REDUCEConfigDialog extends JDialog {
                 "the value of the environment variable named REDUCE if it is set.";
         if (RunREDUCEPrefs.windowsOS)
             text1 += " Otherwise, Run-REDUCE searches for a standard installation folder (on Windows only).";
-        final JTextArea textArea1 = new JTextArea(text1);
-        textArea1.setBackground(backgroundColor);
-        textArea1.setEditable(false);
-        textArea1.setLineWrap(true);
-        textArea1.setWrapStyleWord(true);
+        final JTextArea textArea1 = newJTextArea(text1);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
@@ -148,7 +147,7 @@ public class REDUCEConfigDialog extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = insets;
         rootDirsPane.add(defaultRootDirLabel, gbc);
-        defaultRootDirTextField = new JTextField(textFieldColumns);
+        defaultRootDirTextField = newJTextField(textFieldColumns);
         defaultRootDirTextField.setToolTipText("As an optional convenience, " +
                 "specify a root directory path that provides a default for all other root directories.");
         gbc = new GridBagConstraints();
@@ -161,11 +160,7 @@ public class REDUCEConfigDialog extends JDialog {
         gbc.insets = insets;
         rootDirsPane.add(defaultRootDirTextField, gbc);
 
-        final JTextArea textArea2 = new JTextArea("If 'Packages Root Dir' is empty on start-up, it takes the value of 'Default Root Dir'.");
-        textArea2.setBackground(backgroundColor);
-        textArea2.setEditable(false);
-        textArea2.setLineWrap(true);
-        textArea2.setWrapStyleWord(true);
+        final JTextArea textArea2 = newJTextArea("If 'Packages Root Dir' is empty on start-up, it takes the value of 'Default Root Dir'.");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -186,7 +181,7 @@ public class REDUCEConfigDialog extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = insets;
         rootDirsPane.add(packagesRootDirLabel, gbc);
-        packagesRootDirTextField = new JTextField(textFieldColumns);
+        packagesRootDirTextField = newJTextField(textFieldColumns);
         packagesRootDirTextField.setToolTipText("A directory containing a standard REDUCE packages directory, which defaults to 'Default Root Dir'.");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
@@ -253,7 +248,7 @@ public class REDUCEConfigDialog extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = insets;
         commandPane.add(versionNameLabel, gbc);
-        versionNameTextField = new JTextField(textFieldColumns);
+        versionNameTextField = newJTextField(textFieldColumns);
         versionNameTextField.setToolTipText("An arbitrary name used to identify this version of REDUCE.");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
@@ -275,7 +270,7 @@ public class REDUCEConfigDialog extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = insets;
         commandPane.add(versionRootDirLabel, gbc);
-        versionRootDirTextField = new JTextField(textFieldColumns);
+        versionRootDirTextField = newJTextField(textFieldColumns);
         versionRootDirTextField.setToolTipText("As an optional convenience, " +
                 "specify a root directory path that can be referenced as $REDUCE in the command path name and arguments below.");
         gbc = new GridBagConstraints();
@@ -288,12 +283,8 @@ public class REDUCEConfigDialog extends JDialog {
         gbc.insets = insets;
         commandPane.add(versionRootDirTextField, gbc);
 
-        final JTextArea textArea3 = new JTextArea("$REDUCE below is replaced by 'Version Root Dir' " +
+        final JTextArea textArea3 = newJTextArea("$REDUCE below is replaced by 'Version Root Dir' " +
                 "if it is set, otherwise by 'Default Root Dir'.");
-        textArea3.setBackground(backgroundColor);
-        textArea3.setEditable(false);
-        textArea3.setLineWrap(true);
-        textArea3.setWrapStyleWord(true);
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 2;
@@ -314,7 +305,7 @@ public class REDUCEConfigDialog extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
         gbc.insets = insets;
         commandPane.add(commandPathNameLabel, gbc);
-        commandPathNameTextField = new JTextField(textFieldColumns);
+        commandPathNameTextField = newJTextField(textFieldColumns);
         commandPathNameTextField.setToolTipText("The filename part of the command to run REDUCE, which can optionally begin with $REDUCE.");
         gbc = new GridBagConstraints();
         gbc.gridx = 1;
@@ -337,7 +328,7 @@ public class REDUCEConfigDialog extends JDialog {
             gbc.anchor = GridBagConstraints.WEST;
             gbc.insets = insets;
             commandPane.add(argLabels[i], gbc);
-            args[i] = new JTextField(textFieldColumns);
+            args[i] = newJTextField(textFieldColumns);
             gbc = new GridBagConstraints();
             gbc.gridx = 1;
             gbc.gridy = 4 + i;
@@ -348,6 +339,22 @@ public class REDUCEConfigDialog extends JDialog {
             gbc.insets = insets;
             commandPane.add(args[i], gbc);
         }
+    }
+
+    private JTextArea newJTextArea(String text) {
+        JTextArea textArea = new JTextArea(text);
+        textArea.setMargin(textInsets);
+        textArea.setBackground(backgroundColor);
+        textArea.setEditable(false);
+        textArea.setLineWrap(true);
+        textArea.setWrapStyleWord(true);
+        return textArea;
+    }
+
+    private JTextField newJTextField(int columns) {
+        JTextField textField = new JTextField(columns);
+        textField.setMargin(textInsets);
+        return textField;
     }
 
     public void showDialog() {
@@ -548,30 +555,10 @@ class VersionDocumentListener implements DocumentListener {
     }
 }
 
-class REDUCECommandDocumentsList extends ArrayList<REDUCECommandDocuments> implements ListModel<PlainDocument> {
+class REDUCECommandDocumentsList extends ArrayList<REDUCECommandDocuments> {
     REDUCECommandDocumentsList(REDUCEConfigurationType reduceConfiguration) {
         for (RunREDUCECommand cmd : reduceConfiguration.runREDUCECommandList)
             add(new REDUCECommandDocuments(cmd.version, cmd.versionRootDir, cmd.command));
-    }
-
-    @Override
-    public int getSize() {
-        return size();
-    }
-
-    @Override
-    public PlainDocument getElementAt(int index) {
-        return get(index).version;
-    }
-
-    @Override
-    public void addListDataListener(ListDataListener l) {
-
-    }
-
-    @Override
-    public void removeListDataListener(ListDataListener l) {
-
     }
 }
 
