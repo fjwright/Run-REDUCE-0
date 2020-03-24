@@ -5,6 +5,7 @@ import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.ListDataListener;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -13,8 +14,6 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 
 public class REDUCEConfigDialog extends JDialog {
-    private static final String NEW_VERSION = "NEW VERSION";
-    private static final String NEW_DUPLICATE = " NEW";
     private Frame frame;
     private JPanel contentPane;
     private JButton buttonSave;
@@ -22,8 +21,8 @@ public class REDUCEConfigDialog extends JDialog {
     private JButton resetAllDefaultsButton;
     private JTextField defaultRootDirTextField;
     private JTextField packagesRootDirTextField;
-    static DefaultListModel<String> listModel;
-    static JList<String> versionsJList;
+    static DefaultListModel<PlainDocument> listModel;
+    static JList<PlainDocument> versionsJList;
     private JButton deleteVersionButton;
     private JButton duplicateVersionButton;
     private JButton addVersionButton;
@@ -68,14 +67,6 @@ public class REDUCEConfigDialog extends JDialog {
 
     private void onCancel() {
         setVisible(false);
-    }
-
-    // Only for testing!
-    public static void main(String[] args) {
-        REDUCEConfigDialog dialog = new REDUCEConfigDialog(null);
-        dialog.pack();
-        dialog.setVisible(true);
-        System.exit(0);
     }
 
     private void createUIComponents() {
@@ -221,6 +212,7 @@ public class REDUCEConfigDialog extends JDialog {
         versionsPane.add(versionsLabel);
         versionsPane.add(Box.createVerticalGlue());
         versionsJList = new JList<>();
+        versionsJList.setCellRenderer(new VersionsJListCellRenderer());
         versionsJList.setBorder(border);
         versionsJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         versionsJList.setVisibleRowCount(0);
@@ -382,12 +374,8 @@ public class REDUCEConfigDialog extends JDialog {
         reduceCommandDocumentsList = reduceConfigData.reduceCommandDocumentsList;
         listModel = new DefaultListModel<>();
         versionsJList.setModel(listModel);
-        try {
-            for (REDUCECommandDocuments reduceCommandDocuments : reduceCommandDocumentsList)
-                listModel.addElement(reduceCommandDocuments.version.getText());
-        } catch (BadLocationException e) {
-            e.printStackTrace();
-        }
+        for (REDUCECommandDocuments reduceCommandDocuments : reduceCommandDocumentsList)
+            listModel.addElement(reduceCommandDocuments.version);
         versionsJList.setSelectedIndex(0);
         showREDUCECommand(reduceCommandDocumentsList.get(0));
         versionsJList.addListSelectionListener(e -> {
@@ -435,16 +423,16 @@ public class REDUCEConfigDialog extends JDialog {
             int selectedIndex = versionsJList.getSelectedIndex();
             REDUCECommandDocuments oldCmd = reduceCommandDocumentsList.get(selectedIndex++);
             // selectedIndex is now incremented to the index of the duplicate entry.
-            listModel.add(selectedIndex, oldCmd.version.getText() + NEW_DUPLICATE);
-            versionsJList.setSelectedIndex(selectedIndex);
             String[] commandStrings = new String[oldCmd.command.length];
             for (int i = 0; i < oldCmd.command.length; i++) {
                 commandStrings[i] = oldCmd.command[i].getText();
             }
             REDUCECommandDocuments newCmd = new REDUCECommandDocuments(
-                    oldCmd.version.getText() + NEW_DUPLICATE,
+                    oldCmd.version.getText() + " NEW",
                     oldCmd.versionRootDir.getText(),
                     commandStrings);
+            listModel.add(selectedIndex, newCmd.version);
+            versionsJList.setSelectedIndex(selectedIndex);
             reduceCommandDocumentsList.add(selectedIndex, newCmd);
             showREDUCECommand(newCmd);
         } catch (BadLocationException e) {
@@ -453,11 +441,44 @@ public class REDUCEConfigDialog extends JDialog {
     }
 
     private void addVersion() {
-        listModel.addElement(NEW_VERSION);
+        REDUCECommandDocuments newCmd = new REDUCECommandDocuments("NEW VERSION");
+        listModel.addElement(newCmd.version);
         versionsJList.setSelectedIndex(listModel.size() - 1);
-        REDUCECommandDocuments newCmd = new REDUCECommandDocuments(NEW_VERSION);
         reduceCommandDocumentsList.add(newCmd);
         showREDUCECommand(newCmd);
+    }
+}
+
+/**
+ * Render a cell of versionsJList by displaying a string for each document in the list;
+ * see the JList API documentation for the example on which I based this class.
+ */
+class VersionsJListCellRenderer extends JLabel implements ListCellRenderer<Object> {
+    // This is the only method defined by ListCellRenderer.
+    // We just reconfigure the JLabel each time we're called.
+    public Component getListCellRendererComponent(
+            JList<?> list,           // the list
+            Object value,            // value to display
+            int index,               // cell index
+            boolean isSelected,      // is the cell selected
+            boolean cellHasFocus)    // does the cell have focus
+    {
+        try {
+            setText(((PlainDocument) value).getText());
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+        if (isSelected) {
+            setBackground(list.getSelectionBackground());
+            setForeground(list.getSelectionForeground());
+        } else {
+            setBackground(list.getBackground());
+            setForeground(list.getForeground());
+        }
+        setEnabled(list.isEnabled());
+        setFont(list.getFont());
+        setOpaque(true);
+        return this;
     }
 }
 
@@ -522,20 +543,35 @@ class VersionDocumentListener implements DocumentListener {
 
     private void updateVersionList(DocumentEvent e) {
         // This seems a bit ugly, but it also seems to work!
-        try {
-            String s = ((PlainDocument) e.getDocument()).getText();
-            int selectedIndex = REDUCEConfigDialog.versionsJList.getSelectedIndex();
-            REDUCEConfigDialog.listModel.set(selectedIndex, s);
-        } catch (BadLocationException ex) {
-            ex.printStackTrace();
-        }
+        int selectedIndex = REDUCEConfigDialog.versionsJList.getSelectedIndex();
+        REDUCEConfigDialog.listModel.set(selectedIndex, (PlainDocument) e.getDocument());
     }
 }
 
-class REDUCECommandDocumentsList extends ArrayList<REDUCECommandDocuments> {
+class REDUCECommandDocumentsList extends ArrayList<REDUCECommandDocuments> implements ListModel<PlainDocument> {
     REDUCECommandDocumentsList(REDUCEConfigurationType reduceConfiguration) {
         for (RunREDUCECommand cmd : reduceConfiguration.runREDUCECommandList)
             add(new REDUCECommandDocuments(cmd.version, cmd.versionRootDir, cmd.command));
+    }
+
+    @Override
+    public int getSize() {
+        return size();
+    }
+
+    @Override
+    public PlainDocument getElementAt(int index) {
+        return get(index).version;
+    }
+
+    @Override
+    public void addListDataListener(ListDataListener l) {
+
+    }
+
+    @Override
+    public void removeListDataListener(ListDataListener l) {
+
     }
 }
 
