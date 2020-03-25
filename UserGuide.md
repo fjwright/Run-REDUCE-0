@@ -102,11 +102,14 @@ one of the two triangular icons at the left-hand side.
 You type (or paste) REDUCE input into the input editor pane, edit it
 as necessary, and then click on the `Send Input` button, which sends
 the input to REDUCE and echos it in the top pane.  This clears the
-input editor, but you can scroll through the previous input using the
-`Earlier Input` and `Later Input` buttons.  You can edit previous
-input recalled into the input editor as necessary and then send it to
-REDUCE.  Input can be multi-line, in which case Run-REDUCE processes
-all the lines together.
+input editor, but you can scroll through the previous input entered
+via the input editor using the `Earlier Input` and `Later Input`
+buttons.  You can edit previous input recalled into the input editor
+as necessary and then send it to REDUCE.  Input can be multi-line, in
+which case Run-REDUCE processes all the lines together.  The `Send
+Input` button is disabled unless REDUCE is running, and the `Earlier
+Input` and `Later Input` buttons are disabled unless there is earlier
+or later input, respectively.
 
 Sending input to REDUCE strips any trailing white space, adds a
 semicolon if there was no final terminator, and then adds a final
@@ -146,6 +149,7 @@ check box labelled `Echo` on the right-hand side of the file window,
 which is selected by default.  Selecting this option causes file input
 to be echoed to the `Input/Output Display` pane.  (Note that a REDUCE
 source code file should end with `;end;` to avoid an error message.)
+This menu item is disabled unless REDUCE is running.
 
 ### Output to File...
 
@@ -157,16 +161,18 @@ extension for REDUCE output files is `.rlg`.)  Only one output file
 can be selected at a time, but selecting a new output file redirects
 output to that file without shutting the previous output file.  The
 GUI remember all the open output files to facilitate shutting them
-&ndash; see below.
+&ndash; see below.  This menu item is disabled unless REDUCE is
+running.
 
 ### Output Here
 
 This redirects output to the GUI without shutting the current output
-file using the REDUCE `OUT T` command.
+file using the REDUCE `OUT T` command.  This menu item is disabled
+unless REDUCE is running.
 
 ### Shut Output Files...
 
-This is inactive unless there are open output files, in which case it
+This is disabled unless there are open output files, in which case it
 brings up a dialogue that allows you to select and shut one or more of
 the open output files using the REDUCE `SHUT` command.  It uses a
 special dialogue, not a file selector, and only shows open output
@@ -174,7 +180,7 @@ files.
 
 ### Shut Last Output File
 
-This is inactive unless there are open output files, in which case it
+This is disabled unless there are open output files, in which case it
 shuts the last used open output file using the REDUCE `SHUT` command.
 
 ### Load Packages...
@@ -185,7 +191,7 @@ a special dialogue, not a file selector, and only shows standard
 REDUCE packages, excluding those that are pre-loaded, sorted
 alphabetically.  Run-REDUCE determines the list of packages each time
 it starts up by reading the `package.map` file in the REDUCE
-installation.
+installation.  This menu item is disabled unless REDUCE is running.
 
 ### Save Session Log...
 
@@ -198,7 +204,7 @@ right-hand side of the packages window, which is deselected by
 default.  Selecting this option appends the session log to the
 selected file; otherwise, it overwrites any previous file content.
 
-### Quit
+### Exit
 
 This terminates both REDUCE and the Run-REDUCE GUI, as does the close
 widget that is normally at the top right-hand corner of the main
@@ -212,9 +218,8 @@ The REDUCE menu provides the following items.
 
 This sub-menu provides an item for each configured version of REDUCE
 (typically based on different versions of Lisp &ndash; by default CSL
-and PSL).  Clicking on a version of REDUCE runs it.  (Currently,
-another version of REDUCE cannot be run without restarting
-Run-REDUCE.)
+and PSL).  Clicking on a version of REDUCE runs it.  This sub-menu is
+disabled when REDUCE is running.
 
 ### Auto-run REDUCE?
 
@@ -227,6 +232,14 @@ remembers this option value and uses it the next time it runs.
 This sub-menu allows you to select the version of REDUCE to auto-run
 when auto-run is enabled.  Run-REDUCE remembers this selection and
 uses it the next time it runs.
+
+### Stop REDUCE
+
+This terminates REDUCE but **not** the Run-REDUCE GUI.  **It is the
+recommended way to stop REDUCE because then Run-REDUCE reliably knows
+that REDUCE is no longer running.** (Run-REDUCE tries to detect input
+of the `BYE` and `QUIT` commands via the input editor, but this is
+less reliable.)  This menu item is disabled unless REDUCE is running.
 
 ### Configure REDUCE...
 

@@ -32,8 +32,6 @@ top-level directory.
 
 * More sophisticated font colouring, including a full emulation of
   redfront.
-* Detect whether REDUCE is running and enable or disable menu items
-  appropriately.  Allow REDUCE to be restarted.
 * Better scrolling facilities in the IO display pane.
 * Keyboard shortcuts to send input to REDUCE and scroll the input
   list.
@@ -41,6 +39,7 @@ top-level directory.
 
 ### To do later
 
+* Detect whether REDUCE is running more reliably (maybe).
 * Remember all user choices, including window configurations (maybe).
 * Typeset output supporting copy and paste. Could parse `off nat`
   output, or use it together with TeX or MathML output.
@@ -71,3 +70,7 @@ top-level directory.
   longer throws an error.
 * Better handling of `Load Packages...` and `Packages Root Dir`.
 * Disable earlier and later input buttons as appropriate.
+* Enable or disable menu items etc. according to whether REDUCE is
+  running.  Allow REDUCE to be restarted.
+* `Quit` menu item renamed to `Exit`, and a new `Stop REDUCE` item
+  added to the `REDUCE` menu.

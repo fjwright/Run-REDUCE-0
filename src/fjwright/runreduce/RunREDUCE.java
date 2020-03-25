@@ -20,6 +20,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * This is the main class that runs the whole application.
@@ -30,6 +31,7 @@ public class RunREDUCE extends JPanel implements ActionListener {
     static JTextArea inputTextArea;
     static JTextPane outputTextPane;
     private static JButton earlierButton;
+    static JButton sendButton;
     private static JButton laterButton;
 
     // Use the logical Monospaced font for REDUCE I/O:
@@ -40,6 +42,8 @@ public class RunREDUCE extends JPanel implements ActionListener {
     static SimpleAttributeSet inputSimpleAttributeSet = new SimpleAttributeSet();
     static REDUCEConfigurationDefault reduceConfigurationDefault;
     static REDUCEConfiguration reduceConfiguration;
+    private static final Pattern pattern =
+            Pattern.compile(".*\\b(?:bye|quit)\\s*[;$]?.*", Pattern.CASE_INSENSITIVE);
 
     public RunREDUCE() {
         super(new BorderLayout()); // JPanel defaults to FlowLayout!
@@ -76,16 +80,16 @@ public class RunREDUCE extends JPanel implements ActionListener {
         earlierButton = new JButton("\u25b2 Earlier Input");
         earlierButton.setActionCommand("Earlier");
         earlierButton.addActionListener(this);
-        earlierButton.setToolTipText("Select earlier input.");
+        earlierButton.setToolTipText("Select earlier input via this editor.");
         earlierButton.setEnabled(false);
-        JButton sendButton = new JButton("Send Input");
+        sendButton = new JButton("Send Input");
         sendButton.setActionCommand("Send");
         sendButton.addActionListener(this);
         sendButton.setToolTipText("Send the input above to REDUCE, adding a semicolon and/or newline if necessary.");
         laterButton = new JButton("\u25bc Later Input");
         laterButton.setActionCommand("Later");
         laterButton.addActionListener(this);
-        laterButton.setToolTipText("Select later input.");
+        laterButton.setToolTipText("Select later input via this editor.");
         laterButton.setEnabled(false);
 
         // Set buttons to all have the same size as the widest:
@@ -119,6 +123,9 @@ public class RunREDUCE extends JPanel implements ActionListener {
                 maxInputListIndex = inputListIndex - 1;
                 earlierButton.setEnabled(true);
                 laterButton.setEnabled(false);
+                if (pattern.matcher(text).matches())
+                    // Reset enabled state of menu items etc.:
+                    RunREDUCEMenubar.whenREDUCERunning(false);
             }
         } else if ("Earlier".equals(e.getActionCommand())) {
             if (inputListIndex > 0) {

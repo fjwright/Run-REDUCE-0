@@ -70,6 +70,8 @@ class RunREDUCECommand {
                     ReduceOutputThread(p.getInputStream(), RunREDUCE.outputTextPane);
             outputGobbler.start();
 
+            // Initialise enabled state of menu items etc.:
+            RunREDUCEMenubar.whenREDUCERunning(true);
         } catch (Exception exc) {
             RunREDUCE.errorMessageDialog(
                     "Error running REDUCE -- " + exc,
