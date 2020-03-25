@@ -70,3 +70,4 @@ top-level directory.
 * Clicking on the `Send Input` button when REDUCE is not running no
   longer throws an error.
 * Better handling of `Load Packages...` and `Packages Root Dir`.
+* Disable earlier and later input buttons as appropriate.

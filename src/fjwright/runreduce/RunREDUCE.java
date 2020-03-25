@@ -29,6 +29,9 @@ public class RunREDUCE extends JPanel implements ActionListener {
     private static JFrame frame;
     static JTextArea inputTextArea;
     static JTextPane outputTextPane;
+    private static JButton earlierButton;
+    private static JButton laterButton;
+
     // Use the logical Monospaced font for REDUCE I/O:
     static Font reduceFont = new Font(Font.MONOSPACED, Font.PLAIN, RunREDUCEPrefs.fontSize);
     private final static List<String> inputList = new ArrayList<>();
@@ -70,18 +73,20 @@ public class RunREDUCE extends JPanel implements ActionListener {
         add(splitPane, BorderLayout.CENTER);
 
         // Buttons to control the input:
-        JButton earlierButton = new JButton("\u25b2 Earlier Input");
+        earlierButton = new JButton("\u25b2 Earlier Input");
         earlierButton.setActionCommand("Earlier");
         earlierButton.addActionListener(this);
         earlierButton.setToolTipText("Select earlier input.");
+        earlierButton.setEnabled(false);
         JButton sendButton = new JButton("Send Input");
         sendButton.setActionCommand("Send");
         sendButton.addActionListener(this);
         sendButton.setToolTipText("Send the input above to REDUCE, adding a semicolon and/or newline if necessary.");
-        JButton laterButton = new JButton("\u25bc Later Input");
+        laterButton = new JButton("\u25bc Later Input");
         laterButton.setActionCommand("Later");
         laterButton.addActionListener(this);
         laterButton.setToolTipText("Select later input.");
+        laterButton.setEnabled(false);
 
         // Set buttons to all have the same size as the widest:
         Dimension buttonDimension = earlierButton.getPreferredSize();
@@ -112,13 +117,24 @@ public class RunREDUCE extends JPanel implements ActionListener {
                 inputTextArea.setText(null);
                 inputListIndex = inputList.size();
                 maxInputListIndex = inputListIndex - 1;
+                earlierButton.setEnabled(true);
+                laterButton.setEnabled(false);
             }
         } else if ("Earlier".equals(e.getActionCommand())) {
-            if (inputListIndex > 0)
+            if (inputListIndex > 0) {
                 inputTextArea.setText(inputList.get(--inputListIndex));
+                if (inputListIndex < maxInputListIndex)
+                    laterButton.setEnabled(true);
+            }
+            if (inputListIndex == 0)
+                earlierButton.setEnabled(false);
         } else if ("Later".equals(e.getActionCommand())) {
-            if (inputListIndex < maxInputListIndex)
+            if (inputListIndex < maxInputListIndex) {
                 inputTextArea.setText(inputList.get(++inputListIndex));
+                earlierButton.setEnabled(true);
+            }
+            if (inputListIndex == maxInputListIndex)
+                laterButton.setEnabled(false);
         }
         // Return the focus to the input text area:
         inputTextArea.requestFocusInWindow();
