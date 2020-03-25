@@ -288,13 +288,19 @@ empty.  But a version of REDUCE running on Common Lisp would probably
 use a different root directory.
 
 The `Load Packages...` facility in the `File` menu requires a standard
-REDUCE packages directory and the information used is independent of
-the REDUCE implementation, so this directory is fixed for all REDUCE
-versions.  It is normally associated with the portable REDUCE source
-code.  If this directory does not exist (or is mis-configured) then
-the `Load Packages...` facility will just fail in some reasonably
-obvious and graceful way; it is not necessary for the rest of
-Run-REDUCE.
+REDUCE packages directory, which should exist in the directory
+specified by the `Packages Root Dir` field.  The information used is
+independent of the REDUCE implementation, so this directory is fixed
+for all REDUCE versions.  It is normally associated with the portable
+REDUCE source code.  The value of the `Packages Root Dir` field is
+only used by `Load Packages...`.  If this directory does not exist or
+is mis-configured then `Load Packages...` will pop up a warning
+dialogue, and closing this will automatically pop up the `Configure
+REDUCE...` dialogue to allow you to correct the problem.
+
+If the `Packages Root Dir` field is empty on start-up (because you
+previously saved a blank value) then it reverts to the platform
+default value.
 
 All field values are stripped of leading and trailing space before
 they are used or saved, and empty fields are not saved at all.

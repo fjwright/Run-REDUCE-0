@@ -144,8 +144,10 @@ public class RunREDUCE extends JPanel implements ActionListener {
         outputTextPane.setCaretPosition(styledDoc.getLength());
 
         // Send the input to the REDUCE input pipe:
-        RunREDUCECommand.reduceInputPrintWriter.print(text);
-        RunREDUCECommand.reduceInputPrintWriter.flush();
+        if (RunREDUCECommand.reduceInputPrintWriter != null) {
+            RunREDUCECommand.reduceInputPrintWriter.print(text);
+            RunREDUCECommand.reduceInputPrintWriter.flush();
+        }
     }
 
     /**

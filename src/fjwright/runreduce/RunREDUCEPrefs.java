@@ -145,6 +145,7 @@ class REDUCEConfiguration extends REDUCEConfigurationType {
         Preferences prefs = RunREDUCEPrefs.prefs;
         reduceRootDir = prefs.get(REDUCE_ROOT_DIR, RunREDUCE.reduceConfigurationDefault.reduceRootDir);
         packagesRootDir = prefs.get(PACKAGES_ROOT_DIR, RunREDUCE.reduceConfigurationDefault.packagesRootDir);
+        if (packagesRootDir.isEmpty()) packagesRootDir = RunREDUCE.reduceConfigurationDefault.packagesRootDir;
 
         try {
             if (prefs.nodeExists(REDUCE_VERSIONS)) {

@@ -122,7 +122,7 @@ public class REDUCEConfigDialog extends JDialog {
         mainPane.add(rootDirsPane, mainPaneGBC);
         rootDirsPane.setBorder(border);
 
-        String text1 = "If 'Default Root Dir' is empty on start-up, it takes " +
+        String text1 = "If 'Default Root Dir' is blank on start-up, it takes " +
                 "the value of the environment variable named REDUCE if it is set.";
         if (RunREDUCEPrefs.windowsOS)
             text1 += " Otherwise, Run-REDUCE searches for a standard installation folder (on Windows only).";
@@ -160,7 +160,8 @@ public class REDUCEConfigDialog extends JDialog {
         gbc.insets = insets;
         rootDirsPane.add(defaultRootDirTextField, gbc);
 
-        final JTextArea textArea2 = newJTextArea("If 'Packages Root Dir' is empty on start-up, it takes the value of 'Default Root Dir'.");
+        final JTextArea textArea2 = newJTextArea(
+                "If 'Packages Root Dir' is blank on start-up, it takes the platform default value.");
         gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 2;

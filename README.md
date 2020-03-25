@@ -65,4 +65,8 @@ top-level directory.
 ### Pre-release updates since v0.4
 
 * Button to duplicate selected version added to REDUCEConfigDialog.
-
+* Descenders in text are no longer cut off (on Windows) in
+  REDUCEConfigDialog.
+* Clicking on the `Send Input` button when REDUCE is not running no
+  longer throws an error.
+* Better handling of `Load Packages...` and `Packages Root Dir`.

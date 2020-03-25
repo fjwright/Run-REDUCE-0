@@ -19,7 +19,8 @@ class RunREDUCECommand {
     String versionRootDir = ""; // version-specific reduceRootDir.
     String[] command = {"", "", "", "", "", ""}; // executable pathname followed by arguments
 
-    RunREDUCECommand() {}
+    RunREDUCECommand() {
+    }
 
     RunREDUCECommand(String version, String versionRootDir, String... command) {
         this.version = version;
@@ -126,7 +127,12 @@ class REDUCEPackageList extends ArrayList<String> {
         Path packagesRootPath = Paths.get(RunREDUCE.reduceConfiguration.packagesRootDir);
         Path packageMapFile = packagesRootPath.resolve("packages/package.map");
         if (!Files.isReadable(packageMapFile)) {
-            System.err.println("REDUCE package map file is not available!");
+            RunREDUCE.errorMessageDialog(
+                    new String[]{"The REDUCE package map file is not available!",
+                            "Please correct 'Packages Root Dir' in the 'Configure REDUCE...' dialogue,",
+                            "which will open automatically when you close this dialogue."},
+                    "REDUCE Package Error");
+            RunREDUCEMenubar.showREDUCEConfigDialog();
             return;
         }
 

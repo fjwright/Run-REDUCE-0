@@ -17,7 +17,7 @@ import java.util.List;
  * directory or absolute; I currently use the latter.
  */
 class RunREDUCEMenubar extends JMenuBar {
-
+    private static Frame frame = null;
     static final JMenuItem closeFileMenuItem = new JMenuItem("Shut Output Files...");
     static final JMenuItem closeLastMenuItem = new JMenuItem("Shut Last Output File");
     static final JMenuItem loadPackagesMenuItem = new JMenuItem("Load Packages...");
@@ -39,6 +39,7 @@ class RunREDUCEMenubar extends JMenuBar {
     static REDUCEConfigDialog reduceConfigDialog;
 
     RunREDUCEMenubar(JFrame frame) {
+        this.frame = frame;
         frame.setJMenuBar(this);
         // menuBar.setOpaque(true);
 
@@ -157,6 +158,11 @@ class RunREDUCEMenubar extends JMenuBar {
         loadPackagesMenuItem.addActionListener(e -> {
             if (loadPackagesDialog == null) loadPackagesDialog = new LoadPackagesDialog(frame);
             if (packageList == null) packageList = new REDUCEPackageList();
+            if (packageList.isEmpty()) {
+                // Allow the user to correct the packages directory and try again:
+                packageList = null;
+                return;
+            }
             // Select packages to load:
             List<String> selectedPackages = loadPackagesDialog.showDialog(packageList);
             if (!selectedPackages.isEmpty()) {
@@ -233,10 +239,7 @@ class RunREDUCEMenubar extends JMenuBar {
         JMenuItem configureREDUCEMenuItem = new JMenuItem("Configure REDUCE...");
         reduceMenu.add(configureREDUCEMenuItem);
         configureREDUCEMenuItem.setToolTipText("Configure REDUCE directories and commands.");
-        configureREDUCEMenuItem.addActionListener(e -> {
-            if (reduceConfigDialog == null) reduceConfigDialog = new REDUCEConfigDialog(frame);
-            reduceConfigDialog.showDialog();
-        });
+        configureREDUCEMenuItem.addActionListener(e -> showREDUCEConfigDialog());
 
 
         /* ************* *
@@ -321,5 +324,10 @@ class RunREDUCEMenubar extends JMenuBar {
                             ((JRadioButtonMenuItem) e.getItem()).getText());
             });
         }
+    }
+
+    static void showREDUCEConfigDialog() {
+        if (reduceConfigDialog == null) reduceConfigDialog = new REDUCEConfigDialog(frame);
+        reduceConfigDialog.showDialog();
     }
 }
