@@ -30,6 +30,7 @@ public class REDUCEConfigDialog extends JDialog {
     private JTextField commandPathNameTextField;
     private Color backgroundColor;
     private Insets textInsets = new Insets(0, 0, 3, 0);
+    private Font textAreaFont = new JTextField().getFont();
 
     static final int nArgs = 5;
     private final JLabel[] argLabels = new JLabel[nArgs];
@@ -349,6 +350,8 @@ public class REDUCEConfigDialog extends JDialog {
         textArea.setEditable(false);
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
+        // This seems necessary when not using the default look and feel:
+        textArea.setFont(textAreaFont);
         return textArea;
     }
 
