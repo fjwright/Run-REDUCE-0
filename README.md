@@ -39,6 +39,7 @@ top-level directory.
 
 ### To do later
 
+* Better support for non-default look-and-feels.
 * Detect whether REDUCE is running more reliably (maybe).
 * Remember all user choices, including window configurations (maybe).
 * Typeset output supporting copy and paste. Could parse `off nat`
@@ -61,16 +62,17 @@ top-level directory.
   configure REDUCE directories and commands.  Using this should allow
   Run-REDUCE to run on any platform.
 
-### Pre-release updates since v0.4
+### Version 0.5 updates (since v0.4)
 
 * Button to duplicate selected version added to REDUCEConfigDialog.
 * Descenders in text are no longer cut off (on Windows) in
   REDUCEConfigDialog.
-* Clicking on the `Send Input` button when REDUCE is not running no
-  longer throws an error.
 * Better handling of `Load Packages...` and `Packages Root Dir`.
-* Disable earlier and later input buttons as appropriate.
+* Disable the earlier and later input buttons as appropriate.
 * Enable or disable menu items etc. according to whether REDUCE is
   running.  Allow REDUCE to be restarted.
 * `Quit` menu item renamed to `Exit`, and a new `Stop REDUCE` item
   added to the `REDUCE` menu.
+* Correct REDUCEConfigDialog with a non-default look-and-feel.
+
+### Pre-release updates since v0.5

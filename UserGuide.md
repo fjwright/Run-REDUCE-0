@@ -57,6 +57,31 @@ open Files and navigate to the directory to which you downloaded
 `Run-REDUCE.jar`.  Right-click on this directory and select `Open in
 Terminal`.
 
+## Look and Feel
+
+The "look" of an application refers to its appearance and the "feel"
+refers to how the widgets behave.  By default, Run-REDUCE uses the
+standard Swing look-and-feel, which is the same on all platforms
+(apart from the title bar, which always follows the platform default).
+You can use a different look-and-feel if you run Run-REDUCE by
+executing one of the following shell commands in the directory
+containing `Run-REDUCE.jar`:
+
+    java -Dswing.defaultlaf=com.sun.java.swing.plaf.windows.WindowsLookAndFeel -jar Run-REDUCE.jar
+
+    java -Dswing.defaultlaf=com.sun.java.swing.plaf.gtk.GTKLookAndFeel -jar Run-REDUCE.jar
+
+    java -Dswing.defaultlaf=com.sun.java.swing.plaf.motif.MotifLookAndFeel -jar Run-REDUCE.jar
+
+Note that the Windows look-and-feel only works on Microsoft Windows
+and the GTK look-and-feel only works on GNU platforms such as
+GNU/Linux with GTK+ 2.2 or later (e.g. Ubuntu 18 and later), but the
+Motif look-and-feel should work on all platforms.  Note that there
+seems to be a minor glitch in the GTK look-and-feel that causes an
+error report, but nevertheless it appears to work.  (Specifying the
+look-and-feel this way is a temporary measure; I hope to provide
+better support for specifying the look-and-feel at some later date.)
+
 ## General Information
 
 Run-REDUCE remembers user preferences and uses them the next time it
