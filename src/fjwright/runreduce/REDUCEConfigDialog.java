@@ -11,6 +11,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.function.Consumer;
 
 public class REDUCEConfigDialog extends JDialog {
     private Frame frame;
@@ -569,7 +572,7 @@ class VersionDocumentListener implements DocumentListener {
 //    }
 //}
 
-class REDUCECommandDocumentsList extends AbstractListModel<PlainDocument> {
+class REDUCECommandDocumentsList extends AbstractListModel<PlainDocument> implements Iterable <REDUCECommandDocuments> {
     private ArrayList<REDUCECommandDocuments> reduceCommandDocumentsList = new ArrayList<>();
 
     REDUCECommandDocumentsList(REDUCEConfigurationType reduceConfiguration) {
@@ -630,6 +633,23 @@ class REDUCECommandDocumentsList extends AbstractListModel<PlainDocument> {
         // AbstractListModel subclasses must call this method after changing one or more elements of the model:
         fireContentsChanged(this, index, index);
     }
+
+    // Iterable methods that need to be overridden to use the enhanced for statement:
+
+    @Override
+    public Iterator<REDUCECommandDocuments> iterator() {
+        return reduceCommandDocumentsList.iterator();
+    }
+
+    @Override
+    public void forEach(Consumer<? super REDUCECommandDocuments> action) {
+        reduceCommandDocumentsList.forEach(action);
+    }
+
+    @Override
+    public Spliterator<REDUCECommandDocuments> spliterator() {
+        return reduceCommandDocumentsList.spliterator();
+    }
 }
 
 /*
@@ -659,9 +679,7 @@ class REDUCEConfigData {
             RunREDUCE.reduceConfiguration.reduceRootDir = reduceRootDir.getText().trim();
             RunREDUCE.reduceConfiguration.packagesRootDir = packagesRootDir.getText().trim();
             RunREDUCE.reduceConfiguration.runREDUCECommandList = new RunREDUCECommandList();
-//            for (REDUCECommandDocuments cmd : reduceCommandDocumentsList) {
-            for (int index = 0; index < reduceCommandDocumentsList.size(); index++) { // FixMe
-                REDUCECommandDocuments cmd = reduceCommandDocumentsList.get(index);   // FixMe
+            for (REDUCECommandDocuments cmd : reduceCommandDocumentsList) {
                 // Do not save blank arguments:
                 ArrayList<String> commandList = new ArrayList<>();
                 for (int i = 0; i < cmd.command.length; i++) {
