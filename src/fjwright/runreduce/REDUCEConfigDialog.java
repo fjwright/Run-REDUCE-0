@@ -537,23 +537,22 @@ class REDUCECommandDocuments {
             e.printStackTrace();
         }
     }
-}
 
-class VersionDocumentListener implements DocumentListener {
-    // Move this class into REDUCEConfigDialog as an inner class?
-    public void insertUpdate(DocumentEvent e) {
-        int selectedIndex = REDUCEConfigDialog.versionsJList.getSelectedIndex();
-        REDUCEConfigDialog.reduceCommandDocumentsList.changedUpdate(selectedIndex);
-    }
+    private static class VersionDocumentListener implements DocumentListener {
+        public void insertUpdate(DocumentEvent e) {
+            int selectedIndex = REDUCEConfigDialog.versionsJList.getSelectedIndex();
+            REDUCEConfigDialog.reduceCommandDocumentsList.changedUpdate(selectedIndex);
+        }
 
-    public void removeUpdate(DocumentEvent e) {
-        int selectedIndex = REDUCEConfigDialog.versionsJList.getSelectedIndex();
-        REDUCEConfigDialog.reduceCommandDocumentsList.changedUpdate(selectedIndex);
-    }
+        public void removeUpdate(DocumentEvent e) {
+            int selectedIndex = REDUCEConfigDialog.versionsJList.getSelectedIndex();
+            REDUCEConfigDialog.reduceCommandDocumentsList.changedUpdate(selectedIndex);
+        }
 
-    public void changedUpdate(DocumentEvent e) {
-        int selectedIndex = REDUCEConfigDialog.versionsJList.getSelectedIndex();
-        REDUCEConfigDialog.reduceCommandDocumentsList.changedUpdate(selectedIndex);
+        public void changedUpdate(DocumentEvent e) {
+            int selectedIndex = REDUCEConfigDialog.versionsJList.getSelectedIndex();
+            REDUCEConfigDialog.reduceCommandDocumentsList.changedUpdate(selectedIndex);
+        }
     }
 }
 
