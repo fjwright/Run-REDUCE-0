@@ -545,33 +545,6 @@ class VersionDocumentListener implements DocumentListener {
     }
 }
 
-//class REDUCECommandDocumentsList extends ArrayList<REDUCECommandDocuments> implements ListModel<PlainDocument> {
-//    REDUCECommandDocumentsList(REDUCEConfigurationType reduceConfiguration) {
-//        for (RunREDUCECommand cmd : reduceConfiguration.runREDUCECommandList)
-//            add(new REDUCECommandDocuments(cmd.version, cmd.versionRootDir, cmd.command));
-//    }
-//
-//    @Override
-//    public int getSize() {
-//        return size();
-//    }
-//
-//    @Override
-//    public PlainDocument getElementAt(int index) {
-//        return get(index).version;
-//    }
-//
-//    @Override
-//    public void addListDataListener(ListDataListener l) {
-//
-//    }
-//
-//    @Override
-//    public void removeListDataListener(ListDataListener l) {
-//
-//    }
-//}
-
 class REDUCECommandDocumentsList extends AbstractListModel<PlainDocument> implements Iterable <REDUCECommandDocuments> {
     private ArrayList<REDUCECommandDocuments> reduceCommandDocumentsList = new ArrayList<>();
 
