@@ -3,6 +3,8 @@ package fjwright.runreduce;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.KeyEvent;
@@ -18,7 +20,6 @@ public class REDUCEConfigDialog extends JDialog {
     private JButton resetAllDefaultsButton;
     private JTextField defaultRootDirTextField;
     private JTextField packagesRootDirTextField;
-    //    static DefaultListModel<PlainDocument> listModel;
     static JList<PlainDocument> versionsJList;
     private JButton deleteVersionButton;
     private JButton duplicateVersionButton;
@@ -29,7 +30,7 @@ public class REDUCEConfigDialog extends JDialog {
     static final int nArgs = 5;
     private final JLabel[] argLabels = new JLabel[nArgs];
     private final JTextField[] args = new JTextField[nArgs];
-    private REDUCECommandDocumentsList reduceCommandDocumentsList;
+    static REDUCECommandDocumentsList reduceCommandDocumentsList;
     private REDUCEConfigData reduceConfigData;
 
     public REDUCEConfigDialog(Frame frame) {
@@ -369,10 +370,7 @@ public class REDUCEConfigDialog extends JDialog {
         defaultRootDirTextField.setDocument(reduceConfigData.reduceRootDir);
         packagesRootDirTextField.setDocument(reduceConfigData.packagesRootDir);
         reduceCommandDocumentsList = reduceConfigData.reduceCommandDocumentsList;
-//        listModel = new DefaultListModel<>();
         versionsJList.setModel(reduceCommandDocumentsList);
-//        for (REDUCECommandDocuments reduceCommandDocuments : reduceCommandDocumentsList)
-//            listModel.addElement(reduceCommandDocuments.version);
         versionsJList.setSelectedIndex(0);
         showREDUCECommand(reduceCommandDocumentsList.get(0));
         versionsJList.addListSelectionListener(e -> {
@@ -403,8 +401,8 @@ public class REDUCEConfigDialog extends JDialog {
     private void deleteVersion() {
         int selectedIndex = versionsJList.getSelectedIndex();
         if (selectedIndex >= 0) {
-//            listModel.remove(selectedIndex);
             reduceCommandDocumentsList.remove(selectedIndex);
+            reduceCommandDocumentsList.removeUpdate(selectedIndex);
             int size = reduceCommandDocumentsList.size(); // new size!
             if (size > 0) {
                 if (selectedIndex >= size) selectedIndex = 0;
@@ -428,9 +426,9 @@ public class REDUCEConfigDialog extends JDialog {
                     oldCmd.version.getText() + " NEW",
                     oldCmd.versionRootDir.getText(),
                     commandStrings);
-//            listModel.add(selectedIndex, newCmd.version);
-            versionsJList.setSelectedIndex(selectedIndex);
             reduceCommandDocumentsList.add(selectedIndex, newCmd);
+            reduceCommandDocumentsList.insertUpdate(selectedIndex);
+            versionsJList.setSelectedIndex(selectedIndex);
             showREDUCECommand(newCmd);
         } catch (BadLocationException e) {
             e.printStackTrace();
@@ -439,9 +437,10 @@ public class REDUCEConfigDialog extends JDialog {
 
     private void addVersion() {
         REDUCECommandDocuments newCmd = new REDUCECommandDocuments("NEW VERSION");
-//        listModel.addElement(newCmd.version);
-        versionsJList.setSelectedIndex(reduceCommandDocumentsList.size() - 1);
         reduceCommandDocumentsList.add(newCmd);
+        int newIndex = reduceCommandDocumentsList.size() - 1;
+        reduceCommandDocumentsList.insertUpdate(newIndex);
+        versionsJList.setSelectedIndex(newIndex);
         showREDUCECommand(newCmd);
     }
 }
@@ -506,7 +505,7 @@ class REDUCECommandDocuments {
         try {
             this.version = new PlainDocument();
             this.version.insertString(version);
-//            this.version.addDocumentListener(new VersionDocumentListener());
+            this.version.addDocumentListener(new VersionDocumentListener());
             this.versionRootDir = new PlainDocument();
             this.versionRootDir.insertString(versionRootDir);
             this.command = new PlainDocument[REDUCEConfigDialog.nArgs + 1];
@@ -525,25 +524,23 @@ class REDUCECommandDocuments {
     }
 }
 
-//class VersionDocumentListener implements DocumentListener {
-//    public void insertUpdate(DocumentEvent e) {
-//        updateVersionList(e);
-//    }
-//
-//    public void removeUpdate(DocumentEvent e) {
-//        updateVersionList(e);
-//    }
-//
-//    public void changedUpdate(DocumentEvent e) {
-//        updateVersionList(e);
-//    }
-//
-//    private void updateVersionList(DocumentEvent e) {
-//        // This seems a bit ugly, but it also seems to work!
-//        int selectedIndex = REDUCEConfigDialog.versionsJList.getSelectedIndex();
-//        REDUCEConfigDialog.listModel.set(selectedIndex, (PlainDocument) e.getDocument());
-//    }
-//}
+class VersionDocumentListener implements DocumentListener {
+    // Move this class into REDUCEConfigDialog as an inner class?
+    public void insertUpdate(DocumentEvent e) {
+        int selectedIndex = REDUCEConfigDialog.versionsJList.getSelectedIndex();
+        REDUCEConfigDialog.reduceCommandDocumentsList.changedUpdate(selectedIndex);
+    }
+
+    public void removeUpdate(DocumentEvent e) {
+        int selectedIndex = REDUCEConfigDialog.versionsJList.getSelectedIndex();
+        REDUCEConfigDialog.reduceCommandDocumentsList.changedUpdate(selectedIndex);
+    }
+
+    public void changedUpdate(DocumentEvent e) {
+        int selectedIndex = REDUCEConfigDialog.versionsJList.getSelectedIndex();
+        REDUCEConfigDialog.reduceCommandDocumentsList.changedUpdate(selectedIndex);
+    }
+}
 
 //class REDUCECommandDocumentsList extends ArrayList<REDUCECommandDocuments> implements ListModel<PlainDocument> {
 //    REDUCECommandDocumentsList(REDUCEConfigurationType reduceConfiguration) {
@@ -607,7 +604,7 @@ class REDUCECommandDocumentsList extends AbstractListModel<PlainDocument> {
         return reduceCommandDocumentsList.size();
     }
 
-    // AbstractListModel methods that need to be overridden:
+    // AbstractListModel methods that need to be overridden or called:
 
     @Override
     public int getSize() {
@@ -617,6 +614,21 @@ class REDUCECommandDocumentsList extends AbstractListModel<PlainDocument> {
     @Override
     public PlainDocument getElementAt(int index) {
         return reduceCommandDocumentsList.get(index).version;
+    }
+
+    public void insertUpdate(int index) {
+        // AbstractListModel subclasses must call this method after adding one or more elements to the model:
+        fireIntervalAdded(this, index, index);
+    }
+
+    public void removeUpdate(int index) {
+        // AbstractListModel subclasses must call this method after removing one or more elements from the model:
+        fireIntervalRemoved(this, index, index);
+    }
+
+    public void changedUpdate(int index) {
+        // AbstractListModel subclasses must call this method after changing one or more elements of the model:
+        fireContentsChanged(this, index, index);
     }
 }
 
