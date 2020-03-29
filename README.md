@@ -32,7 +32,6 @@ top-level directory.
 
 * More sophisticated font colouring, including a full emulation of
   redfront.
-* Better scrolling facilities in the IO display pane.
 * Multiple tabs that each run an independent invocation of REDUCE.
 
 ### To do later
@@ -77,3 +76,4 @@ top-level directory.
 
 * Keyboard shortcuts to send input to REDUCE and scroll the input
   list.  Scrolling beyond the last input clears the input pane.
+* Set the main application window to 2/3 the linear dimension of the screen.

@@ -114,7 +114,7 @@ public class RunREDUCE extends JPanel {
         actionMap.put("Later", laterAction);
     }
 
-    static class SendAction extends AbstractAction {
+    private static class SendAction extends AbstractAction {
         public SendAction() {
             super("Send Input");
             putValue(SHORT_DESCRIPTION,
@@ -141,7 +141,7 @@ public class RunREDUCE extends JPanel {
         }
     }
 
-    static class EarlierAction extends AbstractAction {
+    private static class EarlierAction extends AbstractAction {
         public EarlierAction() {
             super("\u25b2 Earlier Input");
             putValue(SHORT_DESCRIPTION, "Select earlier input via this editor." +
@@ -161,7 +161,7 @@ public class RunREDUCE extends JPanel {
         }
     }
 
-    static class LaterAction extends AbstractAction {
+    private static class LaterAction extends AbstractAction {
         public LaterAction() {
             super("\u25bc Later Input");
             putValue(SHORT_DESCRIPTION, "Select later input via this editor." +
@@ -219,7 +219,9 @@ public class RunREDUCE extends JPanel {
         // Create and set up the window:
         frame = new JFrame("RunREDUCE");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setPreferredSize(new Dimension(640, 480)); // (960, 720)???
+        // Set the main window to 2/3 the linear dimension of the screen:
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        frame.setPreferredSize(new Dimension((screenSize.width*2)/3, (screenSize.height*2)/3));
 
         // Add content to the window:
         RunREDUCE runREDUCE = new RunREDUCE();
