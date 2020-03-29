@@ -17,7 +17,8 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -26,13 +27,13 @@ import java.util.regex.Pattern;
  * This is the main class that runs the whole application.
  * It also provides the pane that displays REDUCE input and output.
  */
-public class RunREDUCE extends JPanel implements ActionListener {
+public class RunREDUCE extends JPanel {
     private static JFrame frame;
     static JTextArea inputTextArea;
     static JTextPane outputTextPane;
-    private static JButton earlierButton;
-    static JButton sendButton;
-    private static JButton laterButton;
+    static Action sendAction = new SendAction();
+    private static Action earlierAction = new EarlierAction();
+    private static Action laterAction = new LaterAction();
 
     // Use the logical Monospaced font for REDUCE I/O:
     static Font reduceFont = new Font(Font.MONOSPACED, Font.PLAIN, RunREDUCEPrefs.fontSize);
@@ -77,20 +78,11 @@ public class RunREDUCE extends JPanel implements ActionListener {
         add(splitPane, BorderLayout.CENTER);
 
         // Buttons to control the input:
-        earlierButton = new JButton("\u25b2 Earlier Input");
-        earlierButton.setActionCommand("Earlier");
-        earlierButton.addActionListener(this);
-        earlierButton.setToolTipText("Select earlier input via this editor.");
-        earlierButton.setEnabled(false);
-        sendButton = new JButton("Send Input");
-        sendButton.setActionCommand("Send");
-        sendButton.addActionListener(this);
-        sendButton.setToolTipText("Send the input above to REDUCE, adding a semicolon and/or newline if necessary.");
-        laterButton = new JButton("\u25bc Later Input");
-        laterButton.setActionCommand("Later");
-        laterButton.addActionListener(this);
-        laterButton.setToolTipText("Select later input via this editor.");
-        laterButton.setEnabled(false);
+        JButton sendButton = new JButton(sendAction);
+        JButton earlierButton = new JButton(earlierAction);
+        earlierAction.setEnabled(false);
+        JButton laterButton = new JButton(laterAction);
+        laterAction.setEnabled(false);
 
         // Set buttons to all have the same size as the widest:
         Dimension buttonDimension = earlierButton.getPreferredSize();
@@ -110,10 +102,27 @@ public class RunREDUCE extends JPanel implements ActionListener {
         buttonPane.add(Box.createHorizontalGlue());
 
         add(buttonPane, BorderLayout.PAGE_END);
+
+        // Add keyboard shortcuts to the input text area:
+        InputMap inputMap = inputTextArea.getInputMap(); // WHEN_FOCUSED map
+        ActionMap actionMap = inputTextArea.getActionMap();
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK), "Send");
+        actionMap.put("Send", sendAction);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK), "Earlier");
+        actionMap.put("Earlier", earlierAction);
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_DOWN_MASK), "Later");
+        actionMap.put("Later", laterAction);
     }
 
-    public void actionPerformed(ActionEvent e) {
-        if ("Send".equals(e.getActionCommand())) {
+    static class SendAction extends AbstractAction {
+        public SendAction() {
+            super("Send Input");
+            putValue(SHORT_DESCRIPTION,
+                    "Send the input above to REDUCE, adding a semicolon and/or newline if necessary." +
+                            " Keyboard Shortcut: Control+Enter");
+        }
+
+        public void actionPerformed(ActionEvent e) {
             String text = inputTextArea.getText();
             if (text.length() > 0) {
                 inputList.add(text);
@@ -121,30 +130,60 @@ public class RunREDUCE extends JPanel implements ActionListener {
                 inputTextArea.setText(null);
                 inputListIndex = inputList.size();
                 maxInputListIndex = inputListIndex - 1;
-                earlierButton.setEnabled(true);
-                laterButton.setEnabled(false);
+                earlierAction.setEnabled(true);
+                laterAction.setEnabled(false);
                 if (pattern.matcher(text).matches())
                     // Reset enabled state of menu items etc.:
                     RunREDUCEMenubar.whenREDUCERunning(false);
+                // Return the focus to the input text area:
+                inputTextArea.requestFocusInWindow();
             }
-        } else if ("Earlier".equals(e.getActionCommand())) {
+        }
+    }
+
+    static class EarlierAction extends AbstractAction {
+        public EarlierAction() {
+            super("\u25b2 Earlier Input");
+            putValue(SHORT_DESCRIPTION, "Select earlier input via this editor." +
+                    " Keyboard Shortcut: Control+UpArrow");
+        }
+
+        public void actionPerformed(ActionEvent e) {
             if (inputListIndex > 0) {
                 inputTextArea.setText(inputList.get(--inputListIndex));
-                if (inputListIndex < maxInputListIndex)
-                    laterButton.setEnabled(true);
+                if (inputListIndex <= maxInputListIndex)
+                    laterAction.setEnabled(true);
             }
             if (inputListIndex == 0)
-                earlierButton.setEnabled(false);
-        } else if ("Later".equals(e.getActionCommand())) {
+                earlierAction.setEnabled(false);
+            // Return the focus to the input text area:
+            inputTextArea.requestFocusInWindow();
+        }
+    }
+
+    static class LaterAction extends AbstractAction {
+        public LaterAction() {
+            super("\u25bc Later Input");
+            putValue(SHORT_DESCRIPTION, "Select later input via this editor." +
+                    " Keyboard Shortcut: Control+DownArrow");
+        }
+
+        public void actionPerformed(ActionEvent e) {
             if (inputListIndex < maxInputListIndex) {
                 inputTextArea.setText(inputList.get(++inputListIndex));
-                earlierButton.setEnabled(true);
+            } else {
+                inputTextArea.setText(null);
+                inputListIndex = maxInputListIndex + 1;
             }
-            if (inputListIndex == maxInputListIndex)
-                laterButton.setEnabled(false);
+            if (inputListIndex > 0) {
+                earlierAction.setEnabled(true);
+            }
+            if (inputListIndex > maxInputListIndex) {
+                laterAction.setEnabled(false);
+            }
+            // Return the focus to the input text area:
+            inputTextArea.requestFocusInWindow();
         }
-        // Return the focus to the input text area:
-        inputTextArea.requestFocusInWindow();
     }
 
     static void sendStringToREDUCE(String text) {

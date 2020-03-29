@@ -33,8 +33,6 @@ top-level directory.
 * More sophisticated font colouring, including a full emulation of
   redfront.
 * Better scrolling facilities in the IO display pane.
-* Keyboard shortcuts to send input to REDUCE and scroll the input
-  list.
 * Multiple tabs that each run an independent invocation of REDUCE.
 
 ### To do later
@@ -51,7 +49,7 @@ top-level directory.
 
 ## Release Notes
 
-### Version 0.4 updates (since v0.2)
+### Version 0.4 user-visible updates (since v0.2)
 
 * Add a semicolon to the end of input if there is no terminator.
 * Optional redfront-style font colouring to distinguish input and
@@ -62,7 +60,7 @@ top-level directory.
   configure REDUCE directories and commands.  Using this should allow
   Run-REDUCE to run on any platform.
 
-### Version 0.5 updates (since v0.4)
+### Version 0.5 user-visible updates (since v0.4)
 
 * Button to duplicate selected version added to REDUCEConfigDialog.
 * Descenders in text are no longer cut off (on Windows) in
@@ -75,4 +73,7 @@ top-level directory.
   added to the `REDUCE` menu.
 * Correct REDUCEConfigDialog with a non-default look-and-feel.
 
-### Pre-release updates since v0.5
+### Pre-release user-visible updates since v0.5
+
+* Keyboard shortcuts to send input to REDUCE and scroll the input
+  list.  Scrolling beyond the last input clears the input pane.

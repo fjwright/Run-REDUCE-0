@@ -348,7 +348,7 @@ class RunREDUCEMenubar extends JMenuBar {
 //        closeLastMenuItem.setEnabled(running);
         loadPackagesMenuItem.setEnabled(running);
         stopREDUCEMenuItem.setEnabled(running);
-        RunREDUCE.sendButton.setEnabled(running);
+        RunREDUCE.sendAction.setEnabled(running);
 
         // Items to disable when REDUCE is running:
         runREDUCESubmenu.setEnabled(!running);

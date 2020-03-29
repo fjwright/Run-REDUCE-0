@@ -129,11 +129,26 @@ as necessary, and then click on the `Send Input` button, which sends
 the input to REDUCE and echos it in the top pane.  This clears the
 input editor, but you can scroll through the previous input entered
 via the input editor using the `Earlier Input` and `Later Input`
-buttons.  You can edit previous input recalled into the input editor
-as necessary and then send it to REDUCE.  Input can be multi-line, in
+buttons.  Scrolling to input later than the last previous input clears
+the input editor pane back to its state before you started scrolling.
+
+When keyboard focus is in the input editor pane, the following
+keyboard shortcuts are active:
+
+Keyboard Shortcuts   | Action
+:-------------------:|:------------:
+*Control+Enter*      | Send Input
+*Control+UpArrow*    | Earlier Input
+*Control+DownArrow*  | Later Input
+
+where *Enter* is the *Return* or *Enter* key and *UpArrow* /
+*DownArrow* are the cursor up / down keys, respectively.
+
+You can edit previous input recalled into the input editor as
+necessary and then send it to REDUCE.  Input can be multi-line, in
 which case Run-REDUCE processes all the lines together.  The `Send
-Input` button is disabled unless REDUCE is running, and the `Earlier
-Input` and `Later Input` buttons are disabled unless there is earlier
+Input` action is disabled unless REDUCE is running, and the `Earlier
+Input` and `Later Input` actions are disabled unless there is earlier
 or later input, respectively.
 
 Sending input to REDUCE strips any trailing white space, adds a
