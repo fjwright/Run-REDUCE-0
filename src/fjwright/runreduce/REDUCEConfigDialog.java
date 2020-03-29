@@ -401,9 +401,9 @@ public class REDUCEConfigDialog extends JDialog {
     private void showREDUCECommand(REDUCECommandDocuments cmd) {
         versionNameTextField.setDocument(cmd.version);
         versionRootDirTextField.setDocument(cmd.versionRootDir);
-        PlainDocument[] command = cmd.command;
-        commandPathNameTextField.setDocument(command[0]);
-        for (int i = 0; i < nArgs; i++) args[i].setDocument(command[i + 1]);
+        ArrayList<PlainDocument> command = cmd.command;
+        commandPathNameTextField.setDocument(command.get(0));
+        for (int i = 0; i < nArgs; i++) args[i].setDocument(command.get(i + 1));
     }
 
     private void onSave() {
@@ -429,25 +429,17 @@ public class REDUCEConfigDialog extends JDialog {
     }
 
     private void duplicateVersion() {
-        try {
-            int selectedIndex = versionsJList.getSelectedIndex();
-            REDUCECommandDocuments oldCmd = reduceCommandDocumentsList.get(selectedIndex++);
-            // selectedIndex is now incremented to the index of the duplicate entry.
-            String[] commandStrings = new String[oldCmd.command.length];
-            for (int i = 0; i < oldCmd.command.length; i++) {
-                commandStrings[i] = oldCmd.command[i].getText();
-            }
-            REDUCECommandDocuments newCmd = new REDUCECommandDocuments(
-                    oldCmd.version.getText() + " NEW",
-                    oldCmd.versionRootDir.getText(),
-                    commandStrings);
-            reduceCommandDocumentsList.add(selectedIndex, newCmd);
-            reduceCommandDocumentsList.insertUpdate(selectedIndex);
-            versionsJList.setSelectedIndex(selectedIndex);
-            showREDUCECommand(newCmd);
-        } catch (BadLocationException e) {
-            e.printStackTrace();
-        }
+        int selectedIndex = versionsJList.getSelectedIndex();
+        REDUCECommandDocuments oldCmd = reduceCommandDocumentsList.get(selectedIndex++);
+        // selectedIndex is now incremented to the index of the duplicate entry.
+        REDUCECommandDocuments newCmd = new REDUCECommandDocuments(
+                oldCmd.version.getText() + " NEW",
+                oldCmd.versionRootDir.getText(),
+                oldCmd.command.stream().map(PlainDocument::getText).toArray(String[]::new));
+        reduceCommandDocumentsList.add(selectedIndex, newCmd);
+        reduceCommandDocumentsList.insertUpdate(selectedIndex);
+        versionsJList.setSelectedIndex(selectedIndex);
+        showREDUCECommand(newCmd);
     }
 
     private void addVersion() {
@@ -474,11 +466,7 @@ class VersionsJListCellRenderer extends JLabel implements ListCellRenderer<Objec
             boolean isSelected,      // is the cell selected
             boolean cellHasFocus)    // does the cell have focus
     {
-        try {
-            setText(((PlainDocument) value).getText());
-        } catch (BadLocationException e) {
-            e.printStackTrace();
-        }
+        setText(((PlainDocument) value).getText());
         if (isSelected) {
             setBackground(list.getSelectionBackground());
             setForeground(list.getSelectionForeground());
@@ -494,69 +482,69 @@ class VersionsJListCellRenderer extends JLabel implements ListCellRenderer<Objec
 }
 
 class PlainDocument extends javax.swing.text.PlainDocument {
-    String getText() throws BadLocationException {
-        return getText(0, getLength());
+    String getText() {
+        String text = "";
+        try {
+            text = getText(0, getLength());
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+        return text;
     }
 
-    void insertString(String str) throws BadLocationException {
-        insertString(0, str, null);
+    void insertString(String str) {
+        try {
+            insertString(0, str, null);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
     }
-
-//    void replace(String text) throws BadLocationException {
-//        replace(0, getLength(), text, null);
-//    }
 }
 
 class REDUCECommandDocuments {
     PlainDocument version;
     PlainDocument versionRootDir;
-    PlainDocument[] command;
+    ArrayList<PlainDocument> command;
 
     REDUCECommandDocuments(String version) {
         this(version, "", "");
     }
 
     REDUCECommandDocuments(String version, String versionRootDir, String... command) {
-        try {
-            this.version = new PlainDocument();
-            this.version.insertString(version);
-            this.version.addDocumentListener(new VersionDocumentListener());
-            this.versionRootDir = new PlainDocument();
-            this.versionRootDir.insertString(versionRootDir);
-            this.command = new PlainDocument[REDUCEConfigDialog.nArgs + 1];
-            int i;
-            for (i = 0; i < command.length; i++) {
-                this.command[i] = new PlainDocument();
-                this.command[i].insertString(command[i]);
-            }
-            for (; i <= REDUCEConfigDialog.nArgs; i++) {
-                this.command[i] = new PlainDocument();
-                this.command[i].insertString("");
-            }
-        } catch (BadLocationException e) {
-            e.printStackTrace();
+        this.version = new PlainDocument();
+        this.version.insertString(version);
+        this.version.addDocumentListener(new VersionDocumentListener());
+        this.versionRootDir = new PlainDocument();
+        this.versionRootDir.insertString(versionRootDir);
+        this.command = new ArrayList<>(REDUCEConfigDialog.nArgs + 1);
+        for (int i = 0; i <= REDUCEConfigDialog.nArgs; i++) {
+            PlainDocument doc = new PlainDocument();
+            doc.insertString(i < command.length ? command[i] : "");
+            this.command.add(doc);
         }
     }
 
     private static class VersionDocumentListener implements DocumentListener {
         public void insertUpdate(DocumentEvent e) {
-            int selectedIndex = REDUCEConfigDialog.versionsJList.getSelectedIndex();
-            REDUCEConfigDialog.reduceCommandDocumentsList.changedUpdate(selectedIndex);
+            changedUpdate();
         }
 
         public void removeUpdate(DocumentEvent e) {
-            int selectedIndex = REDUCEConfigDialog.versionsJList.getSelectedIndex();
-            REDUCEConfigDialog.reduceCommandDocumentsList.changedUpdate(selectedIndex);
+            changedUpdate();
         }
 
         public void changedUpdate(DocumentEvent e) {
+            changedUpdate();
+        }
+
+        private void changedUpdate() {
             int selectedIndex = REDUCEConfigDialog.versionsJList.getSelectedIndex();
             REDUCEConfigDialog.reduceCommandDocumentsList.changedUpdate(selectedIndex);
         }
     }
 }
 
-class REDUCECommandDocumentsList extends AbstractListModel<PlainDocument> implements Iterable <REDUCECommandDocuments> {
+class REDUCECommandDocumentsList extends AbstractListModel<PlainDocument> implements Iterable<REDUCECommandDocuments> {
     private ArrayList<REDUCECommandDocuments> reduceCommandDocumentsList = new ArrayList<>();
 
     REDUCECommandDocumentsList(REDUCEConfigurationType reduceConfiguration) {
@@ -636,7 +624,7 @@ class REDUCECommandDocumentsList extends AbstractListModel<PlainDocument> implem
     }
 }
 
-/*
+/**
  * The constructor initialises this class to represent the current status, editing the above dialogue updates it, and
  * closing the dialogue via the Save button copies it back to the relevant data structures.
  */
@@ -659,28 +647,20 @@ class REDUCEConfigData {
 
     void save() {
         // Write form data back to REDUCEConfiguration:
-        try {
-            RunREDUCE.reduceConfiguration.reduceRootDir = reduceRootDir.getText().trim();
-            RunREDUCE.reduceConfiguration.packagesRootDir = packagesRootDir.getText().trim();
-            RunREDUCE.reduceConfiguration.runREDUCECommandList = new RunREDUCECommandList();
-            for (REDUCECommandDocuments cmd : reduceCommandDocumentsList) {
-                // Do not save blank arguments:
-                ArrayList<String> commandList = new ArrayList<>();
-                for (int i = 0; i < cmd.command.length; i++) {
-                    String s = cmd.command[i].getText().trim();
-                    if (!s.isEmpty()) commandList.add(s);
-                }
-                RunREDUCE.reduceConfiguration.runREDUCECommandList.add(new RunREDUCECommand(
-                        cmd.version.getText().trim(),
-                        cmd.versionRootDir.getText().trim(),
-                        commandList.toArray(new String[0])));
-            }
-            // Rebuild submenus that depend on RunREDUCECommandList.
-            // Only really need to do this if the version list changes in some way!
-            RunREDUCEMenubar.runREDUCESubmenuBuild();
-            RunREDUCEMenubar.autoRunREDUCESubmenuBuild();
-        } catch (BadLocationException e) {
-            e.printStackTrace();
+        RunREDUCE.reduceConfiguration.reduceRootDir = reduceRootDir.getText().trim();
+        RunREDUCE.reduceConfiguration.packagesRootDir = packagesRootDir.getText().trim();
+        RunREDUCE.reduceConfiguration.runREDUCECommandList = new RunREDUCECommandList();
+        for (REDUCECommandDocuments cmd : reduceCommandDocumentsList) {
+            RunREDUCE.reduceConfiguration.runREDUCECommandList.add(new RunREDUCECommand(
+                    cmd.version.getText().trim(),
+                    cmd.versionRootDir.getText().trim(),
+                    // Do not save blank arguments:
+                    cmd.command.stream().map(e -> e.getText().trim()).
+                            filter(e -> !e.isEmpty()).toArray(String[]::new)));
         }
+        // Rebuild submenus that depend on RunREDUCECommandList.
+        // Only really need to do this if the version list changes in some way!
+        RunREDUCEMenubar.runREDUCESubmenuBuild();
+        RunREDUCEMenubar.autoRunREDUCESubmenuBuild();
     }
 }
