@@ -2,6 +2,7 @@ package fjwright.runreduce;
 
 import javax.swing.*;
 import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.io.*;
 import java.nio.file.*;
@@ -87,15 +88,18 @@ class ReduceOutputThread extends Thread {
     InputStream input;        // REDUCE pipe output (buffered)
     JTextPane outputTextPane; // GUI output pane
     static SimpleAttributeSet outputSimpleAttributeSet = new SimpleAttributeSet();
+    static SimpleAttributeSet promptSimpleAttributeSet = new SimpleAttributeSet();
 
     ReduceOutputThread(InputStream input, JTextPane outputTextPane) {
         this.input = input;
         this.outputTextPane = outputTextPane;
+        StyleConstants.setBold(promptSimpleAttributeSet,true);
     }
 
     public void run() {
         StyledDocument styledDoc = outputTextPane.getStyledDocument();
         StringBuilder text = new StringBuilder();
+        SimpleAttributeSet outputSimpleAttributeSet = null;
         // Must output characters rather than lines so that prompt appears!
         try (InputStreamReader isr = new InputStreamReader(input);
              BufferedReader br = new BufferedReader(isr)) {
@@ -103,9 +107,14 @@ class ReduceOutputThread extends Thread {
             for (; ; ) {
                 if (!br.ready()) {
                     if (text.length() > 0) {
-                        styledDoc.insertString(styledDoc.getLength(), text.toString(), outputSimpleAttributeSet);
+                        // Split off the final line consisting of the next input prompt:
+                        int promptIndex = text.lastIndexOf("\n") + 1;
+                        styledDoc.insertString(styledDoc.getLength(), text.substring(0,promptIndex), outputSimpleAttributeSet);
+                        styledDoc.insertString(styledDoc.getLength(), text.substring(promptIndex), promptSimpleAttributeSet);
                         text.setLength(0);
                         outputTextPane.setCaretPosition(styledDoc.getLength());
+                        // Only colour output *after* initial header info:
+                        outputSimpleAttributeSet = ReduceOutputThread.outputSimpleAttributeSet;
                     }
                     Thread.sleep(10);
                 } else if ((c = br.read()) != -1) {

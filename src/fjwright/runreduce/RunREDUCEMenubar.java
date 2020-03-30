@@ -34,8 +34,8 @@ class RunREDUCEMenubar extends JMenuBar {
             new FileNameExtensionFilter("REDUCE Input Files (*.red, *.tst, *.txt)", "red", "tst", "txt");
     static final FileNameExtensionFilter outputFileFilter =
             new FileNameExtensionFilter("REDUCE Output Files (*.rlg, *.txt)", "rlg", "txt");
-    static final JCheckBox echoButton = new JCheckBox("Echo");
-    static final JCheckBox appendButton = new JCheckBox("Append");
+    static final JCheckBox echoCheckBox = new JCheckBox("Echo");
+    static final JCheckBox appendCheckBox = new JCheckBox("Append");
     static ShutOutputFilesDialog shutOutputFilesDialog;
     static final List<File> outputFileList = new ArrayList<>();
     static LoadPackagesDialog loadPackagesDialog;
@@ -63,17 +63,37 @@ class RunREDUCEMenubar extends JMenuBar {
             fileChooser.resetChoosableFileFilters();
             fileChooser.setFileFilter(inputFileFilter);
             fileChooser.setMultiSelectionEnabled(true);
-            fileChooser.setAccessory(echoButton);
             fileChooser.setApproveButtonText("Input");
             fileChooser.setApproveButtonToolTipText("Input from selected files");
-            echoButton.setSelected(true);
+            // Add a Packages button and Echo CheckBox:
+            Box accessoryBox = Box.createVerticalBox();
+            accessoryBox.add(Box.createVerticalGlue());
+            JButton packagesDirButton = new JButton("Packages");
+            packagesDirButton.setMargin(new Insets(0, 0, 0, 0));
+            packagesDirButton.setToolTipText("Go to the REDUCE packages directory.");
+            File packagesDir = new File(RunREDUCE.reduceConfiguration.packagesRootDir, "packages");
+            packagesDirButton.setEnabled(packagesDir.exists());
+            packagesDirButton.addActionListener(e1 -> fileChooser.setCurrentDirectory(packagesDir));
+            accessoryBox.add(packagesDirButton);
+            accessoryBox.add(Box.createVerticalStrut(10));
+            accessoryBox.add(echoCheckBox);
+            echoCheckBox.setSelected(true);
+            packagesDirButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            echoCheckBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+            accessoryBox.add(Box.createVerticalGlue());
+            fileChooser.setAccessory(accessoryBox);
+            // Process the return value:
             int returnVal = fileChooser.showOpenDialog(frame);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File[] files = fileChooser.getSelectedFiles();
-                String text = "in \"" + files[0].toString();
-                for (int i = 1; i < files.length; i++)
-                    text += "\", \"" + files[i].toString();
-                RunREDUCE.sendStringToREDUCE(text + (echoButton.isSelected() ? "\";" : "\"$"));
+                StringBuilder text = new StringBuilder("in \"");
+                text.append(files[0].toString());
+                for (int i = 1; i < files.length; i++) {
+                    text.append("\", \"");
+                    text.append(files[i].toString());
+                }
+                text.append(echoCheckBox.isSelected() ? "\";" : "\"$");
+                RunREDUCE.sendStringToREDUCE(text.toString());
             }
         });
 
@@ -120,10 +140,14 @@ class RunREDUCEMenubar extends JMenuBar {
                 int length = fileIndices.length;
                 if (length != 0) {
                     // Process backwards to avoid remove() changing subsequent indices:
-                    String text = outputFileList.remove(fileIndices[--length]).toString() + "\"$";
-                    for (int i = --length; i >= 0; i--)
-                        text = outputFileList.remove(fileIndices[i]).toString() + "\", \"" + text;
-                    RunREDUCE.sendStringToREDUCE("shut \"" + text);
+                    StringBuilder text = new StringBuilder(outputFileList.remove(fileIndices[--length]).toString());
+                    text.append("\"$");
+                    for (int i = --length; i >= 0; i--) {
+                        text.insert(0, "\", \"");
+                        text.insert(0, outputFileList.remove(fileIndices[i]).toString());
+                    }
+                    text.insert(0, "shut \"");
+                    RunREDUCE.sendStringToREDUCE(text.toString());
                 }
             }
             if (outputFileList.isEmpty()) {
@@ -165,10 +189,14 @@ class RunREDUCEMenubar extends JMenuBar {
             // Select packages to load:
             List<String> selectedPackages = loadPackagesDialog.showDialog(packageList);
             if (!selectedPackages.isEmpty()) {
-                String text = "load_package " + selectedPackages.get(0);
-                for (int i = 1; i < selectedPackages.size(); i++)
-                    text += ", " + selectedPackages.get(i);
-                RunREDUCE.sendStringToREDUCE(text + ";");
+                StringBuilder text = new StringBuilder("load_package ");
+                text.append(selectedPackages.get(0));
+                for (int i = 1; i < selectedPackages.size(); i++) {
+                    text.append(", ");
+                    text.append(selectedPackages.get(i));
+                }
+                text.append(";");
+                RunREDUCE.sendStringToREDUCE(text.toString());
             }
         });
 
@@ -182,14 +210,14 @@ class RunREDUCEMenubar extends JMenuBar {
             fileChooser.resetChoosableFileFilters();
             fileChooser.setFileFilter(outputFileFilter);
             fileChooser.setMultiSelectionEnabled(false);
-            fileChooser.setAccessory(appendButton);
+            fileChooser.setAccessory(appendCheckBox);
             fileChooser.setApproveButtonText("Save");
             fileChooser.setApproveButtonToolTipText("Save to selected file");
             int returnVal = fileChooser.showOpenDialog(frame);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
                 try (Writer out = new BufferedWriter
-                        (new FileWriter(file, appendButton.isSelected()))) {
+                        (new FileWriter(file, appendCheckBox.isSelected()))) {
                     RunREDUCE.outputTextPane.write(out);
                 } catch (IOException ioe) {
                     ioe.printStackTrace();

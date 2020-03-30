@@ -191,6 +191,10 @@ to be echoed to the `Input/Output Display` pane.  (Note that a REDUCE
 source code file should end with `;end;` to avoid an error message.)
 This menu item is disabled unless REDUCE is running.
 
+The `Packages` button switches to the REDUCE packages directory
+(mainly for my benefit during testing).
+
+
 ### Output to File...
 
 This brings up a file selector dialogue that allows you to send output

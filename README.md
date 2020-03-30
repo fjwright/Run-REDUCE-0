@@ -77,3 +77,6 @@ top-level directory.
 * Keyboard shortcuts to send input to REDUCE and scroll the input
   list.  Scrolling beyond the last input clears the input pane.
 * Set the main application window to 2/3 the linear dimension of the screen.
+* The `Packages` button on the `Input from Files...` dialogue switches
+  to the REDUCE packages directory (mainly for my benefit during
+  testing).
