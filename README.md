@@ -30,8 +30,7 @@ top-level directory.
 
 ### To do soon
 
-* More sophisticated font colouring, including a full emulation of
-  redfront.
+* A full emulation of Redfront (maybe).
 * Multiple tabs that each run an independent invocation of REDUCE.
 
 ### To do later
@@ -80,3 +79,5 @@ top-level directory.
 * The `Packages` button on the `Input from Files...` dialogue switches
   to the REDUCE packages directory (mainly for my benefit during
   testing).
+* Rich text output option giving bold prompts and coloured
+  text. `Coloured I/O` item in `View` menu renamed to `Rich I/O`.

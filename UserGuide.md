@@ -373,10 +373,17 @@ used in the `Input/Output Display` and `Input Editor` panes.
 Run-REDUCE remembers the selected size and uses it the next time
 Run-REDUCE runs.
 
-## Coloured I/O?
+## Rich I/O?
 
-Selecting this checkbox causes Run-REDUCE to use redfront-style text
-colouring with red input and blue output.
+Selecting this checkbox causes Run-REDUCE to use rich text in the
+`Input/Output Display` pane: prompts are bold; algebraic-mode prompts
+and input are red; algebraic-mode output is blue; symbolic-mode
+prompts and input are green; symbolic-mode output is cyan.  This
+facility was inspired by Redfront, but it is not identical to
+Redfront.  (It does not use the Redfront build of REDUCE or any
+special REDUCE input, such as the `redfront` package.)  Note that
+turning Rich I/O on or off does not fully take effect until the next
+input prompt.
 
 ## The Help Menu
 

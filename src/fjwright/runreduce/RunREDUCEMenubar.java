@@ -2,7 +2,6 @@ package fjwright.runreduce;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import javax.swing.text.StyleConstants;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.io.*;
@@ -288,15 +287,13 @@ class RunREDUCEMenubar extends JMenuBar {
             fontSizeDialog.showDialog();
         });
 
-        JCheckBoxMenuItem colouredIO = new JCheckBoxMenuItem("Coloured I/O?");
-        viewMenu.add(colouredIO);
-        colouredIO.setToolTipText("Use redfront-style red input and blue output?");
-        setFontColour();
-        colouredIO.setState(RunREDUCEPrefs.colouredIOState);
-        colouredIO.addItemListener(e -> {
-            RunREDUCEPrefs.colouredIOState = colouredIO.isSelected();
-            RunREDUCEPrefs.save(RunREDUCEPrefs.COLOUREDIO);
-            setFontColour();
+        JCheckBoxMenuItem richIO = new JCheckBoxMenuItem("Rich I/O?");
+        viewMenu.add(richIO);
+        richIO.setToolTipText("Use rich text for input and output?");
+        richIO.setState(RunREDUCEPrefs.richIOState);
+        richIO.addItemListener(e -> {
+            RunREDUCEPrefs.richIOState = richIO.isSelected();
+            RunREDUCEPrefs.save(RunREDUCEPrefs.RICHIO);
         });
 
 
@@ -320,13 +317,6 @@ class RunREDUCEMenubar extends JMenuBar {
 
         // Initialise enabled state of menu items etc.:
         whenREDUCERunning(false);
-    }
-
-    static void setFontColour() {
-        StyleConstants.setForeground(RunREDUCE.inputSimpleAttributeSet,
-                RunREDUCEPrefs.colouredIOState ? Color.red : Color.black);
-        StyleConstants.setForeground(ReduceOutputThread.outputSimpleAttributeSet,
-                RunREDUCEPrefs.colouredIOState ? Color.blue : Color.black);
     }
 
     static void runREDUCESubmenuBuild() {

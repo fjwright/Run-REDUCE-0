@@ -13,7 +13,6 @@ package fjwright.runreduce;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -40,7 +39,6 @@ public class RunREDUCE extends JPanel {
     private final static List<String> inputList = new ArrayList<>();
     private static int inputListIndex = 0;
     private static int maxInputListIndex = 0;
-    static SimpleAttributeSet inputSimpleAttributeSet = new SimpleAttributeSet();
     static REDUCEConfigurationDefault reduceConfigurationDefault;
     static REDUCEConfiguration reduceConfiguration;
     private static final Pattern pattern =
@@ -190,14 +188,18 @@ public class RunREDUCE extends JPanel {
         // Strip trailing white space and ensure the input end with a terminator:
         int i;
         char c = 0;
-        for (i = text.length() - 1; i > 0 && Character.isWhitespace(c = text.charAt(i)); i--) ;
+//        for (i = text.length() - 1; i > 0 && Character.isWhitespace(c = text.charAt(i)); i--) ;
+        i = text.length() - 1;
+        while (i > 0 && Character.isWhitespace(c = text.charAt(i)))
+            i--;
         text = text.substring(0, i + 1);
         if (c == ';' || c == '$') text += "\n";
         else text += ";\n";
 
         StyledDocument styledDoc = outputTextPane.getStyledDocument();
         try {
-            styledDoc.insertString(styledDoc.getLength(), text, inputSimpleAttributeSet);
+            styledDoc.insertString(styledDoc.getLength(), text,
+                    RunREDUCEPrefs.richIOState ? ReduceOutputThread.inputAttributeSet : null);
         } catch (BadLocationException exc) {
             exc.printStackTrace();
         }
@@ -210,6 +212,7 @@ public class RunREDUCE extends JPanel {
             RunREDUCECommand.reduceInputPrintWriter.print(text);
             RunREDUCECommand.reduceInputPrintWriter.flush();
         }
+
     }
 
     /**
@@ -221,7 +224,7 @@ public class RunREDUCE extends JPanel {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         // Set the main window to 2/3 the linear dimension of the screen:
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setPreferredSize(new Dimension((screenSize.width*2)/3, (screenSize.height*2)/3));
+        frame.setPreferredSize(new Dimension((screenSize.width * 2) / 3, (screenSize.height * 2) / 3));
 
         // Add content to the window:
         RunREDUCE runREDUCE = new RunREDUCE();

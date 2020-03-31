@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+import java.awt.*;
 import java.io.*;
 import java.nio.file.*;
 import java.util.ArrayList;
@@ -87,34 +88,70 @@ class RunREDUCECommand {
 class ReduceOutputThread extends Thread {
     InputStream input;        // REDUCE pipe output (buffered)
     JTextPane outputTextPane; // GUI output pane
-    static SimpleAttributeSet outputSimpleAttributeSet = new SimpleAttributeSet();
-    static SimpleAttributeSet promptSimpleAttributeSet = new SimpleAttributeSet();
+    static SimpleAttributeSet algebraicPromptAttributeSet = new SimpleAttributeSet();
+    static SimpleAttributeSet symbolicPromptAttributeSet = new SimpleAttributeSet();
+    static SimpleAttributeSet algebraicOutputAttributeSet = new SimpleAttributeSet();
+    static SimpleAttributeSet symbolicOutputAttributeSet = new SimpleAttributeSet();
+    static SimpleAttributeSet algebraicInputAttributeSet = new SimpleAttributeSet();
+    static SimpleAttributeSet symbolicInputAttributeSet = new SimpleAttributeSet();
+    static SimpleAttributeSet inputAttributeSet;
+    static Pattern promptPattern = Pattern.compile("\\d+([:*]) ");
 
     ReduceOutputThread(InputStream input, JTextPane outputTextPane) {
         this.input = input;
         this.outputTextPane = outputTextPane;
-        StyleConstants.setBold(promptSimpleAttributeSet,true);
+        StyleConstants.setBold(algebraicPromptAttributeSet, true);
+        StyleConstants.setBold(symbolicPromptAttributeSet, true);
+        StyleConstants.setForeground(algebraicOutputAttributeSet, Color.blue);
+        StyleConstants.setForeground(symbolicOutputAttributeSet, Color.cyan);
+        StyleConstants.setForeground(algebraicInputAttributeSet, Color.red);
+        StyleConstants.setForeground(symbolicInputAttributeSet, Color.green);
+        StyleConstants.setForeground(algebraicPromptAttributeSet, Color.red);
+        StyleConstants.setForeground(symbolicPromptAttributeSet, Color.green);
     }
 
     public void run() {
         StyledDocument styledDoc = outputTextPane.getStyledDocument();
         StringBuilder text = new StringBuilder();
-        SimpleAttributeSet outputSimpleAttributeSet = null;
+        SimpleAttributeSet outputAttributeSet = null; // for initial header
+        SimpleAttributeSet promptAttributeSet;
         // Must output characters rather than lines so that prompt appears!
         try (InputStreamReader isr = new InputStreamReader(input);
              BufferedReader br = new BufferedReader(isr)) {
             int c;
             for (; ; ) {
                 if (!br.ready()) {
-                    if (text.length() > 0) {
-                        // Split off the final line consisting of the next input prompt:
-                        int promptIndex = text.lastIndexOf("\n") + 1;
-                        styledDoc.insertString(styledDoc.getLength(), text.substring(0,promptIndex), outputSimpleAttributeSet);
-                        styledDoc.insertString(styledDoc.getLength(), text.substring(promptIndex), promptSimpleAttributeSet);
+                    int textLength = text.length();
+                    if (textLength > 0) {
+                        // Split off the final line, which should consist of the next input prompt:
+                        if (RunREDUCEPrefs.richIOState) {
+                            int promptIndex = text.lastIndexOf("\n") + 1;
+                            String promptString;
+                            Matcher promptMatcher;
+                            if (promptIndex < textLength &&
+                                    (promptMatcher = promptPattern.matcher(promptString = text.substring(promptIndex))).matches()) {
+                                styledDoc.insertString(styledDoc.getLength(), text.substring(0, promptIndex), outputAttributeSet);
+                                // Only colour output *after* initial REDUCE header.
+                                switch (promptMatcher.group(1)) {
+                                    case "*":
+                                        promptAttributeSet = symbolicPromptAttributeSet;
+                                        inputAttributeSet = symbolicInputAttributeSet;
+                                        outputAttributeSet = symbolicOutputAttributeSet;
+                                        break;
+                                    case ":":
+                                    default:
+                                        promptAttributeSet = algebraicPromptAttributeSet;
+                                        inputAttributeSet = algebraicInputAttributeSet;
+                                        outputAttributeSet = algebraicOutputAttributeSet;
+                                        break;
+                                }
+                                styledDoc.insertString(styledDoc.getLength(), promptString, promptAttributeSet);
+                            } else
+                                styledDoc.insertString(styledDoc.getLength(), text.toString(), outputAttributeSet);
+                        } else
+                            styledDoc.insertString(styledDoc.getLength(), text.toString(), null);
                         text.setLength(0);
                         outputTextPane.setCaretPosition(styledDoc.getLength());
-                        // Only colour output *after* initial header info:
-                        outputSimpleAttributeSet = ReduceOutputThread.outputSimpleAttributeSet;
                     }
                     Thread.sleep(10);
                 } else if ((c = br.read()) != -1) {
