@@ -1,12 +1,15 @@
 package fjwright.runreduce;
 
 import javax.swing.*;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.io.*;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.regex.Matcher;
@@ -88,18 +91,23 @@ class RunREDUCECommand {
 class ReduceOutputThread extends Thread {
     InputStream input;        // REDUCE pipe output (buffered)
     JTextPane outputTextPane; // GUI output pane
+    static StyledDocument styledDoc;
     static SimpleAttributeSet algebraicPromptAttributeSet = new SimpleAttributeSet();
     static SimpleAttributeSet symbolicPromptAttributeSet = new SimpleAttributeSet();
     static SimpleAttributeSet algebraicOutputAttributeSet = new SimpleAttributeSet();
     static SimpleAttributeSet symbolicOutputAttributeSet = new SimpleAttributeSet();
     static SimpleAttributeSet algebraicInputAttributeSet = new SimpleAttributeSet();
     static SimpleAttributeSet symbolicInputAttributeSet = new SimpleAttributeSet();
+    static SimpleAttributeSet promptAttributeSet = new SimpleAttributeSet();
+    static SimpleAttributeSet outputAttributeSet; // for initial header
     static SimpleAttributeSet inputAttributeSet;
     static Pattern promptPattern = Pattern.compile("\\d+([:*]) ");
+    static StringBuilder text = new StringBuilder();
 
     ReduceOutputThread(InputStream input, JTextPane outputTextPane) {
         this.input = input;
         this.outputTextPane = outputTextPane;
+        styledDoc = outputTextPane.getStyledDocument();
         StyleConstants.setBold(algebraicPromptAttributeSet, true);
         StyleConstants.setBold(symbolicPromptAttributeSet, true);
         StyleConstants.setForeground(algebraicOutputAttributeSet, Color.blue);
@@ -108,13 +116,10 @@ class ReduceOutputThread extends Thread {
         StyleConstants.setForeground(symbolicInputAttributeSet, Color.green);
         StyleConstants.setForeground(algebraicPromptAttributeSet, Color.red);
         StyleConstants.setForeground(symbolicPromptAttributeSet, Color.green);
+        StyleConstants.setForeground(promptAttributeSet, Color.red);
     }
 
     public void run() {
-        StyledDocument styledDoc = outputTextPane.getStyledDocument();
-        StringBuilder text = new StringBuilder();
-        SimpleAttributeSet outputAttributeSet = null; // for initial header
-        SimpleAttributeSet promptAttributeSet;
         // Must output characters rather than lines so that prompt appears!
         try (InputStreamReader isr = new InputStreamReader(input);
              BufferedReader br = new BufferedReader(isr)) {
@@ -123,8 +128,8 @@ class ReduceOutputThread extends Thread {
                 if (!br.ready()) {
                     int textLength = text.length();
                     if (textLength > 0) {
-                        // Split off the final line, which should consist of the next input prompt:
-                        if (RunREDUCEPrefs.richIOState) {
+                        if (false/*RunREDUCEPrefs.richIOState*/) { // full colour IO display processing
+                            // Split off the final line, which should consist of the next input prompt:
                             int promptIndex = text.lastIndexOf("\n") + 1;
                             String promptString;
                             Matcher promptMatcher;
@@ -148,19 +153,80 @@ class ReduceOutputThread extends Thread {
                                 styledDoc.insertString(styledDoc.getLength(), promptString, promptAttributeSet);
                             } else
                                 styledDoc.insertString(styledDoc.getLength(), text.toString(), outputAttributeSet);
-                        } else
+                        } else if (true) {  // redfront IO display processing
+
+                            // Must process arbitrary chunks of output, which may not contain matched pairs of start and end markers:
+                            for (; ; ) {
+                                int algOutputStartMarker = text.indexOf("\u0003");
+                                int algOutputEndMarker = text.indexOf("\u0004");
+                                if (algOutputStartMarker >= 0 && algOutputEndMarker >= 0) {
+                                    if (algOutputStartMarker < algOutputEndMarker) {
+                                        // TEXT < algOutputStartMarker < TEXT < algOutputEndMarker
+                                        styledDoc.insertString(styledDoc.getLength(), text.substring(0, algOutputStartMarker), null);
+                                        styledDoc.insertString(styledDoc.getLength(), text.substring(algOutputStartMarker + 1, algOutputEndMarker), algebraicOutputAttributeSet);
+                                        outputAttributeSet = null;
+                                        text.delete(0, algOutputEndMarker + 1);
+                                    } else {
+                                        // TEXT < algOutputEndMarker < TEXT < algOutputStartMarker
+                                        styledDoc.insertString(styledDoc.getLength(), text.substring(0, algOutputEndMarker), algebraicOutputAttributeSet);
+                                        styledDoc.insertString(styledDoc.getLength(), text.substring(algOutputEndMarker + 1, algOutputStartMarker), null);
+                                        outputAttributeSet = algebraicOutputAttributeSet;
+                                        text.delete(0, algOutputStartMarker + 1);
+                                    }
+                                } else if (algOutputStartMarker >= 0) {
+                                    // TEXT < algOutputStartMarker < TEXT
+                                    styledDoc.insertString(styledDoc.getLength(), text.substring(0, algOutputStartMarker), null);
+                                    styledDoc.insertString(styledDoc.getLength(), text.substring(algOutputStartMarker + 1), algebraicOutputAttributeSet);
+                                    outputAttributeSet = algebraicOutputAttributeSet;
+                                    break;
+                                } else if (algOutputEndMarker >= 0) {
+                                    // TEXT < algOutputEndMarker < TEXT
+                                    styledDoc.insertString(styledDoc.getLength(), text.substring(0, algOutputEndMarker), algebraicOutputAttributeSet);
+                                    outputAttributeSet = null;
+                                    processPromptMarkers(algOutputEndMarker + 1);
+                                    break;
+                                } else {
+                                    // No algebraic output markers.
+                                    processPromptMarkers(0);
+                                    break;
+                                }
+                            }
+
+                        } else // no IO display processing
                             styledDoc.insertString(styledDoc.getLength(), text.toString(), null);
-                        text.setLength(0);
+                        text.setLength(0); // delete any remaining text
                         outputTextPane.setCaretPosition(styledDoc.getLength());
                     }
                     Thread.sleep(10);
                 } else if ((c = br.read()) != -1) {
                     if ((char) c != '\r') // ignore CRs
                         text.append((char) c);
+//                    if (Character.isISOControl((char) c)) {
+//                        if ((char) c != '\r') {
+//                            if ((char) c == '\n')
+//                                text.append((char) c);
+//                            else
+//                                text.append('|').append(Character.getName(c)).append(' ').append(c).append('|');
+//                        }
+//                    } else
+//                        text.append((char) c);
                 } else break;
             }
         } catch (Exception exc) {
             exc.printStackTrace();
+        }
+    }
+
+    static void processPromptMarkers(int start) throws BadLocationException {
+        // Look for prompt markers:
+        int promptStartMarker = text.indexOf("\u0001");
+        int promptEndMarker = text.indexOf("\u0002");
+        if (promptStartMarker >= 0 && promptEndMarker >= 0) {
+            styledDoc.insertString(styledDoc.getLength(), text.substring(start, promptStartMarker), outputAttributeSet);
+            styledDoc.insertString(styledDoc.getLength(), text.substring(promptStartMarker + 1, promptEndMarker), promptAttributeSet);
+            styledDoc.insertString(styledDoc.getLength(), text.substring(promptEndMarker + 1), null);
+        } else {
+            styledDoc.insertString(styledDoc.getLength(), text.substring(start), outputAttributeSet);
         }
     }
 }
