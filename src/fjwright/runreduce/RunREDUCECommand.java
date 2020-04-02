@@ -84,7 +84,7 @@ class RunREDUCECommand {
         }
 
         RunREDUCEPrefs.colouredIOState = RunREDUCEPrefs.colouredIOIntent;
-        if (RunREDUCEPrefs.REDFRONT.equals(RunREDUCEPrefs.colouredIOState))
+        if (RunREDUCEPrefs.colouredIOState == RunREDUCEPrefs.ColouredIO.REDFRONT)
             RunREDUCE.sendStringToREDUCE("load_package redfront;");
     }
 }
@@ -132,7 +132,7 @@ class ReduceOutputThread extends Thread {
                     if (textLength > 0) {
 
                         switch (RunREDUCEPrefs.colouredIOState) {
-                            case RunREDUCEPrefs.MODAL: // mode coloured IO display processing
+                            case MODAL: // mode coloured IO display processing
                                 // Split off the final line, which should consist of the next input prompt:
                                 int promptIndex = text.lastIndexOf("\n") + 1;
                                 String promptString;
@@ -159,7 +159,7 @@ class ReduceOutputThread extends Thread {
                                     styledDoc.insertString(styledDoc.getLength(), text.toString(), outputAttributeSet);
                                 break; // end of case RunREDUCEPrefs.MODE
 
-                            case RunREDUCEPrefs.REDFRONT: // redfront coloured IO display processing
+                            case REDFRONT: // redfront coloured IO display processing
                                 outputAttributeSet = null;
                                 /*
                                  * The markup output by the redfront package uses ASCII control characters:

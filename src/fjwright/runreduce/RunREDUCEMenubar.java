@@ -321,25 +321,25 @@ class RunREDUCEMenubar extends JMenuBar {
         colouredIOButtonGroup.add(noColouredIORadioButton);
         noColouredIORadioButton.setToolTipText(
                 "No text colouring.");
-        noColouredIORadioButton.setSelected(RunREDUCEPrefs.NONE.equals(RunREDUCEPrefs.colouredIOIntent));
+        noColouredIORadioButton.setSelected(RunREDUCEPrefs.colouredIOIntent == RunREDUCEPrefs.ColouredIO.NONE);
         noColouredIORadioButton.addActionListener(e ->
-                RunREDUCEPrefs.save(RunREDUCEPrefs.COLOUREDIO, RunREDUCEPrefs.NONE));
+                RunREDUCEPrefs.save(RunREDUCEPrefs.COLOUREDIO, RunREDUCEPrefs.ColouredIO.NONE));
         JRadioButtonMenuItem modeColouredIORadioButton = new JRadioButtonMenuItem("Modal");
         colouredIOSubMenu.add(modeColouredIORadioButton);
         colouredIOButtonGroup.add(modeColouredIORadioButton);
         modeColouredIORadioButton.setToolTipText(
                 "Colour prompts, input and output to indicate algebraic or symbolic mode.");
-        modeColouredIORadioButton.setSelected(RunREDUCEPrefs.MODAL.equals(RunREDUCEPrefs.colouredIOIntent));
+        modeColouredIORadioButton.setSelected(RunREDUCEPrefs.colouredIOIntent == RunREDUCEPrefs.ColouredIO.MODAL);
         modeColouredIORadioButton.addActionListener(e ->
-                RunREDUCEPrefs.save(RunREDUCEPrefs.COLOUREDIO, RunREDUCEPrefs.MODAL));
+                RunREDUCEPrefs.save(RunREDUCEPrefs.COLOUREDIO, RunREDUCEPrefs.ColouredIO.MODAL));
         JRadioButtonMenuItem redfrontColouredIORadioButton = new JRadioButtonMenuItem("Redfront");
         colouredIOSubMenu.add(redfrontColouredIORadioButton);
         colouredIOButtonGroup.add(redfrontColouredIORadioButton);
         redfrontColouredIORadioButton.setToolTipText(
                 "Use the redfront package and terminal emulation.");
-        redfrontColouredIORadioButton.setSelected(RunREDUCEPrefs.REDFRONT.equals(RunREDUCEPrefs.colouredIOIntent));
+        redfrontColouredIORadioButton.setSelected(RunREDUCEPrefs.colouredIOIntent == RunREDUCEPrefs.ColouredIO.REDFRONT);
         redfrontColouredIORadioButton.addActionListener(e ->
-                RunREDUCEPrefs.save(RunREDUCEPrefs.COLOUREDIO, RunREDUCEPrefs.REDFRONT));
+                RunREDUCEPrefs.save(RunREDUCEPrefs.COLOUREDIO, RunREDUCEPrefs.ColouredIO.REDFRONT));
 
 
         /* ************* *

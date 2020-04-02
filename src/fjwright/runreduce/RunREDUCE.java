@@ -200,10 +200,10 @@ public class RunREDUCE extends JPanel {
         StyledDocument styledDoc = outputTextPane.getStyledDocument();
         SimpleAttributeSet inputAttributeSet;
         switch (RunREDUCEPrefs.colouredIOState) {
-            case RunREDUCEPrefs.MODAL: // mode coloured IO display processing
+            case MODAL: // mode coloured IO display processing
                 inputAttributeSet = ReduceOutputThread.inputAttributeSet;
                 break;
-            case RunREDUCEPrefs.REDFRONT: // redfront coloured IO display processing
+            case REDFRONT: // redfront coloured IO display processing
                 inputAttributeSet = ReduceOutputThread.algebraicInputAttributeSet;
                 break;
             default: // no IO display processing

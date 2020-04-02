@@ -20,10 +20,9 @@ public class RunREDUCEPrefs {
     static final String AUTORUNVERSION = "autoRunVersion";
     static final String BOLDPROMPTS = "boldPrompts";
     static final String COLOUREDIO = "colouredIO";
+
     // colouredIOState values:
-    static final String NONE = "None";
-    static final String MODAL = "Mode";
-    static final String REDFRONT = "Redfront";
+    enum ColouredIO {NONE, MODAL, REDFRONT}
 
     static int fontSize = Math.max(prefs.getInt(FONTSIZE, 12), 5);
     // in case a very small font size gets saved accidentally!
@@ -31,8 +30,17 @@ public class RunREDUCEPrefs {
     static boolean autoRunState = prefs.getBoolean(AUTORUN, false);
     static String autoRunVersion = prefs.get(AUTORUNVERSION, REDUCEConfigurationDefault.CSL_REDUCE);
     static boolean boldPromptsState = prefs.getBoolean(BOLDPROMPTS, false);
-    static String colouredIOIntent = prefs.get(COLOUREDIO, NONE);
-    static String colouredIOState = colouredIOIntent;
+    static ColouredIO colouredIOIntent;
+
+    static {
+        try {
+            colouredIOIntent = ColouredIO.valueOf(prefs.get(COLOUREDIO, ColouredIO.NONE.toString()));
+        } catch (IllegalArgumentException e) {
+            colouredIOIntent = ColouredIO.NONE;
+        }
+    }
+
+    static ColouredIO colouredIOState = colouredIOIntent;
 
     static void save(String key, Object... values) {
         switch (key) {
@@ -49,8 +57,9 @@ public class RunREDUCEPrefs {
                 prefs.putBoolean(BOLDPROMPTS, boldPromptsState);
                 break;
             case COLOUREDIO:
-                prefs.put(COLOUREDIO, colouredIOIntent = (String) values[0]);
-                if (MODAL.equals(colouredIOState) || NONE.equals(colouredIOState))
+                prefs.put(COLOUREDIO, (colouredIOIntent = (ColouredIO) values[0]).toString());
+                // Update colouredIOState immediately unless switching to or from REDFRONT:
+                if (colouredIOIntent != ColouredIO.REDFRONT && colouredIOState != ColouredIO.REDFRONT)
                     colouredIOState = colouredIOIntent;
                 break;
         }
