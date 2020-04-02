@@ -84,8 +84,11 @@ class RunREDUCECommand {
         }
 
         RunREDUCEPrefs.colouredIOState = RunREDUCEPrefs.colouredIOIntent;
-        if (RunREDUCEPrefs.colouredIOState == RunREDUCEPrefs.ColouredIO.REDFRONT)
-            RunREDUCE.sendStringToREDUCE("load_package redfront;");
+        if (RunREDUCEPrefs.colouredIOState == RunREDUCEPrefs.ColouredIO.REDFRONT &&
+                RunREDUCECommand.reduceInputPrintWriter != null) {
+            RunREDUCECommand.reduceInputPrintWriter.print("load_package redfront;");
+            RunREDUCECommand.reduceInputPrintWriter.flush();
+        }
     }
 }
 
@@ -207,8 +210,14 @@ class ReduceOutputThread extends Thread {
                                 }
                                 break; // end of case RunREDUCEPrefs.REDFRONT
 
-                            default: // no IO display processing
-                                styledDoc.insertString(styledDoc.getLength(), text.toString(), null);
+                            default: // no IO display colouring, but maybe prompt processing
+                                if ((RunREDUCEPrefs.boldPromptsState) &&
+                                        (promptIndex = text.lastIndexOf("\n") + 1) < textLength &&
+                                        promptPattern.matcher(promptString = text.substring(promptIndex)).matches()) {
+                                    styledDoc.insertString(styledDoc.getLength(), text.substring(0, promptIndex), null);
+                                    styledDoc.insertString(styledDoc.getLength(), promptString, promptAttributeSet);
+                                } else
+                                    styledDoc.insertString(styledDoc.getLength(), text.toString(), null);
                         } // end of switch (RunREDUCEPrefs.colouredIOState)
 
                         text.setLength(0); // delete any remaining text
