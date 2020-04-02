@@ -304,7 +304,7 @@ class RunREDUCEMenubar extends JMenuBar {
 
         JCheckBoxMenuItem boldPromptsCheckBox = new JCheckBoxMenuItem("Bold Prompts");
         viewMenu.add(boldPromptsCheckBox);
-        boldPromptsCheckBox.setToolTipText("Make input prompts bold (independently of IO colouring).");
+        boldPromptsCheckBox.setToolTipText("Make input prompts bold (independently of I/O colouring).");
         boldPromptsCheckBox.setState(RunREDUCEPrefs.boldPromptsState);
         applyBoldPromptsState();
         boldPromptsCheckBox.addItemListener(e -> {
@@ -313,7 +313,7 @@ class RunREDUCEMenubar extends JMenuBar {
             applyBoldPromptsState();
         });
 
-        JMenu colouredIOSubMenu = new JMenu("Coloured I/O");
+        JMenu colouredIOSubMenu = new JMenu("I/O Colouring");
         viewMenu.add(colouredIOSubMenu);
         ButtonGroup colouredIOButtonGroup = new ButtonGroup();
         JRadioButtonMenuItem noColouredIORadioButton = new JRadioButtonMenuItem("None");
@@ -336,7 +336,7 @@ class RunREDUCEMenubar extends JMenuBar {
         colouredIOSubMenu.add(redfrontColouredIORadioButton);
         colouredIOButtonGroup.add(redfrontColouredIORadioButton);
         redfrontColouredIORadioButton.setToolTipText(
-                "Use the redfront package and terminal emulation.");
+                "Full redfront emulation loading the redfront package.");
         redfrontColouredIORadioButton.setSelected(RunREDUCEPrefs.colouredIOIntent == RunREDUCEPrefs.ColouredIO.REDFRONT);
         redfrontColouredIORadioButton.addActionListener(e ->
                 RunREDUCEPrefs.save(RunREDUCEPrefs.COLOUREDIO, RunREDUCEPrefs.ColouredIO.REDFRONT));
@@ -356,7 +356,7 @@ class RunREDUCEMenubar extends JMenuBar {
                 (frame,
                         new String[]{"Run CLI REDUCE in a Java Swing GUI.",
                                 "Prototype version 0.5",
-                                "Francis Wright, March 2020"},
+                                "Francis Wright, April 2020"},
                         "About Run-REDUCE",
                         JOptionPane.PLAIN_MESSAGE));
 

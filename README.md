@@ -2,7 +2,7 @@
 
 ## A Java GUI to run any CLI version of the REDUCE Computer Algebra System
 
-### Francis Wright, March 2020
+### Francis Wright, April 2020
 
 This is an incomplete prototype!
 
@@ -30,7 +30,9 @@ top-level directory.
 
 ### To do soon
 
-* A full emulation of Redfront (maybe).
+* Double-click handler for dialogues.
+* A more solid font for the I/O display pane.
+* Easy access to distributed documentation via the Help menu.
 * Multiple tabs that each run an independent invocation of REDUCE.
 
 ### To do later
@@ -44,6 +46,7 @@ top-level directory.
 * Integrated plotting support, perhaps with plots in a new tab or in a
   vertically split window (maybe).
 * A calculator-style interface option (maybe).
+* Hybrid I/O colouring combining modal and redfront modes (maybe).
 
 ## Release Notes
 
@@ -75,9 +78,13 @@ top-level directory.
 
 * Keyboard shortcuts to send input to REDUCE and scroll the input
   list.  Scrolling beyond the last input clears the input pane.
-* Set the main application window to 2/3 the linear dimension of the screen.
-* The `Packages` button on the `Input from Files...` dialogue switches
-  to the REDUCE packages directory (mainly for my benefit during
-  testing).
-* Rich text output option giving bold prompts and coloured
-  text. `Coloured I/O` item in `View` menu renamed to `Rich I/O`.
+* Set the initial main application window size to 2/3 the linear
+  dimension of the screen.
+* Add a `Packages` button to the `Input from Files...` dialogue that
+  switches to the REDUCE packages directory (mainly for my benefit
+  during testing).
+* Add a `Clear I/O Display` item to the REDUCE menu.
+* Add a `Bold Prompts` checkbox to the View menu.
+* Replace the `Coloured I/O` item in the `View` menu with an `I/O
+  Colouring` sub-menu.
+* Provide a full emulation of Redfront.

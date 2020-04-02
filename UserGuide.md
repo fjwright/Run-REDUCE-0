@@ -1,6 +1,6 @@
 # Run-REDUCE User Guide
 
-### Francis Wright, March 2020
+### Francis Wright, April 2020
 
 Run-REDUCE is an open-source Java GUI to run the REDUCE Computer
 Algebra System.  REDUCE must be obtained from
@@ -285,6 +285,12 @@ that REDUCE is no longer running.** (Run-REDUCE tries to detect input
 of the `BYE` and `QUIT` commands via the input editor, but this is
 less reliable.)  This menu item is disabled unless REDUCE is running.
 
+### Clear I/O Display
+
+This completely erases all text from the `Input/Output Display` pane
+and its associated buffer.  If you want to save it, use the `Save
+Session Log...` item on the `File` menu before erasing it!
+
 ### Configure REDUCE...
 
 This brings up a dialogue box that allows you to configure the
@@ -373,17 +379,29 @@ used in the `Input/Output Display` and `Input Editor` panes.
 Run-REDUCE remembers the selected size and uses it the next time
 Run-REDUCE runs.
 
-## Rich I/O?
+## Bold Prompts
 
-Selecting this checkbox causes Run-REDUCE to use rich text in the
-`Input/Output Display` pane: prompts are bold; algebraic-mode prompts
-and input are red; algebraic-mode output is blue; symbolic-mode
-prompts and input are green; symbolic-mode output is cyan.  This
-facility was inspired by Redfront, but it is not identical to
-Redfront.  (It does not use the Redfront build of REDUCE or any
-special REDUCE input, such as the `redfront` package.)  Note that
-turning Rich I/O on or off does not fully take effect until the next
-input prompt.
+Selecting this checkbox causes Run-REDUCE to embolden the display of
+all input prompts.  (This works independently of any I/O colouring but
+does not take effect until the **next** input prompt.)
+
+## I/O Colouring
+
+This sub-menu allows you to select an I/O colouring option: `None`,
+`Modal` or `Redfront`.  Modal colouring depends on REDUCE's current
+input mode: algebraic-mode prompts and input are red, algebraic-mode
+output is blue, symbolic-mode prompts and input are green,
+symbolic-mode output is cyan.  Redfront colouring is intended to
+provide a full emulation of the standard REDUCE `redfront` facility
+and it loads the `redfront` package (silently), which outputs
+additional markup that is then interpreted by Run-REDUCE in the same
+way it is normally interpreted by the `redfront` executable running in
+a suitable terminal (emulator).  In Redfront mode all prompts and
+interactive input are red, algebraic-mode output is blue, and echoed
+file input and symbolic-mode output are not coloured.  Note that
+turning Redfront mode on or off does not take effect until REDUCE is
+(re-)started, and turning other modes on or off does not fully take
+effect until the next input prompt.
 
 ## The Help Menu
 
