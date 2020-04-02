@@ -13,6 +13,7 @@ package fjwright.runreduce;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -197,9 +198,20 @@ public class RunREDUCE extends JPanel {
         else text += ";\n";
 
         StyledDocument styledDoc = outputTextPane.getStyledDocument();
+        SimpleAttributeSet inputAttributeSet;
+        switch (RunREDUCEPrefs.colouredIOState) {
+            case RunREDUCEPrefs.MODAL: // mode coloured IO display processing
+                inputAttributeSet = ReduceOutputThread.inputAttributeSet;
+                break;
+            case RunREDUCEPrefs.REDFRONT: // redfront coloured IO display processing
+                inputAttributeSet = ReduceOutputThread.algebraicInputAttributeSet;
+                break;
+            default: // no IO display processing
+                inputAttributeSet = null;
+        }
+
         try {
-            styledDoc.insertString(styledDoc.getLength(), text,
-                    RunREDUCEPrefs.richIOState ? ReduceOutputThread.inputAttributeSet : null);
+            styledDoc.insertString(styledDoc.getLength(), text, inputAttributeSet);
         } catch (BadLocationException exc) {
             exc.printStackTrace();
         }

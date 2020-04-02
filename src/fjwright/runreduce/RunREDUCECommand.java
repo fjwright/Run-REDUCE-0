@@ -82,6 +82,10 @@ class RunREDUCECommand {
                     "Error running REDUCE -- " + exc,
                     "REDUCE Process Error");
         }
+
+        RunREDUCEPrefs.colouredIOState = RunREDUCEPrefs.colouredIOIntent;
+        if (RunREDUCEPrefs.REDFRONT.equals(RunREDUCEPrefs.colouredIOState))
+            RunREDUCE.sendStringToREDUCE("load_package redfront;");
     }
 }
 
@@ -92,31 +96,29 @@ class ReduceOutputThread extends Thread {
     InputStream input;        // REDUCE pipe output (buffered)
     JTextPane outputTextPane; // GUI output pane
     static StyledDocument styledDoc;
-    static SimpleAttributeSet algebraicPromptAttributeSet = new SimpleAttributeSet();
-    static SimpleAttributeSet symbolicPromptAttributeSet = new SimpleAttributeSet();
-    static SimpleAttributeSet algebraicOutputAttributeSet = new SimpleAttributeSet();
-    static SimpleAttributeSet symbolicOutputAttributeSet = new SimpleAttributeSet();
-    static SimpleAttributeSet algebraicInputAttributeSet = new SimpleAttributeSet();
-    static SimpleAttributeSet symbolicInputAttributeSet = new SimpleAttributeSet();
+    static final SimpleAttributeSet algebraicPromptAttributeSet = new SimpleAttributeSet();
+    static final SimpleAttributeSet symbolicPromptAttributeSet = new SimpleAttributeSet();
+    static final SimpleAttributeSet algebraicOutputAttributeSet = new SimpleAttributeSet();
+    static final SimpleAttributeSet symbolicOutputAttributeSet = new SimpleAttributeSet();
+    static final SimpleAttributeSet algebraicInputAttributeSet = new SimpleAttributeSet();
+    static final SimpleAttributeSet symbolicInputAttributeSet = new SimpleAttributeSet();
     static SimpleAttributeSet promptAttributeSet = new SimpleAttributeSet();
-    static SimpleAttributeSet outputAttributeSet; // for initial header
     static SimpleAttributeSet inputAttributeSet;
-    static Pattern promptPattern = Pattern.compile("\\d+([:*]) ");
-    static StringBuilder text = new StringBuilder();
+    static SimpleAttributeSet outputAttributeSet; // for initial header
+    static final Pattern promptPattern = Pattern.compile("\\d+([:*]) ");
+    static final StringBuilder text = new StringBuilder();
 
     ReduceOutputThread(InputStream input, JTextPane outputTextPane) {
         this.input = input;
         this.outputTextPane = outputTextPane;
         styledDoc = outputTextPane.getStyledDocument();
-        StyleConstants.setBold(algebraicPromptAttributeSet, true);
-        StyleConstants.setBold(symbolicPromptAttributeSet, true);
         StyleConstants.setForeground(algebraicOutputAttributeSet, Color.blue);
         StyleConstants.setForeground(symbolicOutputAttributeSet, Color.cyan);
         StyleConstants.setForeground(algebraicInputAttributeSet, Color.red);
         StyleConstants.setForeground(symbolicInputAttributeSet, Color.green);
         StyleConstants.setForeground(algebraicPromptAttributeSet, Color.red);
         StyleConstants.setForeground(symbolicPromptAttributeSet, Color.green);
-        StyleConstants.setForeground(promptAttributeSet, Color.red);
+//        StyleConstants.setForeground(promptAttributeSet, Color.red);
     }
 
     public void run() {
@@ -128,72 +130,87 @@ class ReduceOutputThread extends Thread {
                 if (!br.ready()) {
                     int textLength = text.length();
                     if (textLength > 0) {
-                        if (false/*RunREDUCEPrefs.richIOState*/) { // full colour IO display processing
-                            // Split off the final line, which should consist of the next input prompt:
-                            int promptIndex = text.lastIndexOf("\n") + 1;
-                            String promptString;
-                            Matcher promptMatcher;
-                            if (promptIndex < textLength &&
-                                    (promptMatcher = promptPattern.matcher(promptString = text.substring(promptIndex))).matches()) {
-                                styledDoc.insertString(styledDoc.getLength(), text.substring(0, promptIndex), outputAttributeSet);
-                                // Only colour output *after* initial REDUCE header.
-                                switch (promptMatcher.group(1)) {
-                                    case "*":
-                                        promptAttributeSet = symbolicPromptAttributeSet;
-                                        inputAttributeSet = symbolicInputAttributeSet;
-                                        outputAttributeSet = symbolicOutputAttributeSet;
-                                        break;
-                                    case ":":
-                                    default:
-                                        promptAttributeSet = algebraicPromptAttributeSet;
-                                        inputAttributeSet = algebraicInputAttributeSet;
-                                        outputAttributeSet = algebraicOutputAttributeSet;
-                                        break;
-                                }
-                                styledDoc.insertString(styledDoc.getLength(), promptString, promptAttributeSet);
-                            } else
-                                styledDoc.insertString(styledDoc.getLength(), text.toString(), outputAttributeSet);
-                        } else if (true) {  // redfront IO display processing
 
-                            // Must process arbitrary chunks of output, which may not contain matched pairs of start and end markers:
-                            for (; ; ) {
-                                int algOutputStartMarker = text.indexOf("\u0003");
-                                int algOutputEndMarker = text.indexOf("\u0004");
-                                if (algOutputStartMarker >= 0 && algOutputEndMarker >= 0) {
-                                    if (algOutputStartMarker < algOutputEndMarker) {
-                                        // TEXT < algOutputStartMarker < TEXT < algOutputEndMarker
-                                        styledDoc.insertString(styledDoc.getLength(), text.substring(0, algOutputStartMarker), null);
-                                        styledDoc.insertString(styledDoc.getLength(), text.substring(algOutputStartMarker + 1, algOutputEndMarker), algebraicOutputAttributeSet);
-                                        outputAttributeSet = null;
-                                        text.delete(0, algOutputEndMarker + 1);
-                                    } else {
-                                        // TEXT < algOutputEndMarker < TEXT < algOutputStartMarker
-                                        styledDoc.insertString(styledDoc.getLength(), text.substring(0, algOutputEndMarker), algebraicOutputAttributeSet);
-                                        styledDoc.insertString(styledDoc.getLength(), text.substring(algOutputEndMarker + 1, algOutputStartMarker), null);
-                                        outputAttributeSet = algebraicOutputAttributeSet;
-                                        text.delete(0, algOutputStartMarker + 1);
+                        switch (RunREDUCEPrefs.colouredIOState) {
+                            case RunREDUCEPrefs.MODAL: // mode coloured IO display processing
+                                // Split off the final line, which should consist of the next input prompt:
+                                int promptIndex = text.lastIndexOf("\n") + 1;
+                                String promptString;
+                                Matcher promptMatcher;
+                                if (promptIndex < textLength &&
+                                        (promptMatcher = promptPattern.matcher(promptString = text.substring(promptIndex))).matches()) {
+                                    styledDoc.insertString(styledDoc.getLength(), text.substring(0, promptIndex), outputAttributeSet);
+                                    // Only colour output *after* initial REDUCE header.
+                                    switch (promptMatcher.group(1)) {
+                                        case "*":
+                                            promptAttributeSet = symbolicPromptAttributeSet;
+                                            inputAttributeSet = symbolicInputAttributeSet;
+                                            outputAttributeSet = symbolicOutputAttributeSet;
+                                            break;
+                                        case ":":
+                                        default:
+                                            promptAttributeSet = algebraicPromptAttributeSet;
+                                            inputAttributeSet = algebraicInputAttributeSet;
+                                            outputAttributeSet = algebraicOutputAttributeSet;
+                                            break;
                                     }
-                                } else if (algOutputStartMarker >= 0) {
-                                    // TEXT < algOutputStartMarker < TEXT
-                                    styledDoc.insertString(styledDoc.getLength(), text.substring(0, algOutputStartMarker), null);
-                                    styledDoc.insertString(styledDoc.getLength(), text.substring(algOutputStartMarker + 1), algebraicOutputAttributeSet);
-                                    outputAttributeSet = algebraicOutputAttributeSet;
-                                    break;
-                                } else if (algOutputEndMarker >= 0) {
-                                    // TEXT < algOutputEndMarker < TEXT
-                                    styledDoc.insertString(styledDoc.getLength(), text.substring(0, algOutputEndMarker), algebraicOutputAttributeSet);
-                                    outputAttributeSet = null;
-                                    processPromptMarkers(algOutputEndMarker + 1);
-                                    break;
-                                } else {
-                                    // No algebraic output markers.
-                                    processPromptMarkers(0);
-                                    break;
-                                }
-                            }
+                                    styledDoc.insertString(styledDoc.getLength(), promptString, promptAttributeSet);
+                                } else
+                                    styledDoc.insertString(styledDoc.getLength(), text.toString(), outputAttributeSet);
+                                break; // end of case RunREDUCEPrefs.MODE
 
-                        } else // no IO display processing
-                            styledDoc.insertString(styledDoc.getLength(), text.toString(), null);
+                            case RunREDUCEPrefs.REDFRONT: // redfront coloured IO display processing
+                                outputAttributeSet = null;
+                                /*
+                                 * The markup output by the redfront package uses ASCII control characters:
+                                 * ^A prompt ^B input
+                                 * ^C algebraic-mode output ^D
+                                 * where ^A = \u0001, etc. ^A/^B and ^C/^D should always be paired.
+                                 * Prompts and input are always red, algebraic-mode output is blue,
+                                 * but any other output (echoed input or symbolic-mode output) is not coloured.
+                                 */
+                                // Must process arbitrary chunks of output, which may not contain matched pairs of start and end markers:
+                                for (; ; ) {
+                                    int algOutputStartMarker = text.indexOf("\u0003");
+                                    int algOutputEndMarker = text.indexOf("\u0004");
+                                    if (algOutputStartMarker >= 0 && algOutputEndMarker >= 0) {
+                                        if (algOutputStartMarker < algOutputEndMarker) {
+                                            // TEXT < algOutputStartMarker < TEXT < algOutputEndMarker
+                                            styledDoc.insertString(styledDoc.getLength(), text.substring(0, algOutputStartMarker), null);
+                                            styledDoc.insertString(styledDoc.getLength(), text.substring(algOutputStartMarker + 1, algOutputEndMarker), algebraicOutputAttributeSet);
+                                            outputAttributeSet = null;
+                                            text.delete(0, algOutputEndMarker + 1);
+                                        } else {
+                                            // TEXT < algOutputEndMarker < TEXT < algOutputStartMarker
+                                            styledDoc.insertString(styledDoc.getLength(), text.substring(0, algOutputEndMarker), algebraicOutputAttributeSet);
+                                            styledDoc.insertString(styledDoc.getLength(), text.substring(algOutputEndMarker + 1, algOutputStartMarker), null);
+                                            outputAttributeSet = algebraicOutputAttributeSet;
+                                            text.delete(0, algOutputStartMarker + 1);
+                                        }
+                                    } else if (algOutputStartMarker >= 0) {
+                                        // TEXT < algOutputStartMarker < TEXT
+                                        styledDoc.insertString(styledDoc.getLength(), text.substring(0, algOutputStartMarker), null);
+                                        styledDoc.insertString(styledDoc.getLength(), text.substring(algOutputStartMarker + 1), algebraicOutputAttributeSet);
+                                        outputAttributeSet = algebraicOutputAttributeSet;
+                                        break;
+                                    } else if (algOutputEndMarker >= 0) {
+                                        // TEXT < algOutputEndMarker < TEXT
+                                        styledDoc.insertString(styledDoc.getLength(), text.substring(0, algOutputEndMarker), algebraicOutputAttributeSet);
+                                        outputAttributeSet = null;
+                                        processPromptMarkers(algOutputEndMarker + 1);
+                                        break;
+                                    } else {
+                                        // No algebraic output markers.
+                                        processPromptMarkers(0);
+                                        break;
+                                    }
+                                }
+                                break; // end of case RunREDUCEPrefs.REDFRONT
+
+                            default: // no IO display processing
+                                styledDoc.insertString(styledDoc.getLength(), text.toString(), null);
+                        } // end of switch (RunREDUCEPrefs.colouredIOState)
+
                         text.setLength(0); // delete any remaining text
                         outputTextPane.setCaretPosition(styledDoc.getLength());
                     }
@@ -223,7 +240,7 @@ class ReduceOutputThread extends Thread {
         int promptEndMarker = text.indexOf("\u0002");
         if (promptStartMarker >= 0 && promptEndMarker >= 0) {
             styledDoc.insertString(styledDoc.getLength(), text.substring(start, promptStartMarker), outputAttributeSet);
-            styledDoc.insertString(styledDoc.getLength(), text.substring(promptStartMarker + 1, promptEndMarker), promptAttributeSet);
+            styledDoc.insertString(styledDoc.getLength(), text.substring(promptStartMarker + 1, promptEndMarker), algebraicPromptAttributeSet);
             styledDoc.insertString(styledDoc.getLength(), text.substring(promptEndMarker + 1), null);
         } else {
             styledDoc.insertString(styledDoc.getLength(), text.substring(start), outputAttributeSet);

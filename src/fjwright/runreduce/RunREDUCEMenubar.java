@@ -2,6 +2,9 @@ package fjwright.runreduce;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.io.*;
@@ -263,6 +266,18 @@ class RunREDUCEMenubar extends JMenuBar {
             whenREDUCERunning(false);
         });
 
+        JMenuItem clearDisplayMenuItem = new JMenuItem("Clear I/O Display");
+        reduceMenu.add(clearDisplayMenuItem);
+        clearDisplayMenuItem.setToolTipText("Clear the REDUCE Input/Output Display.");
+        clearDisplayMenuItem.addActionListener(e -> {
+            StyledDocument styledDoc = RunREDUCE.outputTextPane.getStyledDocument();
+            try {
+                styledDoc.remove(0, styledDoc.getLength());
+            } catch (BadLocationException ex) {
+                ex.printStackTrace();
+            }
+        });
+
         reduceMenu.addSeparator();
 
         // Configure REDUCE.
@@ -287,14 +302,44 @@ class RunREDUCEMenubar extends JMenuBar {
             fontSizeDialog.showDialog();
         });
 
-        JCheckBoxMenuItem richIO = new JCheckBoxMenuItem("Rich I/O?");
-        viewMenu.add(richIO);
-        richIO.setToolTipText("Use rich text for input and output?");
-        richIO.setState(RunREDUCEPrefs.richIOState);
-        richIO.addItemListener(e -> {
-            RunREDUCEPrefs.richIOState = richIO.isSelected();
-            RunREDUCEPrefs.save(RunREDUCEPrefs.RICHIO);
+        JCheckBoxMenuItem boldPromptsCheckBox = new JCheckBoxMenuItem("Bold Prompts");
+        viewMenu.add(boldPromptsCheckBox);
+        boldPromptsCheckBox.setToolTipText("Make input prompts bold (independently of IO colouring).");
+        boldPromptsCheckBox.setState(RunREDUCEPrefs.boldPromptsState);
+        applyBoldPromptsState();
+        boldPromptsCheckBox.addItemListener(e -> {
+            RunREDUCEPrefs.boldPromptsState = boldPromptsCheckBox.isSelected();
+            RunREDUCEPrefs.save(RunREDUCEPrefs.BOLDPROMPTS);
+            applyBoldPromptsState();
         });
+
+        JMenu colouredIOSubMenu = new JMenu("Coloured I/O");
+        viewMenu.add(colouredIOSubMenu);
+        ButtonGroup colouredIOButtonGroup = new ButtonGroup();
+        JRadioButtonMenuItem noColouredIORadioButton = new JRadioButtonMenuItem("None");
+        colouredIOSubMenu.add(noColouredIORadioButton);
+        colouredIOButtonGroup.add(noColouredIORadioButton);
+        noColouredIORadioButton.setToolTipText(
+                "No text colouring.");
+        noColouredIORadioButton.setSelected(RunREDUCEPrefs.NONE.equals(RunREDUCEPrefs.colouredIOIntent));
+        noColouredIORadioButton.addActionListener(e ->
+                RunREDUCEPrefs.save(RunREDUCEPrefs.COLOUREDIO, RunREDUCEPrefs.NONE));
+        JRadioButtonMenuItem modeColouredIORadioButton = new JRadioButtonMenuItem("Modal");
+        colouredIOSubMenu.add(modeColouredIORadioButton);
+        colouredIOButtonGroup.add(modeColouredIORadioButton);
+        modeColouredIORadioButton.setToolTipText(
+                "Colour prompts, input and output to indicate algebraic or symbolic mode.");
+        modeColouredIORadioButton.setSelected(RunREDUCEPrefs.MODAL.equals(RunREDUCEPrefs.colouredIOIntent));
+        modeColouredIORadioButton.addActionListener(e ->
+                RunREDUCEPrefs.save(RunREDUCEPrefs.COLOUREDIO, RunREDUCEPrefs.MODAL));
+        JRadioButtonMenuItem redfrontColouredIORadioButton = new JRadioButtonMenuItem("Redfront");
+        colouredIOSubMenu.add(redfrontColouredIORadioButton);
+        colouredIOButtonGroup.add(redfrontColouredIORadioButton);
+        redfrontColouredIORadioButton.setToolTipText(
+                "Use the redfront package and terminal emulation.");
+        redfrontColouredIORadioButton.setSelected(RunREDUCEPrefs.REDFRONT.equals(RunREDUCEPrefs.colouredIOIntent));
+        redfrontColouredIORadioButton.addActionListener(e ->
+                RunREDUCEPrefs.save(RunREDUCEPrefs.COLOUREDIO, RunREDUCEPrefs.REDFRONT));
 
 
         /* ************* *
@@ -352,6 +397,12 @@ class RunREDUCEMenubar extends JMenuBar {
     static void showREDUCEConfigDialog() {
         if (reduceConfigDialog == null) reduceConfigDialog = new REDUCEConfigDialog(frame);
         reduceConfigDialog.showDialog();
+    }
+
+    static void applyBoldPromptsState() {
+        StyleConstants.setBold(ReduceOutputThread.promptAttributeSet, RunREDUCEPrefs.boldPromptsState);
+        StyleConstants.setBold(ReduceOutputThread.algebraicPromptAttributeSet, RunREDUCEPrefs.boldPromptsState);
+        StyleConstants.setBold(ReduceOutputThread.symbolicPromptAttributeSet, RunREDUCEPrefs.boldPromptsState);
     }
 
     /**

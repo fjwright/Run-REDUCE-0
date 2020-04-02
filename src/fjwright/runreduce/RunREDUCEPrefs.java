@@ -18,14 +18,21 @@ public class RunREDUCEPrefs {
     static final String FONTSIZE = "fontSize";
     static final String AUTORUN = "autoRun";
     static final String AUTORUNVERSION = "autoRunVersion";
-    static final String RICHIO = "richIO";
+    static final String BOLDPROMPTS = "boldPrompts";
+    static final String COLOUREDIO = "colouredIO";
+    // colouredIOState values:
+    static final String NONE = "None";
+    static final String MODAL = "Mode";
+    static final String REDFRONT = "Redfront";
 
     static int fontSize = Math.max(prefs.getInt(FONTSIZE, 12), 5);
     // in case a very small font size gets saved accidentally!
     // Minimum of 5 matches minimum set for font size SpinnerModel.
     static boolean autoRunState = prefs.getBoolean(AUTORUN, false);
     static String autoRunVersion = prefs.get(AUTORUNVERSION, REDUCEConfigurationDefault.CSL_REDUCE);
-    static boolean richIOState = prefs.getBoolean(RICHIO, false);
+    static boolean boldPromptsState = prefs.getBoolean(BOLDPROMPTS, false);
+    static String colouredIOIntent = prefs.get(COLOUREDIO, NONE);
+    static String colouredIOState = colouredIOIntent;
 
     static void save(String key, Object... values) {
         switch (key) {
@@ -38,8 +45,13 @@ public class RunREDUCEPrefs {
             case AUTORUNVERSION:
                 prefs.put(AUTORUNVERSION, autoRunVersion = (String) values[0]);
                 break;
-            case RICHIO:
-                prefs.putBoolean(RICHIO, richIOState);
+            case BOLDPROMPTS:
+                prefs.putBoolean(BOLDPROMPTS, boldPromptsState);
+                break;
+            case COLOUREDIO:
+                prefs.put(COLOUREDIO, colouredIOIntent = (String) values[0]);
+                if (MODAL.equals(colouredIOState) || NONE.equals(colouredIOState))
+                    colouredIOState = colouredIOIntent;
                 break;
         }
     }
