@@ -164,7 +164,9 @@ provided by your platform.  In particular, in dialogues that allow
 selection of multiple items, holding the `Control` key down while
 clicking on an item selects or deselects it without affecting any
 other selections, and holding a `Shift` key down while clicking on an
-item extends the selection to that item.
+item extends the selection to that item.  Double-clicking on an item
+selects it and then runs the action associated with the confirmation
+button.
 
 Most of the menu items run a REDUCE command, which is echoed in the
 display pane but does not appear in the input editor.  The file

@@ -30,7 +30,6 @@ top-level directory.
 
 ### To do soon
 
-* Double-click handler for dialogues.
 * A more solid font for the I/O display pane.
 * Easy access to distributed documentation via the Help menu.
 * Multiple tabs that each run an independent invocation of REDUCE.
@@ -88,3 +87,6 @@ top-level directory.
 * Replace the `Coloured I/O` item in the `View` menu with an `I/O
   Colouring` sub-menu.
 * Provide a full emulation of Redfront.
+* Add a double-click handler for the `Shut Output Files...` and `Load
+  Packages...` dialogues that makes them more consistent with the file
+  chooser dialogue.

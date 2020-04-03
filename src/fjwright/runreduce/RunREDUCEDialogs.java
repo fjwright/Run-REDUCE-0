@@ -6,6 +6,8 @@ import javax.swing.event.ChangeListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +15,7 @@ import java.util.List;
 /**
  * This abstract class provides the basis for a modal dialog to select open output files to shut or packages to load.
  */
-abstract class RunREDUCEListDialog<E> extends JDialog implements ActionListener {
+abstract class RunREDUCEListDialog<E> extends JDialog implements ActionListener, MouseListener {
     protected Frame frame;
     protected JList<E> list = new JList<>();
 
@@ -36,7 +38,7 @@ abstract class RunREDUCEListDialog<E> extends JDialog implements ActionListener 
 
         // Create and initialize the control buttons:
         JButton okButton = new JButton(buttonText);
-        okButton.setActionCommand(buttonText);
+        okButton.setActionCommand("OK");
         okButton.addActionListener(this);
         getRootPane().setDefaultButton(okButton);
         JButton cancelButton = new JButton("Cancel");
@@ -54,6 +56,62 @@ abstract class RunREDUCEListDialog<E> extends JDialog implements ActionListener 
         // Lay out the dialog contents:
         add(listPane, BorderLayout.CENTER);
         add(buttonPane, BorderLayout.PAGE_END);
+
+        list.addMouseListener(this);
+    }
+
+    // MouseListener methods that must be overridden:
+
+    /**
+     * Invoked when the mouse button has been clicked (pressed
+     * and released) on a component.
+     *
+     * @param e the event to be processed
+     */
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if (e.getClickCount() >= 2)
+            actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, "OK"));
+    }
+
+    /**
+     * Invoked when a mouse button has been pressed on a component.
+     *
+     * @param e the event to be processed
+     */
+    @Override
+    public void mousePressed(MouseEvent e) {
+
+    }
+
+    /**
+     * Invoked when a mouse button has been released on a component.
+     *
+     * @param e the event to be processed
+     */
+    @Override
+    public void mouseReleased(MouseEvent e) {
+
+    }
+
+    /**
+     * Invoked when the mouse enters a component.
+     *
+     * @param e the event to be processed
+     */
+    @Override
+    public void mouseEntered(MouseEvent e) {
+
+    }
+
+    /**
+     * Invoked when the mouse exits a component.
+     *
+     * @param e the event to be processed
+     */
+    @Override
+    public void mouseExited(MouseEvent e) {
+
     }
 }
 
@@ -81,7 +139,7 @@ class ShutOutputFilesDialog extends RunREDUCEListDialog<File> {
     }
 
     public void actionPerformed(ActionEvent e) {
-        if ("Shut".equals(e.getActionCommand()))
+        if ("OK".equals(e.getActionCommand()))
             fileIndices = list.getSelectedIndices();
         else
             fileIndices = new int[0];
@@ -113,7 +171,7 @@ class LoadPackagesDialog extends RunREDUCEListDialog<String> {
     }
 
     public void actionPerformed(ActionEvent e) {
-        if ("Load".equals(e.getActionCommand()))
+        if ("OK".equals(e.getActionCommand()))
             selectedPackages = list.getSelectedValuesList();
         else
             selectedPackages = new ArrayList<>(0);
@@ -143,7 +201,7 @@ class FontSizeDialog extends JDialog implements ActionListener, ChangeListener {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 0.5;
         c.weighty = 0.5;
-        c.insets = new Insets(5,5,5,5);
+        c.insets = new Insets(5, 5, 5, 5);
 
         JTextField defaultFontSizeTextField = new JTextField("Default font size is 12.");
         defaultFontSizeTextField.setEditable(false);

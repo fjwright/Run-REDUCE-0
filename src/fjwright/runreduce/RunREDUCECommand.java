@@ -98,7 +98,7 @@ class RunREDUCECommand {
 class ReduceOutputThread extends Thread {
     InputStream input;        // REDUCE pipe output (buffered)
     JTextPane outputTextPane; // GUI output pane
-    static StyledDocument styledDoc;
+    private static StyledDocument styledDoc;
     static final SimpleAttributeSet algebraicPromptAttributeSet = new SimpleAttributeSet();
     static final SimpleAttributeSet symbolicPromptAttributeSet = new SimpleAttributeSet();
     static final SimpleAttributeSet algebraicOutputAttributeSet = new SimpleAttributeSet();
@@ -108,8 +108,8 @@ class ReduceOutputThread extends Thread {
     static SimpleAttributeSet promptAttributeSet = new SimpleAttributeSet();
     static SimpleAttributeSet inputAttributeSet;
     static SimpleAttributeSet outputAttributeSet; // for initial header
-    static final Pattern promptPattern = Pattern.compile("\\d+([:*]) ");
-    static final StringBuilder text = new StringBuilder();
+    private static final Pattern promptPattern = Pattern.compile("\\d+([:*]) ");
+    private static final StringBuilder text = new StringBuilder();
 
     ReduceOutputThread(InputStream input, JTextPane outputTextPane) {
         this.input = input;
@@ -121,7 +121,6 @@ class ReduceOutputThread extends Thread {
         StyleConstants.setForeground(symbolicInputAttributeSet, Color.green);
         StyleConstants.setForeground(algebraicPromptAttributeSet, Color.red);
         StyleConstants.setForeground(symbolicPromptAttributeSet, Color.green);
-//        StyleConstants.setForeground(promptAttributeSet, Color.red);
     }
 
     public void run() {
@@ -163,6 +162,7 @@ class ReduceOutputThread extends Thread {
                                 break; // end of case RunREDUCEPrefs.MODE
 
                             case REDFRONT: // redfront coloured IO display processing
+                                // FixMe Errors using PSL and inputting alg.tst!
                                 outputAttributeSet = null;
                                 /*
                                  * The markup output by the redfront package uses ASCII control characters:
@@ -210,6 +210,7 @@ class ReduceOutputThread extends Thread {
                                 }
                                 break; // end of case RunREDUCEPrefs.REDFRONT
 
+                            case NONE:
                             default: // no IO display colouring, but maybe prompt processing
                                 if ((RunREDUCEPrefs.boldPromptsState) &&
                                         (promptIndex = text.lastIndexOf("\n") + 1) < textLength &&
