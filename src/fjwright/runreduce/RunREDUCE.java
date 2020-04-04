@@ -13,7 +13,6 @@ package fjwright.runreduce;
 
 import javax.swing.*;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -36,7 +35,8 @@ public class RunREDUCE extends JPanel {
     private static Action laterAction = new LaterAction();
 
     // Use the logical Monospaced font for REDUCE I/O:
-    static Font reduceFont = new Font(Font.MONOSPACED, Font.PLAIN, RunREDUCEPrefs.fontSize);
+//    static Font reduceFont = new Font(Font.MONOSPACED, Font.PLAIN, RunREDUCEPrefs.fontSize);
+    static Font reduceFont = new Font("DejaVu Sans Mono", Font.PLAIN, RunREDUCEPrefs.fontSize);
     private final static List<String> inputList = new ArrayList<>();
     private static int inputListIndex = 0;
     private static int maxInputListIndex = 0;
@@ -44,6 +44,7 @@ public class RunREDUCE extends JPanel {
     static REDUCEConfiguration reduceConfiguration;
     private static final Pattern pattern =
             Pattern.compile(".*\\b(?:bye|quit)\\s*[;$]?.*", Pattern.CASE_INSENSITIVE);
+    static boolean debugPlatform, debugOutput;
 
     public RunREDUCE() {
         super(new BorderLayout()); // JPanel defaults to FlowLayout!
@@ -111,6 +112,8 @@ public class RunREDUCE extends JPanel {
         actionMap.put("Earlier", earlierAction);
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_DOWN_MASK), "Later");
         actionMap.put("Later", laterAction);
+
+        if (debugPlatform) System.err.println("I/O display font: " + reduceFont.getName());
     }
 
     private static class SendAction extends AbstractAction {
@@ -198,20 +201,8 @@ public class RunREDUCE extends JPanel {
         else text += ";\n";
 
         StyledDocument styledDoc = outputTextPane.getStyledDocument();
-        SimpleAttributeSet inputAttributeSet;
-        switch (RunREDUCEPrefs.colouredIOState) {
-            case MODAL: // mode coloured IO display processing
-                inputAttributeSet = ReduceOutputThread.inputAttributeSet;
-                break;
-            case REDFRONT: // redfront coloured IO display processing
-                inputAttributeSet = ReduceOutputThread.algebraicInputAttributeSet;
-                break;
-            default: // no IO display processing
-                inputAttributeSet = null;
-        }
-
         try {
-            styledDoc.insertString(styledDoc.getLength(), text, inputAttributeSet);
+            styledDoc.insertString(styledDoc.getLength(), text, ReduceOutputThread.inputAttributeSet);
         } catch (BadLocationException exc) {
             exc.printStackTrace();
         }
@@ -266,6 +257,18 @@ public class RunREDUCE extends JPanel {
     }
 
     public static void main(String... args) {
+        for (String arg : args) {
+            switch (arg) {
+                case "--debugPlatform":
+                    debugPlatform = true;
+                    break;
+                case "--debugOutput":
+                    debugOutput = true;
+                    break;
+                default:
+                    System.err.println("Unrecognised argument: " + arg);
+            }
+        }
         reduceConfigurationDefault = new REDUCEConfigurationDefault();
         reduceConfiguration = new REDUCEConfiguration();
         // Schedule jobs for the event-dispatching thread.

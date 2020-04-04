@@ -1,5 +1,6 @@
 package fjwright.runreduce;
 
+import javax.swing.text.StyleConstants;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -59,9 +60,16 @@ public class RunREDUCEPrefs {
             case COLOUREDIO:
                 prefs.put(COLOUREDIO, (colouredIOIntent = (ColouredIO) values[0]).toString());
                 // Update colouredIOState immediately unless switching to or from REDFRONT:
-                if (colouredIOIntent != ColouredIO.REDFRONT && colouredIOState != ColouredIO.REDFRONT)
+                if (colouredIOIntent != ColouredIO.REDFRONT && colouredIOState != ColouredIO.REDFRONT) {
                     colouredIOState = colouredIOIntent;
+                    if (colouredIOState == ColouredIO.NONE) {
+                        ReduceOutputThread.inputAttributeSet = ReduceOutputThread.outputAttributeSet = null;
+                        StyleConstants.setForeground(ReduceOutputThread.promptAttributeSet, null);
+                    }
+                }
                 break;
+            default:
+                System.err.println("Attempt to save unexpected preference key: " + key);
         }
     }
 }
@@ -97,6 +105,8 @@ class REDUCEConfigurationDefault extends REDUCEConfigurationType {
     static final String PSL_REDUCE = "PSL REDUCE";
 
     REDUCEConfigurationDefault() {
+        if (RunREDUCE.debugPlatform) System.err.println("OS name: " + System.getProperty("os.name"));
+
         runREDUCECommandList = new RunREDUCECommandList();
         reduceRootDir = System.getenv("REDUCE");
         // $REDUCE below will be replaced by versionRootDir if set or reduceRootDir otherwise
