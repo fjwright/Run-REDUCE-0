@@ -4,13 +4,13 @@
 
 ### Francis Wright, April 2020
 
-This is an incomplete prototype!
+This application is an incomplete prototype!
 
 For information about how to install and run Run-REDUCE please see the
 [User Guide](UserGuide.md).
 
-Run-REDUCE should run on any platform that supports Java 8, but I have
-only tested it on Microsoft Windows and Ubuntu Linux.  (Whilst Java is
+Run-REDUCE should run on any platform that supports Java 8, but I can
+only test it on Microsoft Windows and Ubuntu Linux.  (Whilst Java is
 portable, filesystem structures and installation conventions are not!)
 
 This version uses the Java Swing library, but at some future date I
@@ -19,10 +19,10 @@ is still a standard component of the latest Java SE SDK.  I am
 developing using Java 13, but compiling for Java 8 to support running
 a jar file using the latest readily available JRE.
 
-REDUCE is an open source project available from
+REDUCE itself is an open source project available from
 [SourceForge](https://sourceforge.net/projects/reduce-algebra/).  I'm
-releasing this project under the [BSD 2-Clause License](LICENSE),
-mainly because it's the license used by REDUCE.
+releasing Run-REDUCE under the [BSD 2-Clause License](LICENSE), mainly
+because it's the license used by REDUCE.
 
 This project is set up for development using [IntelliJ
 IDEA](https://www.jetbrains.com/idea/) with Run-REDUCE as the
@@ -30,13 +30,12 @@ top-level directory.
 
 ### To do soon
 
-* A more solid font for the I/O display pane.
-* Easy access to distributed documentation via the Help menu.
 * Multiple tabs that each run an independent invocation of REDUCE.
 
 ### To do later
 
 * Better support for non-default look-and-feels.
+* Font and colour selectors.
 * Detect whether REDUCE is running more reliably (maybe).
 * Remember all user choices, including window configurations (maybe).
 * Typeset output supporting copy and paste. Could parse `off nat`
@@ -86,7 +85,9 @@ top-level directory.
 * Add a `Bold Prompts` checkbox to the View menu.
 * Replace the `Coloured I/O` item in the `View` menu with an `I/O
   Colouring` sub-menu.
-* Provide a full emulation of Redfront.
+* Provide a full emulation of Redfront (**but this is still buggy**).
 * Add a double-click handler for the `Shut Output Files...` and `Load
   Packages...` dialogues that makes them more consistent with the file
   chooser dialogue.
+* Use a more solid font than the default for the I/O display pane.
+* Provide easy access to the distributed documentation via the Help menu.

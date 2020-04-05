@@ -348,10 +348,36 @@ class RunREDUCEMenubar extends JMenuBar {
         JMenu helpMenu = new JMenu("Help");
         this.add(helpMenu);
 
+        String[][] manuals = {
+                {"REDUCE Manual (HTML)", "lib/csl/reduce.doc/manual.html"},
+                {"REDUCE Manual (PDF)", "lib/csl/reduce.doc/manual.pdf"},
+                {"Inside Reduce (PDF)", "doc/insidereduce.pdf"},
+                {"REDUCE Symbolic Mode Primer (PDF)", "doc/primer.pdf"},
+                {"Standard Lisp Report (PDF)", "doc/sl.pdf"}
+        };
+        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
+            for (String[] manual : manuals) {
+                JMenuItem menuItem = new JMenuItem(manual[0]);
+                helpMenu.add(menuItem);
+                menuItem.setToolTipText("Open this manual in the default application.");
+                menuItem.addActionListener(e ->
+                {
+                    try {
+                        Desktop.getDesktop().open(new File(RunREDUCE.reduceConfiguration.packagesRootDir,
+                                manual[1]));
+                    } catch (IOException ex) {
+                        ex.printStackTrace();
+                    }
+                });
+            }
+        }
+
+        helpMenu.addSeparator();
+
         // Create an About Run-REDUCE item in the Help menu that pops up a dialogue:
         JMenuItem aboutMenuItem = new JMenuItem("About Run-REDUCE");
         helpMenu.add(aboutMenuItem);
-        aboutMenuItem.setToolTipText("Information about this app.");
+        aboutMenuItem.setToolTipText("Information about this application.");
         aboutMenuItem.addActionListener(e -> JOptionPane.showMessageDialog
                 (frame,
                         new String[]{"Run CLI REDUCE in a Java Swing GUI.",

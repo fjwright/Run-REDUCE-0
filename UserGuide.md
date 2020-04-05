@@ -409,6 +409,11 @@ effect until the next input prompt.
 
 The Help menu provides the following items.
 
+### Manuals
+
+These menu items open the manuals distributed with REDUCE in the
+default web browser or PDF viewer, as appropriate.
+
 ### About Run-REDUCE
 
 This pops up a dialogue displaying brief information about Run-REDUCE.
