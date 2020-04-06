@@ -109,7 +109,7 @@ class ReduceOutputThread extends Thread {
     static SimpleAttributeSet inputAttributeSet;
     static SimpleAttributeSet outputAttributeSet;
     private static final Pattern promptPattern = Pattern.compile("\\d+([:*]) ");
-    private static final StringBuilder text = new StringBuilder();
+    private final StringBuilder text = new StringBuilder(); // Must not be static!
 
     private static final Color ALGEBRAICOUTPUTCOLOR = Color.blue;
     private static final Color SYMBOLICOUTPUTCOLOR = new Color(0x80_00_80);
@@ -133,7 +133,6 @@ class ReduceOutputThread extends Thread {
         switch (RunREDUCEPrefs.colouredIOState) {
             case NONE:
                 inputAttributeSet = null;
-//            StyleConstants.setForeground(ReduceOutputThread.promptAttributeSet, null);
                 break;
             case REDFRONT:
                 inputAttributeSet = algebraicInputAttributeSet;
@@ -188,7 +187,6 @@ class ReduceOutputThread extends Thread {
                                 break; // end of case RunREDUCEPrefs.MODE
 
                             case REDFRONT: // redfront coloured IO display processing
-                                // FixMe Errors using PSL and inputting alg.tst!
                                 /*
                                  * The markup output by the redfront package uses ASCII control characters:
                                  * ^A prompt ^B input
@@ -220,19 +218,16 @@ class ReduceOutputThread extends Thread {
                                         styledDoc.insertString(styledDoc.getLength(), text.substring(0, algOutputStartMarker), null);
                                         styledDoc.insertString(styledDoc.getLength(), text.substring(algOutputStartMarker + 1), algebraicOutputAttributeSet);
                                         outputAttributeSet = algebraicOutputAttributeSet;
-                                        text.setLength(0); // delete any remaining text
                                         break;
                                     } else if (algOutputEndMarker >= 0) {
                                         // TEXT < algOutputEndMarker < TEXT
                                         styledDoc.insertString(styledDoc.getLength(), text.substring(0, algOutputEndMarker), algebraicOutputAttributeSet);
                                         outputAttributeSet = null;
                                         processPromptMarkers(algOutputEndMarker + 1);
-                                        text.setLength(0); // delete any remaining text
                                         break;
                                     } else {
                                         // No algebraic output markers.
                                         processPromptMarkers(0);
-                                        text.setLength(0); // delete any remaining text
                                         break;
                                     }
                                 }
@@ -265,7 +260,7 @@ class ReduceOutputThread extends Thread {
         }
     }
 
-    static void processPromptMarkers(int start) throws BadLocationException {
+    void processPromptMarkers(int start) throws BadLocationException {
         // Look for prompt markers:
         int promptStartMarker = text.indexOf("\u0001", start);
         int promptEndMarker = text.indexOf("\u0002", start);

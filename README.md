@@ -86,7 +86,7 @@ top-level directory.
 * Add a `Bold Prompts` checkbox to the View menu.
 * Replace the `Coloured I/O` item in the `View` menu with an `I/O
   Colouring` sub-menu.
-* Provide a full emulation of Redfront (**but this is still buggy**).
+* Provide a full emulation of Redfront.
 * Add a double-click handler for the `Shut Output Files...` and `Load
   Packages...` dialogues that makes them more consistent with the file
   chooser dialogue.
