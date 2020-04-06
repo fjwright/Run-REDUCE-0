@@ -9,15 +9,16 @@ This application is an incomplete prototype!
 For information about how to install and run Run-REDUCE please see the
 [User Guide](UserGuide.md).
 
-Run-REDUCE should run on any platform that supports Java 8, but I can
-only test it on Microsoft Windows and Ubuntu Linux.  (Whilst Java is
-portable, filesystem structures and installation conventions are not!)
+Run-REDUCE should run on any platform that supports Java 8 (or later),
+but I can only test it on Microsoft Windows and Ubuntu Linux.  (Whilst
+Java is portable, filesystem structures and installation conventions
+are not!)
 
 This version uses the Java Swing library, but at some future date I
 will probably switch to using JavaFX.  Swing has the advantage that it
 is still a standard component of the latest Java SE SDK.  I am
 developing using Java 13, but compiling for Java 8 to support running
-a jar file using the latest readily available JRE.
+a jar file using the latest readily available JREs.
 
 REDUCE itself is an open source project available from
 [SourceForge](https://sourceforge.net/projects/reduce-algebra/).  I'm
@@ -30,11 +31,11 @@ top-level directory.
 
 ### To do soon
 
+* Better support for non-default look-and-feels.
 * Multiple tabs that each run an independent invocation of REDUCE.
 
 ### To do later
 
-* Better support for non-default look-and-feels.
 * Font and colour selectors.
 * Detect whether REDUCE is running more reliably (maybe).
 * Remember all user choices, including window configurations (maybe).

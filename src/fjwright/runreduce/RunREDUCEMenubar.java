@@ -349,11 +349,11 @@ class RunREDUCEMenubar extends JMenuBar {
         this.add(helpMenu);
 
         String[][] manuals = {
-                {"REDUCE Manual (HTML)", "lib/csl/reduce.doc/manual.html"},
-                {"REDUCE Manual (PDF)", "lib/csl/reduce.doc/manual.pdf"},
-                {"Inside Reduce (PDF)", "doc/insidereduce.pdf"},
-                {"REDUCE Symbolic Mode Primer (PDF)", "doc/primer.pdf"},
-                {"Standard Lisp Report (PDF)", "doc/sl.pdf"}
+                {"REDUCE Manual (HTML)", "lib/csl/reduce.doc/manual.html", "manual.html"},
+                {"REDUCE Manual (PDF)", "lib/csl/reduce.doc/manual.pdf", "manual.pdf.gz"},
+                {"Inside Reduce (PDF)", "doc/insidereduce.pdf", "insidereduce.pdf.gz"},
+                {"REDUCE Symbolic Mode Primer (PDF)", "doc/primer.pdf", "primer.pdf.gz"},
+                {"Standard Lisp Report (PDF)", "doc/sl.pdf", "sl.pdf.gz"}
         };
         if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
             for (String[] manual : manuals) {
@@ -363,8 +363,10 @@ class RunREDUCEMenubar extends JMenuBar {
                 menuItem.addActionListener(e ->
                 {
                     try {
-                        Desktop.getDesktop().open(new File(RunREDUCE.reduceConfiguration.packagesRootDir,
-                                manual[1]));
+                        Desktop.getDesktop().open(RunREDUCEPrefs.windowsOS ?
+                                // ToDo Make the directory used below configurable?
+                                new File(RunREDUCE.reduceConfiguration.packagesRootDir, manual[1]) :
+                                new File("/usr/share/doc/reduce", manual[2]));
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
@@ -382,7 +384,7 @@ class RunREDUCEMenubar extends JMenuBar {
                 (frame,
                         new String[]{"Run CLI REDUCE in a Java Swing GUI.",
                                 "Prototype version 0.5",
-                                "Francis Wright, April 2020"},
+                                "\u00A9 Francis Wright, April 2020"},
                         "About Run-REDUCE",
                         JOptionPane.PLAIN_MESSAGE));
 

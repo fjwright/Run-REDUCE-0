@@ -33,9 +33,10 @@ that any error messages will be displayed in the shell window.
 
 Here is a bit more detail:
 
-### On Microsoft Windows
+### Microsoft Windows
 
-You can install a suitable JRE from [java.com](https://www.java.com/).
+You can install a suitable Java 8 JRE from
+[java.com](https://www.java.com/).
 
 An easy way to run Run-REDUCE using a shell command is first to open
 File Explorer and navigate to the folder to which you downloaded
@@ -43,12 +44,16 @@ File Explorer and navigate to the folder to which you downloaded
 *Return* key.  This will open a Command Prompt window in the current
 folder.
 
-### On Ubuntu Linux
+### Ubuntu Linux
 
 You can install a suitable JRE by opening a terminal window and
 executing the command
 
-    sudo apt install openjdk-8-jre
+    sudo apt install openjdk-11-jre
+
+(Java 8 has some known bugs on Ubuntu 18, so I recommend using
+Java 11.  After I upgraded to Java 11 I found that I also needed to
+install `canberra-gtk-module`.)
 
 If you set `Run-REDUCE.jar` to be executable then you should be able
 to run Run-REDUCE as an executable file, e.g. by double-clicking on
@@ -56,6 +61,13 @@ it.  An easy way to run Run-REDUCE using a shell command is first to
 open Files and navigate to the directory to which you downloaded
 `Run-REDUCE.jar`.  Right-click on this directory and select `Open in
 Terminal`.
+
+### Other Platforms
+
+[AdoptOpenJDK](https://adoptopenjdk.net/) provides "Prebuilt OpenJDK
+Binaries for Free!" for Java 8 and later for most current platforms
+including Linux, Windows and macOS.  I recommend the JRE build of
+either OpenJDK 8 (LTS) or OpenJDK 11 (LTS).
 
 ## Look and Feel
 
@@ -76,9 +88,7 @@ containing `Run-REDUCE.jar`:
 Note that the Windows look-and-feel only works on Microsoft Windows
 and the GTK look-and-feel only works on GNU platforms such as
 GNU/Linux with GTK+ 2.2 or later (e.g. Ubuntu 18 and later), but the
-Motif look-and-feel should work on all platforms.  Note that there
-seems to be a minor glitch in the GTK look-and-feel that causes an
-error report, but nevertheless it appears to work.  (Specifying the
+Motif look-and-feel should work on all platforms.  (Specifying the
 look-and-feel this way is a temporary measure; I hope to provide
 better support for specifying the look-and-feel at some later date.)
 
@@ -392,17 +402,17 @@ does not take effect until the **next** input prompt.)
 This sub-menu allows you to select an I/O colouring option: `None`,
 `Modal` or `Redfront`.  Modal colouring depends on REDUCE's current
 input mode: algebraic-mode prompts and input are red, algebraic-mode
-output is blue, symbolic-mode prompts and input are green,
-symbolic-mode output is cyan.  Redfront colouring is intended to
+output is blue, symbolic-mode prompts and input are brown,
+symbolic-mode output is purple.  Redfront colouring is intended to
 provide a full emulation of the standard REDUCE `redfront` facility
 and it loads the `redfront` package (silently), which outputs
 additional markup that is then interpreted by Run-REDUCE in the same
-way it is normally interpreted by the `redfront` executable running in
-a suitable terminal (emulator).  In Redfront mode all prompts and
-interactive input are red, algebraic-mode output is blue, and echoed
-file input and symbolic-mode output are not coloured.  Note that
-turning Redfront mode on or off does not take effect until REDUCE is
-(re-)started, and turning other modes on or off does not fully take
+way that it is normally interpreted by the `redfront` executable
+running in a suitable terminal (emulator).  In Redfront mode all
+prompts and interactive input are red, algebraic-mode output is blue,
+and echoed file input and symbolic-mode output are not coloured.  Note
+that turning Redfront mode on or off does not take effect until REDUCE
+is (re-)started, and turning other modes on or off does not fully take
 effect until the next input prompt.
 
 ## The Help Menu
