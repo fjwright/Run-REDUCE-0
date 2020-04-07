@@ -91,4 +91,8 @@ top-level directory.
   Packages...` dialogues that makes them more consistent with the file
   chooser dialogue.
 * Use a more solid font than the default for the I/O display pane.
-* Provide easy access to the distributed documentation via the Help menu.
+* Provide easy access to the distributed documentation via the Help
+  menu.
+* Replace the `Auto-run REDUCE?` checkbox with a `None` option in the
+  `Auto-run REDUCE` radio button group, and start the selected version
+  of REDUCE immediately if REDUCE is not running.

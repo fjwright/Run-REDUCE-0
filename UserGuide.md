@@ -95,7 +95,7 @@ better support for specifying the look-and-feel at some later date.)
 ## General Information
 
 Run-REDUCE remembers user preferences and uses them the next time it
-runs.  It uses the standard Java package
+starts.  It uses the standard Java package
 [java.util.prefs](https://docs.oracle.com/en/java/javase/13/docs/api/java.prefs/java/util/prefs/package-summary.html),
 which stores data persistently in an implementation-dependent backing
 store.  For example, on Microsoft Windows the preferences for this
@@ -277,17 +277,13 @@ This sub-menu provides an item for each configured version of REDUCE
 and PSL).  Clicking on a version of REDUCE runs it.  This sub-menu is
 disabled when REDUCE is running.
 
-### Auto-run REDUCE?
-
-Selecting this checkbox causes Run-REDUCE to run the selected version
-of REDUCE (see below) automatically when it starts.  Run-REDUCE
-remembers this option value and uses it the next time it runs.
-
 ### Auto-run REDUCE...
 
-This sub-menu allows you to select the version of REDUCE to auto-run
-when auto-run is enabled.  Run-REDUCE remembers this selection and
-uses it the next time it runs.
+This sub-menu allows you to select a version of REDUCE that Run-REDUCE
+will run automatically when it starts, or none.  Run-REDUCE remembers
+this selection and uses it the next time it starts.  If REDUCE is not
+running then Run-REDUCE also runs the selected version of REDUCE
+immediately.
 
 ### Stop REDUCE
 
@@ -389,7 +385,7 @@ The View menu provides the following items.
 This brings up a dialogue box that allows you to change the font size
 used in the `Input/Output Display` and `Input Editor` panes.
 Run-REDUCE remembers the selected size and uses it the next time
-Run-REDUCE runs.
+Run-REDUCE starts.
 
 ## Bold Prompts
 

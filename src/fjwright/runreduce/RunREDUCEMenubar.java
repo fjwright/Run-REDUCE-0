@@ -44,6 +44,7 @@ class RunREDUCEMenubar extends JMenuBar {
     static List<String> packageList;
     static FontSizeDialog fontSizeDialog;
     static REDUCEConfigDialog reduceConfigDialog;
+    static private boolean runningREDUCE;
 
     RunREDUCEMenubar(JFrame frame) {
         RunREDUCEMenubar.frame = frame;
@@ -243,19 +244,13 @@ class RunREDUCEMenubar extends JMenuBar {
         // Create a menu to run the selected version of REDUCE:
         // Allow space in the title string for the submenu indicator.
         reduceMenu.add(runREDUCESubmenu);
+        runREDUCESubmenu.setToolTipText("Select a version of REDUCE and run it.");
         runREDUCESubmenuBuild();
-
-        JCheckBoxMenuItem autoRun = new JCheckBoxMenuItem("Auto-run REDUCE?");
-        reduceMenu.add(autoRun);
-        autoRun.setState(RunREDUCEPrefs.autoRunState);
-        autoRun.addItemListener(e -> {
-            RunREDUCEPrefs.autoRunState = autoRun.isSelected();
-            RunREDUCEPrefs.save(RunREDUCEPrefs.AUTORUN);
-        });
 
         // Create a menu to select the version of REDUCE to auto-run:
         // Allow space in the title string for the submenu indicator.
         reduceMenu.add(autoRunREDUCESubmenu);
+        autoRunREDUCESubmenu.setToolTipText("Select a version of REDUCE to auto-run and run it now if REDUCE is not already running.");
         autoRunREDUCESubmenuBuild();
 
         reduceMenu.add(stopREDUCEMenuItem);
@@ -315,6 +310,7 @@ class RunREDUCEMenubar extends JMenuBar {
 
         JMenu colouredIOSubMenu = new JMenu("I/O Colouring");
         viewMenu.add(colouredIOSubMenu);
+        colouredIOSubMenu.setToolTipText("Select a text colouring style for the I/O Display, or none.");
         ButtonGroup colouredIOButtonGroup = new ButtonGroup();
         JRadioButtonMenuItem noColouredIORadioButton = new JRadioButtonMenuItem("None");
         colouredIOSubMenu.add(noColouredIORadioButton);
@@ -397,7 +393,6 @@ class RunREDUCEMenubar extends JMenuBar {
         for (RunREDUCECommand cmd : RunREDUCE.reduceConfiguration.runREDUCECommandList) {
             JMenuItem item = new JMenuItem(cmd.version);
             runREDUCESubmenu.add(item);
-            item.setToolTipText("Select a version of REDUCE and run it.");
             item.addActionListener(e -> {
                 // Run REDUCE.  (A direct call hangs the GUI!)
                 SwingUtilities.invokeLater(cmd::run);
@@ -408,16 +403,30 @@ class RunREDUCEMenubar extends JMenuBar {
     static void autoRunREDUCESubmenuBuild() {
         autoRunREDUCESubmenu.removeAll();
         ButtonGroup autoRunButtonGroup = new ButtonGroup();
+        JRadioButtonMenuItem noAutoRunRadioButton = new JRadioButtonMenuItem(RunREDUCEPrefs.NONE);
+        autoRunREDUCESubmenu.add(noAutoRunRadioButton);
+        autoRunButtonGroup.add(noAutoRunRadioButton);
+        if (RunREDUCEPrefs.autoRunVersion.equals(RunREDUCEPrefs.NONE)) noAutoRunRadioButton.setSelected(true);
+        noAutoRunRadioButton.addItemListener(e -> {
+            if (e.getStateChange() == ItemEvent.SELECTED)
+                RunREDUCEPrefs.save(RunREDUCEPrefs.AUTORUNVERSION, RunREDUCEPrefs.NONE);
+        });
         for (RunREDUCECommand cmd : RunREDUCE.reduceConfiguration.runREDUCECommandList) {
             JRadioButtonMenuItem item = new JRadioButtonMenuItem(cmd.version);
             if (RunREDUCEPrefs.autoRunVersion.equals(cmd.version)) item.setSelected(true);
             autoRunREDUCESubmenu.add(item);
             autoRunButtonGroup.add(item);
-            item.setToolTipText("Select a version of REDUCE to auto-run.");
             item.addItemListener(e -> {
-                if (e.getStateChange() == ItemEvent.SELECTED)
-                    RunREDUCEPrefs.save(RunREDUCEPrefs.AUTORUNVERSION,
-                            ((JRadioButtonMenuItem) e.getItem()).getText());
+                if (e.getStateChange() == ItemEvent.SELECTED) {
+                    String version = ((JRadioButtonMenuItem) e.getItem()).getText();
+                    RunREDUCEPrefs.save(RunREDUCEPrefs.AUTORUNVERSION, version);
+                    if (!runningREDUCE) {
+                        for (RunREDUCECommand cmd1 : RunREDUCE.reduceConfiguration.runREDUCECommandList) {
+                            if (version.equals(cmd1.version)) SwingUtilities.invokeLater(cmd1::run);
+                            break;
+                        }
+                    }
+                }
             });
         }
     }
@@ -437,6 +446,7 @@ class RunREDUCEMenubar extends JMenuBar {
      * Enable or disable menu items, buttons, etc., depending on whether REDUCE is running.
      */
     static void whenREDUCERunning(boolean running) {
+        runningREDUCE = running;
         // Items to enable when REDUCE is running:
         inputFileMenuItem.setEnabled(running);
         outputFileMenuItem.setEnabled(running);

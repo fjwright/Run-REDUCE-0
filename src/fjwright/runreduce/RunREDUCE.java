@@ -243,7 +243,7 @@ public class RunREDUCE extends JPanel {
         frame.setVisible(true);
 
         // Auto-run REDUCE if appropriate:
-        if (RunREDUCEPrefs.autoRunState)
+        if (!RunREDUCEPrefs.autoRunVersion.equals(RunREDUCEPrefs.NONE))
             for (RunREDUCECommand cmd : reduceConfiguration.runREDUCECommandList)
                 if (RunREDUCEPrefs.autoRunVersion.equals(cmd.version)) {
                     // Run REDUCE.  (A direct call hangs the GUI!)
@@ -256,17 +256,21 @@ public class RunREDUCE extends JPanel {
         JOptionPane.showMessageDialog(frame, message, title, JOptionPane.ERROR_MESSAGE);
     }
 
+    private static final String debugPlatformOption = "-debugPlatform";
+    private static final String debugOutputOption = "-debugOutput";
+
     public static void main(String... args) {
         for (String arg : args) {
             switch (arg) {
-                case "--debugPlatform":
+                case debugPlatformOption:
                     debugPlatform = true;
                     break;
-                case "--debugOutput":
+                case debugOutputOption:
                     debugOutput = true;
                     break;
                 default:
-                    System.err.println("Unrecognised argument: " + arg);
+                    System.err.format("Unrecognised argument: %s. Allowed options are: %s and %s.",
+                            arg, debugPlatformOption, debugOutputOption);
             }
         }
         reduceConfigurationDefault = new REDUCEConfigurationDefault();

@@ -17,7 +17,6 @@ public class RunREDUCEPrefs {
 
     // Preference keys:
     static final String FONTSIZE = "fontSize";
-    static final String AUTORUN = "autoRun";
     static final String AUTORUNVERSION = "autoRunVersion";
     static final String BOLDPROMPTS = "boldPrompts";
     static final String COLOUREDIO = "colouredIO";
@@ -25,11 +24,12 @@ public class RunREDUCEPrefs {
     // colouredIOState values:
     enum ColouredIO {NONE, MODAL, REDFRONT}
 
+    static final String NONE = "None";
+
     static int fontSize = Math.max(prefs.getInt(FONTSIZE, 12), 5);
     // in case a very small font size gets saved accidentally!
     // Minimum of 5 matches minimum set for font size SpinnerModel.
-    static boolean autoRunState = prefs.getBoolean(AUTORUN, false);
-    static String autoRunVersion = prefs.get(AUTORUNVERSION, REDUCEConfigurationDefault.CSL_REDUCE);
+    static String autoRunVersion = prefs.get(AUTORUNVERSION, NONE);
     static boolean boldPromptsState = prefs.getBoolean(BOLDPROMPTS, false);
     static ColouredIO colouredIOIntent;
 
@@ -47,9 +47,6 @@ public class RunREDUCEPrefs {
         switch (key) {
             case FONTSIZE:
                 prefs.putInt(FONTSIZE, fontSize = (int) values[0]);
-                break;
-            case AUTORUN:
-                prefs.putBoolean(AUTORUN, autoRunState);
                 break;
             case AUTORUNVERSION:
                 prefs.put(AUTORUNVERSION, autoRunVersion = (String) values[0]);
