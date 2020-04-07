@@ -83,11 +83,19 @@ class RunREDUCECommand {
                     "REDUCE Process Error");
         }
 
+        // Special support for Redfront I/O colouring:
         RunREDUCEPrefs.colouredIOState = RunREDUCEPrefs.colouredIOIntent;
         if (RunREDUCEPrefs.colouredIOState == RunREDUCEPrefs.ColouredIO.REDFRONT &&
                 RunREDUCECommand.reduceInputPrintWriter != null) {
-            RunREDUCECommand.reduceInputPrintWriter.print("load_package redfront;");
+            RunREDUCECommand.reduceInputPrintWriter.print("load_package redfront;\n");
             RunREDUCECommand.reduceInputPrintWriter.flush();
+            // Tidy up the initial prompt.
+            StyledDocument styledDoc = RunREDUCE.outputTextPane.getStyledDocument();
+            try {
+                styledDoc.remove(styledDoc.getLength() - 8, 4);
+            } catch (BadLocationException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

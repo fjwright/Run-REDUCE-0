@@ -379,7 +379,7 @@ class RunREDUCEMenubar extends JMenuBar {
         aboutMenuItem.addActionListener(e -> JOptionPane.showMessageDialog
                 (frame,
                         new String[]{"Run CLI REDUCE in a Java Swing GUI.",
-                                "Prototype version 0.5",
+                                "Prototype version 0.6",
                                 "\u00A9 Francis Wright, April 2020"},
                         "About Run-REDUCE",
                         JOptionPane.PLAIN_MESSAGE));

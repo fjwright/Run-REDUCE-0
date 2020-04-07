@@ -215,7 +215,6 @@ public class RunREDUCE extends JPanel {
             RunREDUCECommand.reduceInputPrintWriter.print(text);
             RunREDUCECommand.reduceInputPrintWriter.flush();
         }
-
     }
 
     /**

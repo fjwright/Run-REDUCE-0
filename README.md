@@ -18,7 +18,7 @@ This version uses the Java Swing library, but at some future date I
 will probably switch to using JavaFX.  Swing has the advantage that it
 is still a standard component of the latest Java SE SDK.  I am
 developing using Java 13, but compiling for Java 8 to support running
-a jar file using the latest readily available JREs.
+the jar file using all current JREs.
 
 REDUCE itself is an open source project available from
 [SourceForge](https://sourceforge.net/projects/reduce-algebra/).  I'm
@@ -49,7 +49,7 @@ top-level directory.
 
 ## Release Notes
 
-### Version 0.4 user-visible updates (since v0.2)
+### Version 0.4 user-visible updates
 
 * Add a semicolon to the end of input if there is no terminator.
 * Optional redfront-style font colouring to distinguish input and
@@ -60,7 +60,7 @@ top-level directory.
   configure REDUCE directories and commands.  Using this should allow
   Run-REDUCE to run on any platform.
 
-### Version 0.5 user-visible updates (since v0.4)
+### Version 0.5 user-visible updates
 
 * Button to duplicate selected version added to REDUCEConfigDialog.
 * Descenders in text are no longer cut off (on Windows) in
@@ -73,7 +73,7 @@ top-level directory.
   added to the `REDUCE` menu.
 * Correct REDUCEConfigDialog with a non-default look-and-feel.
 
-### Pre-release user-visible updates since v0.5
+### Version 0.6 user-visible updates
 
 * Keyboard shortcuts to send input to REDUCE and scroll the input
   list.  Scrolling beyond the last input clears the input pane.
@@ -96,3 +96,5 @@ top-level directory.
 * Replace the `Auto-run REDUCE?` checkbox with a `None` option in the
   `Auto-run REDUCE` radio button group, and start the selected version
   of REDUCE immediately if REDUCE is not running.
+
+### Pre-release user-visible updates

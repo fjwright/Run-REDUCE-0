@@ -9,7 +9,7 @@ installed separately.  Run-REDUCE should find a standard REDUCE
 installation automatically and not **require** any initial
 configuration, at least on Microsoft Windows and Ubuntu Linux.  With
 suitable configuration is **should** run on any platform that supports
-Java 8, but I can only test on 64-bit Windows 10 and Ubuntu 18.
+Java 8 (or later), but I can only test on 64-bit Windows 10 and Ubuntu 18.
 
 Run-REDUCE does **not** (yet) provide typeset-quality display of
 mathematical notation.
@@ -119,8 +119,9 @@ REDUCE on your `D` drive:
 Otherwise, by default Run-REDUCE looks in the standard places for a
 REDUCE installation.  On Microsoft Windows it looks for the folder
 `\Program Files\Reduce` on all accessible drives.  On Ubuntu Linux it
-assumes that package information is under `/usr/share/reduce` and
-executable files are under `/usr/lib/reduce`.
+assumes that executable files are under `/usr/lib/reduce`, package
+information is under `/usr/share/reduce`, and documentation is under
+`/usr/share/doc/reduce`.
 
 ## The Main Window
 
