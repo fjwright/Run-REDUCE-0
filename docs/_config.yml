@@ -1,4 +1,4 @@
-#title: [The title of your site]
-description: [A short description of your site's purpose]
+title: Run-REDUCE | A GUI for REDUCE
+description: A Java GUI to run any CLI version of the REDUCE Computer Algebra System
 theme: jekyll-theme-slate
 show_downloads: "true"
