@@ -1,3 +1,5 @@
+**This is a new web site still under development!**
+
 Run-REDUCE is a project to provide a cross-platform GUI for running
 the REDUCE Computer Algebra System that provides a consistent user
 experience across all platforms.  It is implemented in Java and the
@@ -13,8 +15,7 @@ you need to install separately.  Run-REDUCE is designed to run a
 standard installation of REDUCE; it does not include REDUCE.
 
 Full information about how to install and run Run-REDUCE is available
-in the [User
-Guide](https://github.com/fjwright/Run-REDUCE/blob/master/UserGuide.md).
+in the [User Guide](UserGuide.md).
 
 Run-REDUCE is currently under active development and is not yet
 complete.  Here are some of the key features that it currently

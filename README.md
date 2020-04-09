@@ -7,7 +7,7 @@
 This application is an incomplete prototype!
 
 For information about how to install and run Run-REDUCE please see the
-[User Guide](UserGuide.md).
+[User Guide](docs/UserGuide.md).
 
 Run-REDUCE should run on any platform that supports Java 8 (or later),
 but I can only test it on Microsoft Windows and Ubuntu Linux.  (Whilst
