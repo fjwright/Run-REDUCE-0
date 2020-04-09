@@ -1,4 +1,4 @@
-title: Run-REDUCE | A GUI for REDUCE
-description: A Java GUI to run any CLI version of the REDUCE Computer Algebra System
+#title: Run-REDUCE
+description: A GUI for REDUCE
 theme: jekyll-theme-slate
 show_downloads: "true"
