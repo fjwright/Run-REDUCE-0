@@ -107,6 +107,7 @@ public class RunREDUCE extends JPanel {
         InputMap inputMap = inputTextArea.getInputMap(); // WHEN_FOCUSED map
         ActionMap actionMap = inputTextArea.getActionMap();
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK), "Send");
+        inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK), "Send");
         actionMap.put("Send", sendAction);
         inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_DOWN_MASK), "Earlier");
         actionMap.put("Earlier", earlierAction);
@@ -121,14 +122,17 @@ public class RunREDUCE extends JPanel {
             super("Send Input");
             putValue(SHORT_DESCRIPTION,
                     "Send the input above to REDUCE, adding a semicolon and/or newline if necessary." +
-                            " Keyboard Shortcut: Control+Enter");
+                            " Keyboard Shortcut: Control+Enter." +
+                            " (Also hold Shift to prevent auto-termination.)");
         }
 
         public void actionPerformed(ActionEvent e) {
             String text = inputTextArea.getText();
             if (text.length() > 0) {
                 inputList.add(text);
-                sendStringToREDUCE(text);
+                boolean unshifted = (e.getModifiers() & ActionEvent.SHIFT_MASK) == 0;
+                // if shifted then do not auto terminate, hence if unshifted then auto terminate:
+                sendInteractiveInputToREDUCE(text, unshifted);
                 inputTextArea.setText(null);
                 inputListIndex = inputList.size();
                 maxInputListIndex = inputListIndex - 1;
@@ -147,7 +151,7 @@ public class RunREDUCE extends JPanel {
         public EarlierAction() {
             super("\u25b2 Earlier Input");
             putValue(SHORT_DESCRIPTION, "Select earlier input via this editor." +
-                    " Keyboard Shortcut: Control+UpArrow");
+                    " Keyboard Shortcut: Control+UpArrow.");
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -167,7 +171,7 @@ public class RunREDUCE extends JPanel {
         public LaterAction() {
             super("\u25bc Later Input");
             putValue(SHORT_DESCRIPTION, "Select later input via this editor." +
-                    " Keyboard Shortcut: Control+DownArrow");
+                    " Keyboard Shortcut: Control+DownArrow.");
         }
 
         public void actionPerformed(ActionEvent e) {
@@ -188,18 +192,18 @@ public class RunREDUCE extends JPanel {
         }
     }
 
-    static void sendStringToREDUCE(String text) {
-        // Strip trailing white space and ensure the input end with a terminator:
-        int i;
+    static void sendInteractiveInputToREDUCE(String text, boolean autoTerminate) {
+        // Strip trailing white space and if autoTerminate then ensure the input ends with a terminator:
+        int i = text.length() - 1;
         char c = 0;
-//        for (i = text.length() - 1; i > 0 && Character.isWhitespace(c = text.charAt(i)); i--) ;
-        i = text.length() - 1;
-        while (i > 0 && Character.isWhitespace(c = text.charAt(i)))
-            i--;
+        while (i >= 0 && Character.isWhitespace(c = text.charAt(i))) i--;
         text = text.substring(0, i + 1);
-        if (c == ';' || c == '$') text += "\n";
+        if (c == ';' || c == '$' || !autoTerminate) text += "\n";
         else text += ";\n";
+        sendStringToREDUCE(text);
+    }
 
+    static void sendStringToREDUCE(String text) {
         StyledDocument styledDoc = outputTextPane.getStyledDocument();
         try {
             styledDoc.insertString(styledDoc.getLength(), text, ReduceOutputThread.inputAttributeSet);
