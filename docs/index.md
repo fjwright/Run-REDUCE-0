@@ -2,9 +2,7 @@ Run-REDUCE is a project to provide a cross-platform GUI for running
 the REDUCE Computer Algebra System that provides a consistent user
 experience across all platforms.  It is implemented in Java and the
 executable application takes the form of the Java JAR file
-`Run-REDUCE.jar` that is one of the three assets available under
-`Assets` below the information about the [latest
-release](https://github.com/fjwright/Run-REDUCE/releases/latest).
+[`Run-REDUCE.jar`](https://github.com/fjwright/Run-REDUCE/releases/latest/download/Run-REDUCE.jar).
 
 REDUCE itself is an open source project available from
 [SourceForge](https://sourceforge.net/projects/reduce-algebra/), which
