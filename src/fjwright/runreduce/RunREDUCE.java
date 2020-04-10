@@ -130,9 +130,22 @@ public class RunREDUCE extends JPanel {
             String text = inputTextArea.getText();
             if (text.length() > 0) {
                 inputList.add(text);
+                boolean questionPrompt = false;
+                try {
+                    StyledDocument styledDoc = RunREDUCE.outputTextPane.getStyledDocument();
+                    // The last paragraph element should be the prompt line.
+                    int start = styledDoc.getParagraphElement(styledDoc.getLength()).getStartOffset();
+                    for (int i = styledDoc.getLength() - 1; i >= start; i--)
+                        if (styledDoc.getText(i, 1).equals("?")) {
+                            questionPrompt = true;
+                            break;
+                        }
+                } catch (BadLocationException ex) {
+                    ex.printStackTrace();
+                }
                 boolean unshifted = (e.getModifiers() & ActionEvent.SHIFT_MASK) == 0;
                 // if shifted then do not auto terminate, hence if unshifted then auto terminate:
-                sendInteractiveInputToREDUCE(text, unshifted);
+                sendInteractiveInputToREDUCE(text, !questionPrompt && unshifted);
                 inputTextArea.setText(null);
                 inputListIndex = inputList.size();
                 maxInputListIndex = inputListIndex - 1;

@@ -146,11 +146,12 @@ the input editor pane back to its state before you started scrolling.
 When keyboard focus is in the input editor pane, the following
 keyboard shortcuts are active:
 
-Keyboard Shortcuts   | Action
-:-------------------:|:------------:
-*Control+Enter*      | Send Input
-*Control+UpArrow*    | Earlier Input
-*Control+DownArrow*  | Later Input
+Keyboard Shortcuts    | Action
+:--------------------:|:------------:
+*Control+Enter*       | Send Input (auto-terminated)
+*Control+Shift+Enter* | Send Input (no auto-termination)
+*Control+UpArrow*     | Earlier Input
+*Control+DownArrow*   | Later Input
 
 where *Enter* is the *Return* or *Enter* key and *UpArrow* /
 *DownArrow* are the cursor up / down keys, respectively.
@@ -162,9 +163,14 @@ Input` action is disabled unless REDUCE is running, and the `Earlier
 Input` and `Later Input` actions are disabled unless there is earlier
 or later input, respectively.
 
-Sending input to REDUCE strips any trailing white space, adds a
-semicolon if there was no final terminator, and then adds a final
-newline.
+Sending input to REDUCE strips any trailing white space, normally
+auto-terminates it by adding a semicolon if there was no final
+terminator, and then adds a final newline.  However, if Run-REDUCE
+detects a question mark in the input prompt then it suppresses
+auto-termination (so if you really want a terminator you must enter it
+explicitly).  As an additional precaution, holding the Shift key while
+pressing *Control+Enter* or clicking on the `Send Input` button always
+suppresses auto-termination.
 
 ## The File Menu
 

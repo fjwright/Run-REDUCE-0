@@ -95,7 +95,7 @@ class RunREDUCEMenubar extends JMenuBar {
                     text.append("\", \"");
                     text.append(files[i].toString());
                 }
-                text.append(echoCheckBox.isSelected() ? "\";" : "\"$");
+                text.append(echoCheckBox.isSelected() ? "\";\n" : "\"$\n");
                 RunREDUCE.sendStringToREDUCE(text.toString());
             }
         });
@@ -116,7 +116,7 @@ class RunREDUCEMenubar extends JMenuBar {
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
                 RunREDUCE.sendStringToREDUCE
-                        ("out \"" + file.toString() + "\"$");
+                        ("out \"" + file.toString() + "\"$\n");
                 outputFileList.add(file);
                 closeLastMenuItem.setEnabled(true);
                 closeFileMenuItem.setEnabled(true);
@@ -127,7 +127,7 @@ class RunREDUCEMenubar extends JMenuBar {
         fileMenu.add(outputHereMenuItem);
         outputHereMenuItem.setToolTipText
                 ("Switch output back to this GUI.");
-        outputHereMenuItem.addActionListener(e -> RunREDUCE.sendStringToREDUCE("out t$"));
+        outputHereMenuItem.addActionListener(e -> RunREDUCE.sendStringToREDUCE("out t$\n"));
 
         // Shut one or more output files.
         fileMenu.add(closeFileMenuItem);
@@ -144,7 +144,7 @@ class RunREDUCEMenubar extends JMenuBar {
                 if (length != 0) {
                     // Process backwards to avoid remove() changing subsequent indices:
                     StringBuilder text = new StringBuilder(outputFileList.remove(fileIndices[--length]).toString());
-                    text.append("\"$");
+                    text.append("\"$\n");
                     for (int i = --length; i >= 0; i--) {
                         text.insert(0, "\", \"");
                         text.insert(0, outputFileList.remove(fileIndices[i]).toString());
@@ -167,7 +167,7 @@ class RunREDUCEMenubar extends JMenuBar {
         closeLastMenuItem.addActionListener(e -> {
             if (!outputFileList.isEmpty()) { // not strictly necessary
                 int last = outputFileList.size() - 1;
-                RunREDUCE.sendStringToREDUCE("shut \"" + outputFileList.remove(last).toString() + "\"$");
+                RunREDUCE.sendStringToREDUCE("shut \"" + outputFileList.remove(last).toString() + "\"$\n");
             }
             if (outputFileList.isEmpty()) {
                 closeLastMenuItem.setEnabled(false);
@@ -198,7 +198,7 @@ class RunREDUCEMenubar extends JMenuBar {
                     text.append(", ");
                     text.append(selectedPackages.get(i));
                 }
-                text.append(";");
+                text.append(";\n");
                 RunREDUCE.sendStringToREDUCE(text.toString());
             }
         });
@@ -256,7 +256,7 @@ class RunREDUCEMenubar extends JMenuBar {
         reduceMenu.add(stopREDUCEMenuItem);
         stopREDUCEMenuItem.setToolTipText("Terminate REDUCE but *not* this GUI.");
         stopREDUCEMenuItem.addActionListener(e -> {
-            RunREDUCE.sendStringToREDUCE("bye;");
+            RunREDUCE.sendStringToREDUCE("bye;\n");
             // Reset enabled state of menu items etc.:
             whenREDUCERunning(false);
         });

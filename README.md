@@ -98,3 +98,6 @@ top-level directory.
   of REDUCE immediately if REDUCE is not running.
 
 ### Pre-release user-visible updates
+
+* Detect a question prompt and don't auto-terminate the response.
+* Holding Shift always suppresses auto-termination of input.
