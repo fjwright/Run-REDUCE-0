@@ -97,7 +97,10 @@ top-level directory.
   `Auto-run REDUCE` radio button group, and start the selected version
   of REDUCE immediately if REDUCE is not running.
 
-### Pre-release user-visible updates
+### Version 0.7 user-visible updates
 
 * Detect a question prompt and don't auto-terminate the response.
 * Holding Shift always suppresses auto-termination of input.
+* Fix the activated status of the `Output Here` menu item.
+
+### Pre-release user-visible updates
