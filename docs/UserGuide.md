@@ -387,20 +387,20 @@ they are used or saved, and empty fields are not saved at all.
 
 The View menu provides the following items.
 
-## Font Size...
+### Font Size...
 
 This brings up a dialogue box that allows you to change the font size
 used in the `Input/Output Display` and `Input Editor` panes.
 Run-REDUCE remembers the selected size and uses it the next time
 Run-REDUCE starts.
 
-## Bold Prompts
+### Bold Prompts
 
 Selecting this checkbox causes Run-REDUCE to embolden the display of
 all input prompts.  (This works independently of any I/O colouring but
 does not take effect until the **next** input prompt.)
 
-## I/O Colouring
+### I/O Colouring
 
 This sub-menu allows you to select an I/O colouring option: `None`,
 `Modal` or `Redfront`.  Modal colouring depends on REDUCE's current
