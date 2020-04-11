@@ -59,23 +59,40 @@ public class RunREDUCE {
 
     // Run-time argument processing:
     static boolean debugPlatform, debugOutput;
-    private static final String debugPlatformOption = "-debugPlatform";
-    private static final String debugOutputOption = "-debugOutput";
+    private static final String debugPlatformArg = "-debugPlatform";
+    private static final String debugOutputArg = "-debugOutput";
+    private static final String lfNativeArg = "-lfNative";
+    private static final String lfMotifArg = "-lfMotif";
 
     public static void main(String... args) {
+        String lookAndFeel = null;
         for (String arg : args) {
             switch (arg) {
-                case debugPlatformOption:
+                case debugPlatformArg:
                     debugPlatform = true;
                     break;
-                case debugOutputOption:
+                case debugOutputArg:
                     debugOutput = true;
                     break;
+                case lfNativeArg:
+                    lookAndFeel = UIManager.getSystemLookAndFeelClassName();
+                    break;
+                case lfMotifArg:
+                    lookAndFeel = "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
+                    break;
                 default:
-                    System.err.format("Unrecognised argument: %s. Allowed options are: %s and %s.",
-                            arg, debugPlatformOption, debugOutputOption);
+                    System.err.format("Unrecognised argument: %s.\nAllowed arguments are: %s, %s, %s and %s.",
+                            arg, debugPlatformArg, debugOutputArg, lfNativeArg, lfMotifArg);
             }
         }
+
+        if (lookAndFeel != null) try {
+            UIManager.setLookAndFeel(lookAndFeel);
+        } catch (ClassNotFoundException | InstantiationException |
+                IllegalAccessException | UnsupportedLookAndFeelException e) {
+            System.err.println(e);
+        }
+
         reduceConfigurationDefault = new REDUCEConfigurationDefault();
         reduceConfiguration = new REDUCEConfiguration();
         // Schedule jobs for the event-dispatching thread.

@@ -31,7 +31,6 @@ top-level directory.
 
 ### To do soon
 
-* Better support for non-default look-and-feels.
 * Multiple tabs that each run an independent invocation of REDUCE.
 
 ### To do later
@@ -105,3 +104,5 @@ top-level directory.
 * Fix the activated status of the `Output Here` menu item.
 
 ### Pre-release user-visible updates
+
+* Better support for non-default look-and-feels.
