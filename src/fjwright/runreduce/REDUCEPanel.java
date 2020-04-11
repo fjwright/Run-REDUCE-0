@@ -97,6 +97,11 @@ public class REDUCEPanel extends JPanel {
         // Give the input text area the initial focus:
         inputTextArea.requestFocusInWindow();
 
+        // Disable all actions initially:
+        sendAction.setEnabled(false);
+        earlierAction.setEnabled(false);
+        laterAction.setEnabled(false);
+
         // Auto-run REDUCE if appropriate:
         if (!RRPreferences.autoRunVersion.equals(RRPreferences.NONE))
             for (REDUCECommand cmd : RunREDUCE.reduceConfiguration.reduceCommandList)

@@ -16,7 +16,7 @@ import java.util.Spliterator;
 import java.util.function.Consumer;
 
 public class REDUCEConfigDialog extends JDialog {
-    private Frame frame;
+    private final Frame frame;
     private JPanel contentPane;
     private JButton buttonSave;
     private JButton buttonCancel;
@@ -31,8 +31,8 @@ public class REDUCEConfigDialog extends JDialog {
     private JTextField versionRootDirTextField;
     private JTextField commandPathNameTextField;
     private Color backgroundColor;
-    private Insets textInsets = new Insets(0, 0, 3, 0);
-    private Font textAreaFont = new JTextField().getFont();
+    private final Insets textInsets = new Insets(0, 0, 3, 0);
+    private final Font textAreaFont = new JTextField().getFont();
 
     static final int nArgs = 5;
     private final JLabel[] argLabels = new JLabel[nArgs];
@@ -545,7 +545,7 @@ class REDUCECommandDocuments {
 }
 
 class REDUCECommandDocumentsList extends AbstractListModel<PlainDocument> implements Iterable<REDUCECommandDocuments> {
-    private ArrayList<REDUCECommandDocuments> reduceCommandDocumentsList = new ArrayList<>();
+    private final ArrayList<REDUCECommandDocuments> reduceCommandDocumentsList = new ArrayList<>();
 
     REDUCECommandDocumentsList(REDUCEConfigurationType reduceConfiguration) {
         for (REDUCECommand cmd : reduceConfiguration.reduceCommandList)

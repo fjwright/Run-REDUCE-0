@@ -143,7 +143,7 @@ class RRMenuBar extends JMenuBar {
                 shutOutputFilesDialog = new ShutOutputFilesDialog(frame);
             if (!outputFileList.isEmpty()) { // not strictly necessary
                 // Select output files to shut:
-                int[] fileIndices = shutOutputFilesDialog.showDialog(outputFileList);
+                int[] fileIndices = shutOutputFilesDialog.showDialog();
                 int length = fileIndices.length;
                 if (length != 0) {
                     // Process backwards to avoid remove() changing subsequent indices:
@@ -455,8 +455,8 @@ class RRMenuBar extends JMenuBar {
         outputFileMenuItem.setEnabled(running);
         loadPackagesMenuItem.setEnabled(running);
         stopREDUCEMenuItem.setEnabled(running);
-//        RunREDUCE.runREDUCE.sendAction.setEnabled(running);
-// FixMe Cannot call this method when the menubar is instantiated because ReducePanel has not yet been instantiated!
+        if (RunREDUCE.reducePanel != null)
+            RunREDUCE.reducePanel.sendAction.setEnabled(running);
 
         // Items to disable when REDUCE is running:
         runREDUCESubmenu.setEnabled(!running);

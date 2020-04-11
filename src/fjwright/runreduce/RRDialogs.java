@@ -130,8 +130,8 @@ class ShutOutputFilesDialog extends AbstractListDialog<File> {
         list.setVisibleRowCount(5);
     }
 
-    int[] showDialog(List<File> outputFileList) {
-        list.setListData(outputFileList.toArray(new File[0]));
+    int[] showDialog() {
+        list.setListData(RRMenuBar.outputFileList.toArray(new File[0]));
         pack();                       // must be done dynamically
         setLocationRelativeTo(frame); // ditto
         setVisible(true);
@@ -183,11 +183,11 @@ class LoadPackagesDialog extends AbstractListDialog<String> {
  * This class provides a modal dialog to change the REDUCE I/O font size.
  */
 class FontSizeDialog extends JDialog implements ActionListener, ChangeListener {
-    private Frame frame;
-    private JTextField currentSizeDemoTextField;
-    private JTextField currentSizeValueTextField;
-    private JTextField newSizeDemoTextField;
-    private JSpinner newSizeValueSpinner;
+    private final Frame frame;
+    private final JTextField currentSizeDemoTextField;
+    private final JTextField currentSizeValueTextField;
+    private final JTextField newSizeDemoTextField;
+    private final JSpinner newSizeValueSpinner;
     private Font newFont;
     private int newFontSize;
 
