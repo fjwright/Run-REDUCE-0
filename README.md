@@ -36,6 +36,7 @@ top-level directory.
 
 ### To do later
 
+* Easy access to a local copy of the Run-REDUCE User Guide.
 * Font and colour selectors.
 * Detect whether REDUCE is running more reliably (maybe).
 * Remember all user choices, including window configurations (maybe).
