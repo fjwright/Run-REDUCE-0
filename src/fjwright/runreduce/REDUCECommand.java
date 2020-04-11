@@ -19,15 +19,15 @@ import java.util.regex.Pattern;
  * This class defines a command to run REDUCE and checks that it is executable.
  * The run method runs REDUCE as a sub-process.
  */
-class RunREDUCECommand {
+class REDUCECommand {
     String version = ""; // e.g. "CSL REDUCE" or "PSL REDUCE"
     String versionRootDir = ""; // version-specific reduceRootDir.
     String[] command = {"", "", "", "", "", ""}; // executable pathname followed by arguments
 
-    RunREDUCECommand() {
+    REDUCECommand() {
     }
 
-    RunREDUCECommand(String version, String versionRootDir, String... command) {
+    REDUCECommand(String version, String versionRootDir, String... command) {
         this.version = version;
         this.versionRootDir = versionRootDir;
         this.command = command;
@@ -71,12 +71,12 @@ class RunREDUCECommand {
 
             // Start a thread to handle the REDUCE output stream
             // (assigned to a global variable):
-            ReduceOutputThread outputGobbler = new
-                    ReduceOutputThread(p.getInputStream(), RunREDUCE.outputTextPane);
+            REDUCEOutputThread outputGobbler = new
+                    REDUCEOutputThread(p.getInputStream(), RunREDUCE.reducePanel.outputTextPane);
             outputGobbler.start();
 
             // Initialise enabled state of menu items etc.:
-            RunREDUCEMenubar.whenREDUCERunning(true);
+            RRMenuBar.whenREDUCERunning(true);
         } catch (Exception exc) {
             RunREDUCE.errorMessageDialog(
                     "Error running REDUCE -- " + exc,
@@ -84,13 +84,13 @@ class RunREDUCECommand {
         }
 
         // Special support for Redfront I/O colouring:
-        RunREDUCEPrefs.colouredIOState = RunREDUCEPrefs.colouredIOIntent;
-        if (RunREDUCEPrefs.colouredIOState == RunREDUCEPrefs.ColouredIO.REDFRONT &&
-                RunREDUCECommand.reduceInputPrintWriter != null) {
-            RunREDUCECommand.reduceInputPrintWriter.print("load_package redfront;\n");
-            RunREDUCECommand.reduceInputPrintWriter.flush();
+        RRPreferences.colouredIOState = RRPreferences.colouredIOIntent;
+        if (RRPreferences.colouredIOState == RRPreferences.ColouredIO.REDFRONT &&
+                REDUCECommand.reduceInputPrintWriter != null) {
+            REDUCECommand.reduceInputPrintWriter.print("load_package redfront;\n");
+            REDUCECommand.reduceInputPrintWriter.flush();
             // Tidy up the initial prompt.
-            StyledDocument styledDoc = RunREDUCE.outputTextPane.getStyledDocument();
+            StyledDocument styledDoc = RunREDUCE.reducePanel.outputTextPane.getStyledDocument();
             try {
                 styledDoc.remove(styledDoc.getLength() - 8, 4);
             } catch (BadLocationException e) {
@@ -103,7 +103,7 @@ class RunREDUCECommand {
 /**
  * This thread reads from the REDUCE output pipe and appends it to the GUI output pane.
  */
-class ReduceOutputThread extends Thread {
+class REDUCEOutputThread extends Thread {
     InputStream input;        // REDUCE pipe output (buffered)
     JTextPane outputTextPane; // GUI output pane
     private static StyledDocument styledDoc;
@@ -124,7 +124,7 @@ class ReduceOutputThread extends Thread {
     private static final Color ALGEBRAICINPUTCOLOR = Color.red;
     private static final Color SYMBOLICINPUTCOLOR = new Color(0x80_00_00);
 
-    ReduceOutputThread(InputStream input, JTextPane outputTextPane) {
+    REDUCEOutputThread(InputStream input, JTextPane outputTextPane) {
         this.input = input;
         this.outputTextPane = outputTextPane;
         styledDoc = outputTextPane.getStyledDocument();
@@ -138,7 +138,7 @@ class ReduceOutputThread extends Thread {
 
     public void run() {
         outputAttributeSet = null; // for initial header
-        switch (RunREDUCEPrefs.colouredIOState) {
+        switch (RRPreferences.colouredIOState) {
             case NONE:
                 inputAttributeSet = null;
                 break;
@@ -156,10 +156,10 @@ class ReduceOutputThread extends Thread {
                     int textLength = text.length();
                     if (textLength > 0) {
 
-                        switch (RunREDUCEPrefs.colouredIOState) {
+                        switch (RRPreferences.colouredIOState) {
                             case NONE:
                             default: // no IO display colouring, but maybe prompt processing
-                                if ((RunREDUCEPrefs.boldPromptsState) &&
+                                if ((RRPreferences.boldPromptsState) &&
                                         (promptIndex = text.lastIndexOf("\n") + 1) < textLength &&
                                         promptPattern.matcher(promptString = text.substring(promptIndex)).matches()) {
                                     styledDoc.insertString(styledDoc.getLength(), text.substring(0, promptIndex), null);
@@ -297,7 +297,7 @@ class REDUCEPackageList extends ArrayList<String> {
                             "Please correct 'Packages Root Dir' in the 'Configure REDUCE...' dialogue,",
                             "which will open automatically when you close this dialogue."},
                     "REDUCE Package Error");
-            RunREDUCEMenubar.showREDUCEConfigDialog();
+            RRMenuBar.showREDUCEConfigDialog();
             return;
         }
 

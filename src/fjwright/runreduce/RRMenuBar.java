@@ -18,7 +18,7 @@ import java.util.List;
  * which this GUI was run, so filenames must be relative to that
  * directory or absolute; I currently use the latter.
  */
-class RunREDUCEMenubar extends JMenuBar {
+class RRMenuBar extends JMenuBar {
     private static Frame frame = null;
 
     static final JMenuItem inputFileMenuItem = new JMenuItem("Input from Files...");
@@ -46,8 +46,8 @@ class RunREDUCEMenubar extends JMenuBar {
     static REDUCEConfigDialog reduceConfigDialog;
     static private boolean runningREDUCE;
 
-    RunREDUCEMenubar(JFrame frame) {
-        RunREDUCEMenubar.frame = frame;
+    RRMenuBar(JFrame frame) {
+        RRMenuBar.frame = frame;
         frame.setJMenuBar(this);
         // menuBar.setOpaque(true);
 
@@ -96,7 +96,7 @@ class RunREDUCEMenubar extends JMenuBar {
                     text.append(files[i].toString());
                 }
                 text.append(echoCheckBox.isSelected() ? "\";\n" : "\"$\n");
-                RunREDUCE.sendStringToREDUCE(text.toString());
+                RunREDUCE.reducePanel.sendStringToREDUCE(text.toString());
             }
         });
 
@@ -116,7 +116,7 @@ class RunREDUCEMenubar extends JMenuBar {
             int returnVal = fileChooser.showOpenDialog(frame);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
-                RunREDUCE.sendStringToREDUCE("out \"" + file.toString() + "\"$\n");
+                RunREDUCE.reducePanel.sendStringToREDUCE("out \"" + file.toString() + "\"$\n");
                 outputFileList.remove(file); // in case it was already open
                 outputFileList.add(file);
                 shutLastMenuItem.setEnabled(true);
@@ -130,7 +130,7 @@ class RunREDUCEMenubar extends JMenuBar {
         outputHereMenuItem.setEnabled(false);
         outputHereMenuItem.setToolTipText("Switch output back to this GUI.");
         outputHereMenuItem.addActionListener(e -> {
-            RunREDUCE.sendStringToREDUCE("out t$\n");
+            RunREDUCE.reducePanel.sendStringToREDUCE("out t$\n");
             outputHereMenuItem.setEnabled(false);
         });
 
@@ -154,7 +154,7 @@ class RunREDUCEMenubar extends JMenuBar {
                         text.insert(0, outputFileList.remove(fileIndices[i]).toString());
                     }
                     text.insert(0, "shut \"");
-                    RunREDUCE.sendStringToREDUCE(text.toString());
+                    RunREDUCE.reducePanel.sendStringToREDUCE(text.toString());
                 }
             }
             if (outputFileList.isEmpty()) {
@@ -171,7 +171,7 @@ class RunREDUCEMenubar extends JMenuBar {
         shutLastMenuItem.addActionListener(e -> {
             if (!outputFileList.isEmpty()) { // not strictly necessary
                 int last = outputFileList.size() - 1;
-                RunREDUCE.sendStringToREDUCE("shut \"" + outputFileList.remove(last).toString() + "\"$\n");
+                RunREDUCE.reducePanel.sendStringToREDUCE("shut \"" + outputFileList.remove(last).toString() + "\"$\n");
             }
             if (outputFileList.isEmpty()) {
                 shutLastMenuItem.setEnabled(false);
@@ -203,7 +203,7 @@ class RunREDUCEMenubar extends JMenuBar {
                     text.append(selectedPackages.get(i));
                 }
                 text.append(";\n");
-                RunREDUCE.sendStringToREDUCE(text.toString());
+                RunREDUCE.reducePanel.sendStringToREDUCE(text.toString());
             }
         });
 
@@ -224,7 +224,7 @@ class RunREDUCEMenubar extends JMenuBar {
                 File file = fileChooser.getSelectedFile();
                 try (Writer out = new BufferedWriter
                         (new FileWriter(file, appendCheckBox.isSelected()))) {
-                    RunREDUCE.outputTextPane.write(out);
+                    RunREDUCE.reducePanel.outputTextPane.write(out);
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
                 }
@@ -260,7 +260,7 @@ class RunREDUCEMenubar extends JMenuBar {
         reduceMenu.add(stopREDUCEMenuItem);
         stopREDUCEMenuItem.setToolTipText("Terminate REDUCE but *not* this GUI.");
         stopREDUCEMenuItem.addActionListener(e -> {
-            RunREDUCE.sendStringToREDUCE("bye;\n");
+            RunREDUCE.reducePanel.sendStringToREDUCE("bye;\n");
             outputFileList.clear();
             // Reset enabled state of menu items etc.:
             whenREDUCERunning(false);
@@ -270,7 +270,7 @@ class RunREDUCEMenubar extends JMenuBar {
         reduceMenu.add(clearDisplayMenuItem);
         clearDisplayMenuItem.setToolTipText("Clear the REDUCE Input/Output Display.");
         clearDisplayMenuItem.addActionListener(e -> {
-            StyledDocument styledDoc = RunREDUCE.outputTextPane.getStyledDocument();
+            StyledDocument styledDoc = RunREDUCE.reducePanel.outputTextPane.getStyledDocument();
             try {
                 styledDoc.remove(0, styledDoc.getLength());
             } catch (BadLocationException ex) {
@@ -305,11 +305,11 @@ class RunREDUCEMenubar extends JMenuBar {
         JCheckBoxMenuItem boldPromptsCheckBox = new JCheckBoxMenuItem("Bold Prompts");
         viewMenu.add(boldPromptsCheckBox);
         boldPromptsCheckBox.setToolTipText("Make input prompts bold (independently of I/O colouring).");
-        boldPromptsCheckBox.setState(RunREDUCEPrefs.boldPromptsState);
+        boldPromptsCheckBox.setState(RRPreferences.boldPromptsState);
         applyBoldPromptsState();
         boldPromptsCheckBox.addItemListener(e -> {
-            RunREDUCEPrefs.boldPromptsState = boldPromptsCheckBox.isSelected();
-            RunREDUCEPrefs.save(RunREDUCEPrefs.BOLDPROMPTS);
+            RRPreferences.boldPromptsState = boldPromptsCheckBox.isSelected();
+            RRPreferences.save(RRPreferences.BOLDPROMPTS);
             applyBoldPromptsState();
         });
 
@@ -321,24 +321,24 @@ class RunREDUCEMenubar extends JMenuBar {
         colouredIOSubMenu.add(noColouredIORadioButton);
         colouredIOButtonGroup.add(noColouredIORadioButton);
         noColouredIORadioButton.setToolTipText("No text colouring.");
-        noColouredIORadioButton.setSelected(RunREDUCEPrefs.colouredIOIntent == RunREDUCEPrefs.ColouredIO.NONE);
+        noColouredIORadioButton.setSelected(RRPreferences.colouredIOIntent == RRPreferences.ColouredIO.NONE);
         noColouredIORadioButton.addActionListener(e ->
-                RunREDUCEPrefs.save(RunREDUCEPrefs.COLOUREDIO, RunREDUCEPrefs.ColouredIO.NONE));
+                RRPreferences.save(RRPreferences.COLOUREDIO, RRPreferences.ColouredIO.NONE));
         JRadioButtonMenuItem modeColouredIORadioButton = new JRadioButtonMenuItem("Modal");
         colouredIOSubMenu.add(modeColouredIORadioButton);
         colouredIOButtonGroup.add(modeColouredIORadioButton);
         modeColouredIORadioButton.setToolTipText(
                 "Colour prompts, input and output to indicate algebraic or symbolic mode.");
-        modeColouredIORadioButton.setSelected(RunREDUCEPrefs.colouredIOIntent == RunREDUCEPrefs.ColouredIO.MODAL);
+        modeColouredIORadioButton.setSelected(RRPreferences.colouredIOIntent == RRPreferences.ColouredIO.MODAL);
         modeColouredIORadioButton.addActionListener(e ->
-                RunREDUCEPrefs.save(RunREDUCEPrefs.COLOUREDIO, RunREDUCEPrefs.ColouredIO.MODAL));
+                RRPreferences.save(RRPreferences.COLOUREDIO, RRPreferences.ColouredIO.MODAL));
         JRadioButtonMenuItem redfrontColouredIORadioButton = new JRadioButtonMenuItem("Redfront");
         colouredIOSubMenu.add(redfrontColouredIORadioButton);
         colouredIOButtonGroup.add(redfrontColouredIORadioButton);
         redfrontColouredIORadioButton.setToolTipText("Full redfront emulation loading the redfront package.");
-        redfrontColouredIORadioButton.setSelected(RunREDUCEPrefs.colouredIOIntent == RunREDUCEPrefs.ColouredIO.REDFRONT);
+        redfrontColouredIORadioButton.setSelected(RRPreferences.colouredIOIntent == RRPreferences.ColouredIO.REDFRONT);
         redfrontColouredIORadioButton.addActionListener(e ->
-                RunREDUCEPrefs.save(RunREDUCEPrefs.COLOUREDIO, RunREDUCEPrefs.ColouredIO.REDFRONT));
+                RRPreferences.save(RRPreferences.COLOUREDIO, RRPreferences.ColouredIO.REDFRONT));
 
 
         /* ************* *
@@ -362,7 +362,7 @@ class RunREDUCEMenubar extends JMenuBar {
                 menuItem.addActionListener(e ->
                 {
                     try {
-                        Desktop.getDesktop().open(RunREDUCEPrefs.windowsOS ?
+                        Desktop.getDesktop().open(RRPreferences.windowsOS ?
                                 // ToDo Make the directory used below configurable?
                                 new File(RunREDUCE.reduceConfiguration.packagesRootDir, manual[1]) :
                                 new File("/usr/share/doc/reduce", manual[2]));
@@ -382,7 +382,7 @@ class RunREDUCEMenubar extends JMenuBar {
         aboutMenuItem.addActionListener(e -> JOptionPane.showMessageDialog
                 (frame,
                         new String[]{"Run CLI REDUCE in a Java Swing GUI.",
-                                "Prototype version 0.7",
+                                "Prototype version 0.8",
                                 "\u00A9 Francis Wright, April 2020"},
                         "About Run-REDUCE",
                         JOptionPane.PLAIN_MESSAGE));
@@ -393,7 +393,7 @@ class RunREDUCEMenubar extends JMenuBar {
 
     static void runREDUCESubmenuBuild() {
         runREDUCESubmenu.removeAll();
-        for (RunREDUCECommand cmd : RunREDUCE.reduceConfiguration.runREDUCECommandList) {
+        for (REDUCECommand cmd : RunREDUCE.reduceConfiguration.reduceCommandList) {
             JMenuItem item = new JMenuItem(cmd.version);
             runREDUCESubmenu.add(item);
             item.addActionListener(e -> {
@@ -406,25 +406,25 @@ class RunREDUCEMenubar extends JMenuBar {
     static void autoRunREDUCESubmenuBuild() {
         autoRunREDUCESubmenu.removeAll();
         ButtonGroup autoRunButtonGroup = new ButtonGroup();
-        JRadioButtonMenuItem noAutoRunRadioButton = new JRadioButtonMenuItem(RunREDUCEPrefs.NONE);
+        JRadioButtonMenuItem noAutoRunRadioButton = new JRadioButtonMenuItem(RRPreferences.NONE);
         autoRunREDUCESubmenu.add(noAutoRunRadioButton);
         autoRunButtonGroup.add(noAutoRunRadioButton);
-        if (RunREDUCEPrefs.autoRunVersion.equals(RunREDUCEPrefs.NONE)) noAutoRunRadioButton.setSelected(true);
+        if (RRPreferences.autoRunVersion.equals(RRPreferences.NONE)) noAutoRunRadioButton.setSelected(true);
         noAutoRunRadioButton.addItemListener(e -> {
             if (e.getStateChange() == ItemEvent.SELECTED)
-                RunREDUCEPrefs.save(RunREDUCEPrefs.AUTORUNVERSION, RunREDUCEPrefs.NONE);
+                RRPreferences.save(RRPreferences.AUTORUNVERSION, RRPreferences.NONE);
         });
-        for (RunREDUCECommand cmd : RunREDUCE.reduceConfiguration.runREDUCECommandList) {
+        for (REDUCECommand cmd : RunREDUCE.reduceConfiguration.reduceCommandList) {
             JRadioButtonMenuItem item = new JRadioButtonMenuItem(cmd.version);
-            if (RunREDUCEPrefs.autoRunVersion.equals(cmd.version)) item.setSelected(true);
+            if (RRPreferences.autoRunVersion.equals(cmd.version)) item.setSelected(true);
             autoRunREDUCESubmenu.add(item);
             autoRunButtonGroup.add(item);
             item.addItemListener(e -> {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     String version = ((JRadioButtonMenuItem) e.getItem()).getText();
-                    RunREDUCEPrefs.save(RunREDUCEPrefs.AUTORUNVERSION, version);
+                    RRPreferences.save(RRPreferences.AUTORUNVERSION, version);
                     if (!runningREDUCE) {
-                        for (RunREDUCECommand cmd1 : RunREDUCE.reduceConfiguration.runREDUCECommandList) {
+                        for (REDUCECommand cmd1 : RunREDUCE.reduceConfiguration.reduceCommandList) {
                             if (version.equals(cmd1.version)) SwingUtilities.invokeLater(cmd1::run);
                             break;
                         }
@@ -440,9 +440,9 @@ class RunREDUCEMenubar extends JMenuBar {
     }
 
     static void applyBoldPromptsState() {
-        StyleConstants.setBold(ReduceOutputThread.promptAttributeSet, RunREDUCEPrefs.boldPromptsState);
-        StyleConstants.setBold(ReduceOutputThread.algebraicPromptAttributeSet, RunREDUCEPrefs.boldPromptsState);
-        StyleConstants.setBold(ReduceOutputThread.symbolicPromptAttributeSet, RunREDUCEPrefs.boldPromptsState);
+        StyleConstants.setBold(REDUCEOutputThread.promptAttributeSet, RRPreferences.boldPromptsState);
+        StyleConstants.setBold(REDUCEOutputThread.algebraicPromptAttributeSet, RRPreferences.boldPromptsState);
+        StyleConstants.setBold(REDUCEOutputThread.symbolicPromptAttributeSet, RRPreferences.boldPromptsState);
     }
 
     /**
@@ -455,7 +455,8 @@ class RunREDUCEMenubar extends JMenuBar {
         outputFileMenuItem.setEnabled(running);
         loadPackagesMenuItem.setEnabled(running);
         stopREDUCEMenuItem.setEnabled(running);
-        RunREDUCE.sendAction.setEnabled(running);
+//        RunREDUCE.runREDUCE.sendAction.setEnabled(running);
+// FixMe Cannot call this method when the menubar is instantiated because ReducePanel has not yet been instantiated!
 
         // Items to disable when REDUCE is running:
         runREDUCESubmenu.setEnabled(!running);

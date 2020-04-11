@@ -127,7 +127,7 @@ public class REDUCEConfigDialog extends JDialog {
 
         String text1 = "If 'Default Root Dir' is blank on start-up, it takes " +
                 "the value of the environment variable named REDUCE if it is set.";
-        if (RunREDUCEPrefs.windowsOS)
+        if (RRPreferences.windowsOS)
             text1 += " Otherwise, Run-REDUCE searches for a standard installation folder (on Windows only).";
         final JTextArea textArea1 = newJTextArea(text1);
         gbc = new GridBagConstraints();
@@ -548,7 +548,7 @@ class REDUCECommandDocumentsList extends AbstractListModel<PlainDocument> implem
     private ArrayList<REDUCECommandDocuments> reduceCommandDocumentsList = new ArrayList<>();
 
     REDUCECommandDocumentsList(REDUCEConfigurationType reduceConfiguration) {
-        for (RunREDUCECommand cmd : reduceConfiguration.runREDUCECommandList)
+        for (REDUCECommand cmd : reduceConfiguration.reduceCommandList)
             reduceCommandDocumentsList.add(new REDUCECommandDocuments(cmd.version, cmd.versionRootDir, cmd.command));
     }
 
@@ -649,9 +649,9 @@ class REDUCEConfigData {
         // Write form data back to REDUCEConfiguration:
         RunREDUCE.reduceConfiguration.reduceRootDir = reduceRootDir.getText().trim();
         RunREDUCE.reduceConfiguration.packagesRootDir = packagesRootDir.getText().trim();
-        RunREDUCE.reduceConfiguration.runREDUCECommandList = new RunREDUCECommandList();
+        RunREDUCE.reduceConfiguration.reduceCommandList = new REDUCECommandList();
         for (REDUCECommandDocuments cmd : reduceCommandDocumentsList) {
-            RunREDUCE.reduceConfiguration.runREDUCECommandList.add(new RunREDUCECommand(
+            RunREDUCE.reduceConfiguration.reduceCommandList.add(new REDUCECommand(
                     cmd.version.getText().trim(),
                     cmd.versionRootDir.getText().trim(),
                     // Do not save blank arguments:
@@ -660,7 +660,7 @@ class REDUCEConfigData {
         }
         // Rebuild submenus that depend on RunREDUCECommandList.
         // Only really need to do this if the version list changes in some way!
-        RunREDUCEMenubar.runREDUCESubmenuBuild();
-        RunREDUCEMenubar.autoRunREDUCESubmenuBuild();
+        RRMenuBar.runREDUCESubmenuBuild();
+        RRMenuBar.autoRunREDUCESubmenuBuild();
     }
 }

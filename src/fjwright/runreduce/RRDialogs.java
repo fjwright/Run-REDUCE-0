@@ -15,11 +15,11 @@ import java.util.List;
 /**
  * This abstract class provides the basis for a modal dialog to select open output files to shut or packages to load.
  */
-abstract class RunREDUCEListDialog<E> extends JDialog implements ActionListener, MouseListener {
+abstract class AbstractListDialog<E> extends JDialog implements ActionListener, MouseListener {
     protected Frame frame;
     protected JList<E> list = new JList<>();
 
-    RunREDUCEListDialog(Frame frame, String dialogTitle, String listLabel, String buttonText) {
+    AbstractListDialog(Frame frame, String dialogTitle, String listLabel, String buttonText) {
         // Create a modal dialog:
         super(frame, dialogTitle, true);
         this.frame = frame;
@@ -118,7 +118,7 @@ abstract class RunREDUCEListDialog<E> extends JDialog implements ActionListener,
 /**
  * This class provides a modal dialog to select open output files to shut.
  */
-class ShutOutputFilesDialog extends RunREDUCEListDialog<File> {
+class ShutOutputFilesDialog extends AbstractListDialog<File> {
     private static int[] fileIndices;
 
     ShutOutputFilesDialog(Frame frame) {
@@ -150,7 +150,7 @@ class ShutOutputFilesDialog extends RunREDUCEListDialog<File> {
 /**
  * This class provides a modal dialog to select packages to load.
  */
-class LoadPackagesDialog extends RunREDUCEListDialog<String> {
+class LoadPackagesDialog extends AbstractListDialog<String> {
     private List<String> selectedPackages;
 
     LoadPackagesDialog(Frame frame) {
@@ -286,9 +286,9 @@ class FontSizeDialog extends JDialog implements ActionListener, ChangeListener {
         // Update the font size
         if ("OK".equals(e.getActionCommand())) {
             RunREDUCE.reduceFont = newFont;
-            RunREDUCE.outputTextPane.setFont(newFont);
-            RunREDUCE.inputTextArea.setFont(newFont);
-            RunREDUCEPrefs.save(RunREDUCEPrefs.FONTSIZE, newFontSize);
+            RunREDUCE.reducePanel.outputTextPane.setFont(newFont);
+            RunREDUCE.reducePanel.inputTextArea.setFont(newFont);
+            RRPreferences.save(RRPreferences.FONTSIZE, newFontSize);
         }
         setVisible(false);
     }
