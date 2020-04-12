@@ -35,7 +35,7 @@ top-level directory.
 
 ### To do later
 
-* Easy access to a local copy of the Run-REDUCE User Guide.
+* Easy access to a **local** copy of the Run-REDUCE User Guide.
 * Font and colour selectors.
 * Detect whether REDUCE is running more reliably (maybe).
 * Remember all user choices, including window configurations (maybe).
@@ -106,3 +106,4 @@ top-level directory.
 ### Pre-release user-visible updates
 
 * Better support for non-default look-and-feels.
+* Easy access to the Run-REDUCE User Guide on GitHub.

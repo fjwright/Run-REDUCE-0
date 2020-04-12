@@ -417,10 +417,16 @@ effect until the next input prompt.
 
 The Help menu provides the following items.
 
-### Manuals
+### Run-REDUCE User Guide (HTML)
 
-These menu items open the manuals distributed with REDUCE in the
-default web browser or PDF viewer, as appropriate.
+This opens the Run-REDUCE User Guide on GitHub in the default web
+browser.
+
+### REDUCE Manual etc.
+
+These menu items open the manuals and other guides that are
+distributed with REDUCE in the default web browser or PDF viewer, as
+appropriate.
 
 ### About Run-REDUCE
 

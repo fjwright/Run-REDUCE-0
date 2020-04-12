@@ -8,6 +8,8 @@ import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -347,33 +349,54 @@ class RRMenuBar extends JMenuBar {
         JMenu helpMenu = new JMenu("Help");
         this.add(helpMenu);
 
-        String[][] manuals = {
-                {"REDUCE Manual (HTML)", "lib/csl/reduce.doc/manual.html", "manual.html"},
-                {"REDUCE Manual (PDF)", "lib/csl/reduce.doc/manual.pdf", "manual.pdf.gz"},
-                {"Inside Reduce (PDF)", "doc/insidereduce.pdf", "insidereduce.pdf.gz"},
-                {"REDUCE Symbolic Mode Primer (PDF)", "doc/primer.pdf", "primer.pdf.gz"},
-                {"Standard Lisp Report (PDF)", "doc/sl.pdf", "sl.pdf.gz"}
-        };
-        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
-            for (String[] manual : manuals) {
-                JMenuItem menuItem = new JMenuItem(manual[0]);
-                helpMenu.add(menuItem);
-                menuItem.setToolTipText("Open this manual in the default application.");
-                menuItem.addActionListener(e ->
+        if (Desktop.isDesktopSupported()) {
+            Desktop desktop = Desktop.getDesktop();
+
+            if (desktop.isSupported(Desktop.Action.BROWSE)) {
+                JMenuItem userGuideMenuItem = new JMenuItem("Run-REDUCE User Guide (HTML)");
+                helpMenu.add(userGuideMenuItem);
+                userGuideMenuItem.setToolTipText("Open the Run-REDUCE User Guide in the default web browser.");
+                userGuideMenuItem.addActionListener(e ->
                 {
                     try {
-                        Desktop.getDesktop().open(RRPreferences.windowsOS ?
-                                // ToDo Make the directory used below configurable?
-                                new File(RunREDUCE.reduceConfiguration.packagesRootDir, manual[1]) :
-                                new File("/usr/share/doc/reduce", manual[2]));
-                    } catch (IOException ex) {
+                        desktop.browse(new URI("https://fjwright.github.io/Run-REDUCE/UserGuide.html"));
+                    } catch (IOException | URISyntaxException ex) {
                         ex.printStackTrace();
                     }
                 });
             }
-        }
 
-        helpMenu.addSeparator();
+            helpMenu.addSeparator();
+
+            String[][] manuals = {
+                    {"REDUCE Manual (HTML)", "lib/csl/reduce.doc/manual.html", "manual.html"},
+                    {"REDUCE Manual (PDF)", "lib/csl/reduce.doc/manual.pdf", "manual.pdf.gz"},
+                    {"Inside Reduce (PDF)", "doc/insidereduce.pdf", "insidereduce.pdf.gz"},
+                    {"REDUCE Symbolic Mode Primer (PDF)", "doc/primer.pdf", "primer.pdf.gz"},
+                    {"Standard Lisp Report (PDF)", "doc/sl.pdf", "sl.pdf.gz"}
+            };
+
+            if (desktop.isSupported(Desktop.Action.OPEN)) {
+                for (String[] manual : manuals) {
+                    JMenuItem menuItem = new JMenuItem(manual[0]);
+                    helpMenu.add(menuItem);
+                    menuItem.setToolTipText("Open this manual in the default application.");
+                    menuItem.addActionListener(e ->
+                    {
+                        try {
+                            desktop.open(RRPreferences.windowsOS ?
+                                    // ToDo Make the directory used below configurable?
+                                    new File(RunREDUCE.reduceConfiguration.packagesRootDir, manual[1]) :
+                                    new File("/usr/share/doc/reduce", manual[2]));
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+                    });
+                }
+            }
+
+            helpMenu.addSeparator();
+        }
 
         // Create an About Run-REDUCE item in the Help menu that pops up a dialogue:
         JMenuItem aboutMenuItem = new JMenuItem("About Run-REDUCE");
