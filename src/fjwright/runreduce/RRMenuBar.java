@@ -13,9 +13,8 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
+/*
  * This class provides the RunREDUCE menu bar.
- * <p>
  * Note that the current directory for REDUCE is the directory from
  * which this GUI was run, so filenames must be relative to that
  * directory or absolute; I currently use the latter.
@@ -46,16 +45,15 @@ class RRMenuBar extends JMenuBar {
     static List<String> packageList;
     static FontSizeDialog fontSizeDialog;
     static REDUCEConfigDialog reduceConfigDialog;
-    static private boolean runningREDUCE;
 
     RRMenuBar(JFrame frame) {
         RRMenuBar.frame = frame;
         frame.setJMenuBar(this);
         // menuBar.setOpaque(true);
 
-        /* ************* *
-         * The File menu *
-         * ************* */
+        /* ********* *
+         * File menu *
+         * ********* */
         JMenu fileMenu = new JMenu("File");
         this.add(fileMenu);
 
@@ -98,7 +96,7 @@ class RRMenuBar extends JMenuBar {
                     text.append(files[i].toString());
                 }
                 text.append(echoCheckBox.isSelected() ? "\";\n" : "\"$\n");
-                RunREDUCE.reducePanel.sendStringToREDUCE(text.toString());
+                RunREDUCE.reducePanel.sendStringToREDUCEAndEcho(text.toString());
             }
         });
 
@@ -118,12 +116,10 @@ class RRMenuBar extends JMenuBar {
             int returnVal = fileChooser.showOpenDialog(frame);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
-                RunREDUCE.reducePanel.sendStringToREDUCE("out \"" + file.toString() + "\"$\n");
+                RunREDUCE.reducePanel.sendStringToREDUCEAndEcho("out \"" + file.toString() + "\"$\n");
                 outputFileList.remove(file); // in case it was already open
                 outputFileList.add(file);
-                shutLastMenuItem.setEnabled(true);
-                shutFileMenuItem.setEnabled(true);
-                outputHereMenuItem.setEnabled(true);
+                outputFileSetEnabledMenuItems(true);
             }
         });
 
@@ -132,8 +128,9 @@ class RRMenuBar extends JMenuBar {
         outputHereMenuItem.setEnabled(false);
         outputHereMenuItem.setToolTipText("Switch output back to this GUI.");
         outputHereMenuItem.addActionListener(e -> {
-            RunREDUCE.reducePanel.sendStringToREDUCE("out t$\n");
-            outputHereMenuItem.setEnabled(false);
+            RunREDUCE.reducePanel.sendStringToREDUCEAndEcho("out t$\n");
+            outputHereMenuItem.setEnabled(
+                    RunREDUCE.reducePanel.menuItemStatus.outputHereMenuItem = false);
         });
 
         // Shut one or more output files.
@@ -156,14 +153,10 @@ class RRMenuBar extends JMenuBar {
                         text.insert(0, outputFileList.remove(fileIndices[i]).toString());
                     }
                     text.insert(0, "shut \"");
-                    RunREDUCE.reducePanel.sendStringToREDUCE(text.toString());
+                    RunREDUCE.reducePanel.sendStringToREDUCEAndEcho(text.toString());
                 }
             }
-            if (outputFileList.isEmpty()) {
-                shutLastMenuItem.setEnabled(false);
-                shutFileMenuItem.setEnabled(false);
-                outputHereMenuItem.setEnabled(false);
-            }
+            if (outputFileList.isEmpty()) outputFileSetEnabledMenuItems(false);
         });
 
         // Shut the last output file used.
@@ -173,13 +166,9 @@ class RRMenuBar extends JMenuBar {
         shutLastMenuItem.addActionListener(e -> {
             if (!outputFileList.isEmpty()) { // not strictly necessary
                 int last = outputFileList.size() - 1;
-                RunREDUCE.reducePanel.sendStringToREDUCE("shut \"" + outputFileList.remove(last).toString() + "\"$\n");
+                RunREDUCE.reducePanel.sendStringToREDUCEAndEcho("shut \"" + outputFileList.remove(last).toString() + "\"$\n");
             }
-            if (outputFileList.isEmpty()) {
-                shutLastMenuItem.setEnabled(false);
-                shutFileMenuItem.setEnabled(false);
-                outputHereMenuItem.setEnabled(false);
-            }
+            if (outputFileList.isEmpty()) outputFileSetEnabledMenuItems(false);
         });
 
         fileMenu.addSeparator();
@@ -205,7 +194,7 @@ class RRMenuBar extends JMenuBar {
                     text.append(selectedPackages.get(i));
                 }
                 text.append(";\n");
-                RunREDUCE.reducePanel.sendStringToREDUCE(text.toString());
+                RunREDUCE.reducePanel.sendStringToREDUCEAndEcho(text.toString());
             }
         });
 
@@ -240,9 +229,9 @@ class RRMenuBar extends JMenuBar {
         exitMenuItem.addActionListener(e -> System.exit(0));
 
 
-        /* *************** *
-         * The REDUCE menu *
-         * *************** */
+        /* *********** *
+         * REDUCE menu *
+         * *********** */
         JMenu reduceMenu = new JMenu("REDUCE");
         this.add(reduceMenu);
 
@@ -262,10 +251,12 @@ class RRMenuBar extends JMenuBar {
         reduceMenu.add(stopREDUCEMenuItem);
         stopREDUCEMenuItem.setToolTipText("Terminate REDUCE but *not* this GUI.");
         stopREDUCEMenuItem.addActionListener(e -> {
-            RunREDUCE.reducePanel.sendStringToREDUCE("bye;\n");
+            RunREDUCE.reducePanel.sendStringToREDUCEAndEcho("bye;\n");
+            RunREDUCE.reducePanel.sendAction.setEnabled(
+                    RunREDUCE.reducePanel.runningREDUCE = false);
             outputFileList.clear();
-            // Reset enabled state of menu items etc.:
-            whenREDUCERunning(false);
+            // Reset enabled status of menu items:
+            RunREDUCE.reducePanel.menuItemStatus.reduceStopped();
         });
 
         JMenuItem clearDisplayMenuItem = new JMenuItem("Clear I/O Display");
@@ -289,9 +280,9 @@ class RRMenuBar extends JMenuBar {
         configureREDUCEMenuItem.addActionListener(e -> showREDUCEConfigDialog());
 
 
-        /* ************* *
-         * The View menu *
-         * ************* */
+        /* ********* *
+         * View menu *
+         * ********* */
         JMenu viewMenu = new JMenu("View");
         this.add(viewMenu);
 
@@ -342,10 +333,15 @@ class RRMenuBar extends JMenuBar {
         redfrontColouredIORadioButton.addActionListener(e ->
                 RRPreferences.save(RRPreferences.COLOUREDIO, RRPreferences.ColouredIO.REDFRONT));
 
+        JMenuItem newTabMenuItem = new JMenuItem("New Tab");
+        reduceMenu.add(newTabMenuItem);
+        newTabMenuItem.setToolTipText("Add a new REDUCE tab.");
+        newTabMenuItem.addActionListener(e -> RunREDUCE.addTab());
 
-        /* ************* *
-         * The Help menu *
-         * ************* */
+
+        /* ********* *
+         * Help menu *
+         * ********* */
         JMenu helpMenu = new JMenu("Help");
         this.add(helpMenu);
 
@@ -409,9 +405,6 @@ class RRMenuBar extends JMenuBar {
                                 "\u00A9 Francis Wright, April 2020"},
                         "About Run-REDUCE",
                         JOptionPane.PLAIN_MESSAGE));
-
-        // Initialise enabled state of menu items etc.:
-        whenREDUCERunning(false);
     }
 
     static void runREDUCESubmenuBuild() {
@@ -421,7 +414,7 @@ class RRMenuBar extends JMenuBar {
             runREDUCESubmenu.add(item);
             item.addActionListener(e -> {
                 // Run REDUCE.  (A direct call hangs the GUI!)
-                SwingUtilities.invokeLater(cmd::run);
+                SwingUtilities.invokeLater(() -> RunREDUCE.reducePanel.run(cmd));
             });
         }
     }
@@ -446,15 +439,22 @@ class RRMenuBar extends JMenuBar {
                 if (e.getStateChange() == ItemEvent.SELECTED) {
                     String version = ((JRadioButtonMenuItem) e.getItem()).getText();
                     RRPreferences.save(RRPreferences.AUTORUNVERSION, version);
-                    if (!runningREDUCE) {
+                    if (!RunREDUCE.reducePanel.runningREDUCE) {
                         for (REDUCECommand cmd1 : RunREDUCE.reduceConfiguration.reduceCommandList) {
-                            if (version.equals(cmd1.version)) SwingUtilities.invokeLater(cmd1::run);
+                            if (version.equals(cmd1.version))
+                                SwingUtilities.invokeLater(() -> RunREDUCE.reducePanel.run(cmd1));
                             break;
                         }
                     }
                 }
             });
         }
+    }
+
+    static void outputFileSetEnabledMenuItems(boolean enabled) {
+        shutLastMenuItem.setEnabled(RunREDUCE.reducePanel.menuItemStatus.shutLastMenuItem = enabled);
+        shutFileMenuItem.setEnabled(RunREDUCE.reducePanel.menuItemStatus.shutFileMenuItem = enabled);
+        outputHereMenuItem.setEnabled(RunREDUCE.reducePanel.menuItemStatus.outputHereMenuItem = enabled);
     }
 
     static void showREDUCEConfigDialog() {
@@ -466,27 +466,5 @@ class RRMenuBar extends JMenuBar {
         StyleConstants.setBold(REDUCEOutputThread.promptAttributeSet, RRPreferences.boldPromptsState);
         StyleConstants.setBold(REDUCEOutputThread.algebraicPromptAttributeSet, RRPreferences.boldPromptsState);
         StyleConstants.setBold(REDUCEOutputThread.symbolicPromptAttributeSet, RRPreferences.boldPromptsState);
-    }
-
-    /**
-     * Enable or disable menu items, buttons, etc., depending on whether REDUCE is running.
-     */
-    static void whenREDUCERunning(boolean running) {
-        runningREDUCE = running;
-        // Items to enable when REDUCE is running:
-        inputFileMenuItem.setEnabled(running);
-        outputFileMenuItem.setEnabled(running);
-        loadPackagesMenuItem.setEnabled(running);
-        stopREDUCEMenuItem.setEnabled(running);
-        if (RunREDUCE.reducePanel != null)
-            RunREDUCE.reducePanel.sendAction.setEnabled(running);
-
-        // Items to disable when REDUCE is running:
-        runREDUCESubmenu.setEnabled(!running);
-
-        // Items to disable always:
-        outputHereMenuItem.setEnabled(false);
-        shutFileMenuItem.setEnabled(false);
-        shutLastMenuItem.setEnabled(false);
     }
 }

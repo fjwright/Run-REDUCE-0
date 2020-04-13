@@ -20,9 +20,12 @@ import java.awt.*;
 public class RunREDUCE {
     static JFrame frame;
     static Font reduceFont;
+    static JTabbedPane tabbedPane;
+    static int tabCount = 1;
+    static REDUCEPanel reducePanel;
+
     static REDUCEConfigurationDefault reduceConfigurationDefault;
     static REDUCEConfiguration reduceConfiguration;
-    static REDUCEPanel reducePanel;
 
     /**
      * Create the GUI and show it.
@@ -44,13 +47,27 @@ public class RunREDUCE {
         reduceFont = new Font("DejaVu Sans Mono", Font.PLAIN, RRPreferences.fontSize);
         if (debugPlatform) System.err.println("I/O display font: " + reduceFont.getName());
 
-        // Add content to the window:
         reducePanel = new REDUCEPanel();
-        frame.add(reducePanel);
+        if (true) { // Use Tabbed Pane
+            frame.add(tabbedPane = new JTabbedPane());
+            tabbedPane.addChangeListener(e -> {
+                reducePanel = (REDUCEPanel) tabbedPane.getSelectedComponent();
+                reducePanel.menuItemStatus.updateMenus();
+                reducePanel.inputTextArea.requestFocusInWindow();
+            });
+            tabbedPane.addTab("Tab 1", reducePanel);
+        } else {
+            frame.add(reducePanel);
+        }
 
         // Display the window:
         frame.pack();
         frame.setVisible(true);
+    }
+
+    static void addTab() {
+        tabbedPane.addTab("Tab" + (++tabCount), reducePanel = new REDUCEPanel());
+        tabbedPane.setSelectedIndex(tabCount - 1);
     }
 
     static void errorMessageDialog(Object message, String title) {
