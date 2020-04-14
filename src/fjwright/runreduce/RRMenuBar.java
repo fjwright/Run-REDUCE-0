@@ -345,18 +345,16 @@ class RRMenuBar extends JMenuBar {
             RRPreferences.tabbedPaneState = tabbedPaneCheckBox.isSelected();
             RRPreferences.save(RRPreferences.TABBEDPANE);
             RunREDUCE.useTabbedPane(RRPreferences.tabbedPaneState);
-            addTabMenuItem.setEnabled(RRPreferences.tabbedPaneState);
-            removeTabMenuItem.setEnabled(false);
+            removeTabMenuItem.setEnabled(RRPreferences.tabbedPaneState);
         });
 
         viewMenu.add(addTabMenuItem);
         addTabMenuItem.setToolTipText("Add a new REDUCE tab.");
-        addTabMenuItem.setEnabled(RRPreferences.tabbedPaneState);
         addTabMenuItem.addActionListener(e -> RunREDUCE.addTab());
 
         viewMenu.add(removeTabMenuItem);
         removeTabMenuItem.setToolTipText("Remove the selected REDUCE tab.");
-        removeTabMenuItem.setEnabled(false);
+        removeTabMenuItem.setEnabled(RRPreferences.tabbedPaneState);
         removeTabMenuItem.addActionListener(e -> RunREDUCE.removeTab());
 
 

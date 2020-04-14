@@ -33,7 +33,7 @@ public class RunREDUCE {
      **/
     private static void createAndShowGUI() {
         // Create and set up the window:
-        frame = new JFrame("RunREDUCE");
+        frame = new JFrame("Run-REDUCE");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         // Set the main window to 2/3 the linear dimension of the screen:
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -64,8 +64,8 @@ public class RunREDUCE {
             frame.remove(reducePanel);
             frame.add(tabbedPane);
             tabbedPane.addChangeListener(e -> {
-                if (tabbedPane != null && tabbedPane.getTabCount() > 0) {
-                    reducePanel = (REDUCEPanel) tabbedPane.getSelectedComponent();
+                if (tabbedPane != null && tabbedPane.getTabCount() > 0 &&
+                        (reducePanel = (REDUCEPanel) tabbedPane.getSelectedComponent()) != null) {
                     reducePanel.menuItemStatus.updateMenus();
                     reducePanel.inputTextArea.requestFocusInWindow();
                 }
@@ -74,20 +74,19 @@ public class RunREDUCE {
             tabbedPane.addTab("Tab 1", reducePanel);
         } else {
             frame.remove(tabbedPane);
-            tabbedPane = null; // release resources
             // Retain the reducePanel from the selected tab:
             frame.add(reducePanel);
             frame.pack();
+            tabbedPane = null; // release resources
         }
     }
 
     static void addTab() {
-//        if (!RRPreferences.tabbedPaneState) {
-//            RRMenuBar.tabbedPaneCheckBox.setState(RRPreferences.tabbedPaneState = true);
-//            RRPreferences.save(RRPreferences.TABBEDPANE);
-//            RRMenuBar.removeTabMenuItem.setEnabled(true);
-//            useTabbedPane(true);
-//        }
+        if (!RRPreferences.tabbedPaneState) { // enable tabbed pane
+            RRMenuBar.tabbedPaneCheckBox.setState(RRPreferences.tabbedPaneState = true);
+            RRPreferences.save(RRPreferences.TABBEDPANE);
+            useTabbedPane(true);
+        }
         tabbedPane.addTab("Tab " + (++tabLabelNumber), reducePanel = new REDUCEPanel());
         tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
         RRMenuBar.removeTabMenuItem.setEnabled(true);
@@ -98,14 +97,12 @@ public class RunREDUCE {
         if (tabbedPane.getTabCount() > 1) {
             // Remove both tab and content:
             tabbedPane.remove(tabbedPane.getSelectedIndex());
-            if (tabbedPane.getTabCount() == 1) RRMenuBar.removeTabMenuItem.setEnabled(false);
+        } else { // disable tabbed pane
+            useTabbedPane(false);
+            RRMenuBar.tabbedPaneCheckBox.setState(RRPreferences.tabbedPaneState = false);
+            RRPreferences.save(RRPreferences.TABBEDPANE);
+            RRMenuBar.removeTabMenuItem.setEnabled(false);
         }
-//        else {
-//            RRMenuBar.tabbedPaneCheckBox.setState(RRPreferences.tabbedPaneState = false);
-//            RRPreferences.save(RRPreferences.TABBEDPANE);
-//            RRMenuBar.removeTabMenuItem.setEnabled(false);
-//            useTabbedPane(false);
-//        }
     }
 
     static void errorMessageDialog(Object message, String title) {
