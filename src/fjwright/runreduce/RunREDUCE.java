@@ -21,7 +21,7 @@ public class RunREDUCE {
     static JFrame frame;
     static Font reduceFont;
     static JTabbedPane tabbedPane;
-    static int tabCount = 1;
+    static int tabLabelNumber = 1;
     static REDUCEPanel reducePanel;
 
     static REDUCEConfigurationDefault reduceConfigurationDefault;
@@ -48,26 +48,64 @@ public class RunREDUCE {
         if (debugPlatform) System.err.println("I/O display font: " + reduceFont.getName());
 
         reducePanel = new REDUCEPanel();
-        if (true) { // Use Tabbed Pane
-            frame.add(tabbedPane = new JTabbedPane());
-            tabbedPane.addChangeListener(e -> {
-                reducePanel = (REDUCEPanel) tabbedPane.getSelectedComponent();
-                reducePanel.menuItemStatus.updateMenus();
-                reducePanel.inputTextArea.requestFocusInWindow();
-            });
-            tabbedPane.addTab("Tab 1", reducePanel);
-        } else {
+        if (RRPreferences.tabbedPaneState)
+            useTabbedPane(true);
+        else
             frame.add(reducePanel);
-        }
 
         // Display the window:
         frame.pack();
         frame.setVisible(true);
     }
 
+    static void useTabbedPane(boolean enable) {
+        if (enable) {
+            tabbedPane = new JTabbedPane();
+            frame.remove(reducePanel);
+            frame.add(tabbedPane);
+            tabbedPane.addChangeListener(e -> {
+                if (tabbedPane != null && tabbedPane.getTabCount() > 0) {
+                    reducePanel = (REDUCEPanel) tabbedPane.getSelectedComponent();
+                    reducePanel.menuItemStatus.updateMenus();
+                    reducePanel.inputTextArea.requestFocusInWindow();
+                }
+            });
+            tabLabelNumber = 1;
+            tabbedPane.addTab("Tab 1", reducePanel);
+        } else {
+            frame.remove(tabbedPane);
+            tabbedPane = null; // release resources
+            // Retain the reducePanel from the selected tab:
+            frame.add(reducePanel);
+            frame.pack();
+        }
+    }
+
     static void addTab() {
-        tabbedPane.addTab("Tab" + (++tabCount), reducePanel = new REDUCEPanel());
-        tabbedPane.setSelectedIndex(tabCount - 1);
+//        if (!RRPreferences.tabbedPaneState) {
+//            RRMenuBar.tabbedPaneCheckBox.setState(RRPreferences.tabbedPaneState = true);
+//            RRPreferences.save(RRPreferences.TABBEDPANE);
+//            RRMenuBar.removeTabMenuItem.setEnabled(true);
+//            useTabbedPane(true);
+//        }
+        tabbedPane.addTab("Tab " + (++tabLabelNumber), reducePanel = new REDUCEPanel());
+        tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
+        RRMenuBar.removeTabMenuItem.setEnabled(true);
+    }
+
+    static void removeTab() {
+        // ToDo Does this leave zombie REDUCE processes?
+        if (tabbedPane.getTabCount() > 1) {
+            // Remove both tab and content:
+            tabbedPane.remove(tabbedPane.getSelectedIndex());
+            if (tabbedPane.getTabCount() == 1) RRMenuBar.removeTabMenuItem.setEnabled(false);
+        }
+//        else {
+//            RRMenuBar.tabbedPaneCheckBox.setState(RRPreferences.tabbedPaneState = false);
+//            RRPreferences.save(RRPreferences.TABBEDPANE);
+//            RRMenuBar.removeTabMenuItem.setEnabled(false);
+//            useTabbedPane(false);
+//        }
     }
 
     static void errorMessageDialog(Object message, String title) {

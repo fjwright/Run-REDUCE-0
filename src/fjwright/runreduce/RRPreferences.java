@@ -20,6 +20,7 @@ public class RRPreferences {
     static final String AUTORUNVERSION = "autoRunVersion";
     static final String BOLDPROMPTS = "boldPrompts";
     static final String COLOUREDIO = "colouredIO";
+    static final String TABBEDPANE = "tabbedPane";
 
     // colouredIOState values:
     enum ColouredIO {NONE, MODAL, REDFRONT}
@@ -32,6 +33,7 @@ public class RRPreferences {
     static String autoRunVersion = prefs.get(AUTORUNVERSION, NONE);
     static boolean boldPromptsState = prefs.getBoolean(BOLDPROMPTS, false);
     static ColouredIO colouredIOIntent;
+    static boolean tabbedPaneState = prefs.getBoolean(TABBEDPANE, false);
 
     static {
         try {
@@ -64,6 +66,9 @@ public class RRPreferences {
                         StyleConstants.setForeground(REDUCEOutputThread.promptAttributeSet, null);
                     }
                 }
+                break;
+            case TABBEDPANE:
+                prefs.putBoolean(TABBEDPANE, tabbedPaneState);
                 break;
             default:
                 System.err.println("Attempt to save unexpected preference key: " + key);

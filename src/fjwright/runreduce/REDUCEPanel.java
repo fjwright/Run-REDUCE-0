@@ -272,8 +272,10 @@ public class REDUCEPanel extends JPanel {
                     "REDUCE Process Error");
         }
 
-        int tabIndex = RunREDUCE.tabbedPane.indexOfComponent(this);
-        RunREDUCE.tabbedPane.setTitleAt(tabIndex, reduceCommand.version);
+        if (RRPreferences.tabbedPaneState) {
+            int tabIndex = RunREDUCE.tabbedPane.indexOfComponent(this);
+            RunREDUCE.tabbedPane.setTitleAt(tabIndex, reduceCommand.version);
+        }
 
         sendAction.setEnabled(runningREDUCE = true);
 

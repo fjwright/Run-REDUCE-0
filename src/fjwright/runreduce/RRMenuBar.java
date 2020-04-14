@@ -31,6 +31,9 @@ class RRMenuBar extends JMenuBar {
     static final JMenu runREDUCESubmenu = new JMenu("Run REDUCE...  ");
     static final JMenu autoRunREDUCESubmenu = new JMenu("Auto-run REDUCE...  ");
     static final JMenuItem stopREDUCEMenuItem = new JMenuItem("Stop REDUCE");
+    static final JCheckBoxMenuItem tabbedPaneCheckBox = new JCheckBoxMenuItem("Use Tabbed Pane");
+    static final JMenuItem addTabMenuItem = new JMenuItem("Add New Tab");
+    static final JMenuItem removeTabMenuItem = new JMenuItem("Remove Selected Tab");
 
     static final JFileChooser fileChooser = new JFileChooser();
     static final FileNameExtensionFilter inputFileFilter =
@@ -333,10 +336,28 @@ class RRMenuBar extends JMenuBar {
         redfrontColouredIORadioButton.addActionListener(e ->
                 RRPreferences.save(RRPreferences.COLOUREDIO, RRPreferences.ColouredIO.REDFRONT));
 
-        JMenuItem newTabMenuItem = new JMenuItem("New Tab");
-        reduceMenu.add(newTabMenuItem);
-        newTabMenuItem.setToolTipText("Add a new REDUCE tab.");
-        newTabMenuItem.addActionListener(e -> RunREDUCE.addTab());
+        viewMenu.addSeparator();
+
+        viewMenu.add(tabbedPaneCheckBox);
+        tabbedPaneCheckBox.setToolTipText("Use multiple tabs that each run an independent invocation of REDUCE.");
+        tabbedPaneCheckBox.setState(RRPreferences.tabbedPaneState);
+        tabbedPaneCheckBox.addItemListener(e -> {
+            RRPreferences.tabbedPaneState = tabbedPaneCheckBox.isSelected();
+            RRPreferences.save(RRPreferences.TABBEDPANE);
+            RunREDUCE.useTabbedPane(RRPreferences.tabbedPaneState);
+            addTabMenuItem.setEnabled(RRPreferences.tabbedPaneState);
+            removeTabMenuItem.setEnabled(false);
+        });
+
+        viewMenu.add(addTabMenuItem);
+        addTabMenuItem.setToolTipText("Add a new REDUCE tab.");
+        addTabMenuItem.setEnabled(RRPreferences.tabbedPaneState);
+        addTabMenuItem.addActionListener(e -> RunREDUCE.addTab());
+
+        viewMenu.add(removeTabMenuItem);
+        removeTabMenuItem.setToolTipText("Remove the selected REDUCE tab.");
+        removeTabMenuItem.setEnabled(false);
+        removeTabMenuItem.addActionListener(e -> RunREDUCE.removeTab());
 
 
         /* ********* *
