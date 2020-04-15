@@ -25,10 +25,11 @@ class RRPreferences {
     static final String AUTORUNVERSION = "autoRunVersion";
     static final String BOLDPROMPTS = "boldPrompts";
     static final String COLOUREDIO = "colouredIO";
-    static final String TABBEDPANE = "tabbedPane";
+    static final String TABBEDDISPLAY = "tabbedDisplay";
+    static final String LOOKANDFEEL = "lookAndFeel";
 
-    // colouredIOState values:
     enum ColouredIO {NONE, MODAL, REDFRONT}
+    enum LookAndFeel {JAVA, NATIVE, MOTIF}
 
     static final String NONE = "None";
 
@@ -38,7 +39,8 @@ class RRPreferences {
     static String autoRunVersion = prefs.get(AUTORUNVERSION, NONE);
     static boolean boldPromptsState = prefs.getBoolean(BOLDPROMPTS, false);
     static ColouredIO colouredIOIntent;
-    static boolean tabbedPaneState = prefs.getBoolean(TABBEDPANE, false);
+    static boolean tabbedDisplayState = prefs.getBoolean(TABBEDDISPLAY, false);
+    static LookAndFeel lookAndFeelState = LookAndFeel.valueOf(prefs.get(LOOKANDFEEL, LookAndFeel.JAVA.toString()));
 
     static {
         try {
@@ -72,8 +74,11 @@ class RRPreferences {
                     }
                 }
                 break;
-            case TABBEDPANE:
-                prefs.putBoolean(TABBEDPANE, tabbedPaneState);
+            case TABBEDDISPLAY:
+                prefs.putBoolean(TABBEDDISPLAY, tabbedDisplayState);
+                break;
+            case LOOKANDFEEL:
+                prefs.put(LOOKANDFEEL, (lookAndFeelState = (LookAndFeel) values[0]).toString());
                 break;
             default:
                 System.err.println("Attempt to save unexpected preference key: " + key);

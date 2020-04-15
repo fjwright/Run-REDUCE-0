@@ -31,7 +31,7 @@ class RRMenuBar extends JMenuBar {
     static final JMenu runREDUCESubmenu = new JMenu("Run REDUCE...  ");
     static final JMenu autoRunREDUCESubmenu = new JMenu("Auto-run REDUCE...  ");
     static final JMenuItem stopREDUCEMenuItem = new JMenuItem("Stop REDUCE");
-    static final JCheckBoxMenuItem tabbedPaneCheckBox = new JCheckBoxMenuItem("Use Tabbed Display");
+    static final JCheckBoxMenuItem tabbedDisplayCheckBox = new JCheckBoxMenuItem("Use Tabbed Display");
     static final JMenuItem addTabMenuItem = new JMenuItem("Add Another Tab");
     static final JMenuItem removeTabMenuItem = new JMenuItem("Remove Selected Tab");
 
@@ -289,6 +289,37 @@ class RRMenuBar extends JMenuBar {
         JMenu viewMenu = new JMenu("View");
         this.add(viewMenu);
 
+        JMenu lookAndFeelSubMenu = new JMenu("Look & Feel");
+        viewMenu.add(lookAndFeelSubMenu);
+        lookAndFeelSubMenu.setToolTipText("Select the look-and-feel to be used when Run-REDUCE is next started.");
+        ButtonGroup lookAndFeelButtonGroup = new ButtonGroup();
+
+        JRadioButtonMenuItem javaLFRadioButtonMenuItem = new JRadioButtonMenuItem("Java");
+        lookAndFeelSubMenu.add(javaLFRadioButtonMenuItem);
+        lookAndFeelButtonGroup.add(javaLFRadioButtonMenuItem);
+        javaLFRadioButtonMenuItem.setToolTipText("Use the Java Swing default look-and-feel (\"Metal\").");
+        javaLFRadioButtonMenuItem.setSelected(RRPreferences.lookAndFeelState == RRPreferences.LookAndFeel.JAVA);
+        javaLFRadioButtonMenuItem.addActionListener(e ->
+                RRPreferences.save(RRPreferences.LOOKANDFEEL, RRPreferences.LookAndFeel.JAVA));
+
+        JRadioButtonMenuItem nativeLFRadioButtonMenuItem = new JRadioButtonMenuItem("Native");
+        lookAndFeelSubMenu.add(nativeLFRadioButtonMenuItem);
+        lookAndFeelButtonGroup.add(nativeLFRadioButtonMenuItem);
+        nativeLFRadioButtonMenuItem.setToolTipText("Use the native (normal) look-and-feel for your platform.");
+        nativeLFRadioButtonMenuItem.setSelected(RRPreferences.lookAndFeelState == RRPreferences.LookAndFeel.NATIVE);
+        nativeLFRadioButtonMenuItem.addActionListener(e ->
+                RRPreferences.save(RRPreferences.LOOKANDFEEL, RRPreferences.LookAndFeel.NATIVE));
+
+        JRadioButtonMenuItem motifLFRadioButtonMenuItem = new JRadioButtonMenuItem("Motif");
+        lookAndFeelSubMenu.add(motifLFRadioButtonMenuItem);
+        lookAndFeelButtonGroup.add(motifLFRadioButtonMenuItem);
+        motifLFRadioButtonMenuItem.setToolTipText("Use the Motif look-and-feel (available on all platforms).");
+        motifLFRadioButtonMenuItem.setSelected(RRPreferences.lookAndFeelState == RRPreferences.LookAndFeel.MOTIF);
+        motifLFRadioButtonMenuItem.addActionListener(e ->
+                RRPreferences.save(RRPreferences.LOOKANDFEEL, RRPreferences.LookAndFeel.MOTIF));
+
+        viewMenu.addSeparator();
+
         // Create a Font Size... item in the View menu that pops up a dialogue:
         JMenuItem fontSizeMenuItem = new JMenuItem("Font Size...");
         viewMenu.add(fontSizeMenuItem);
@@ -338,14 +369,14 @@ class RRMenuBar extends JMenuBar {
 
         viewMenu.addSeparator();
 
-        viewMenu.add(tabbedPaneCheckBox);
-        tabbedPaneCheckBox.setToolTipText("Use multiple tabs that each run an independent invocation of REDUCE.");
-        tabbedPaneCheckBox.setState(RRPreferences.tabbedPaneState);
-        tabbedPaneCheckBox.addItemListener(e -> {
-            RRPreferences.tabbedPaneState = tabbedPaneCheckBox.isSelected();
-            RRPreferences.save(RRPreferences.TABBEDPANE);
-            RunREDUCE.useTabbedPane(RRPreferences.tabbedPaneState);
-            removeTabMenuItem.setEnabled(RRPreferences.tabbedPaneState);
+        viewMenu.add(tabbedDisplayCheckBox);
+        tabbedDisplayCheckBox.setToolTipText("Use multiple tabs that each run an independent invocation of REDUCE.");
+        tabbedDisplayCheckBox.setState(RRPreferences.tabbedDisplayState);
+        tabbedDisplayCheckBox.addItemListener(e -> {
+            RRPreferences.tabbedDisplayState = tabbedDisplayCheckBox.isSelected();
+            RRPreferences.save(RRPreferences.TABBEDDISPLAY);
+            RunREDUCE.useTabbedPane(RRPreferences.tabbedDisplayState);
+            removeTabMenuItem.setEnabled(RRPreferences.tabbedDisplayState);
         });
 
         viewMenu.add(addTabMenuItem);
@@ -354,7 +385,7 @@ class RRMenuBar extends JMenuBar {
 
         viewMenu.add(removeTabMenuItem);
         removeTabMenuItem.setToolTipText("Remove the selected REDUCE tab.");
-        removeTabMenuItem.setEnabled(RRPreferences.tabbedPaneState);
+        removeTabMenuItem.setEnabled(RRPreferences.tabbedDisplayState);
         removeTabMenuItem.addActionListener(e -> RunREDUCE.removeTab());
 
 

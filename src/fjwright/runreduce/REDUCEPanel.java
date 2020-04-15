@@ -274,7 +274,7 @@ public class REDUCEPanel extends JPanel {
         }
 
         title = reduceCommand.version;
-        if (RRPreferences.tabbedPaneState) {
+        if (RRPreferences.tabbedDisplayState) {
             int tabIndex = RunREDUCE.tabbedPane.indexOfComponent(this);
             RunREDUCE.tabbedPane.setTitleAt(tabIndex, title);
             RunREDUCE.tabbedPane.getTabComponentAt(tabIndex).invalidate();
@@ -297,7 +297,7 @@ public class REDUCEPanel extends JPanel {
     }
 }
 
-/*
+/**
  * Enabled status of menu items depending on whether REDUCE is running in this panel.
  */
 class MenuItemStatus {
@@ -310,21 +310,21 @@ class MenuItemStatus {
     boolean shutFileMenuItem;
     boolean shutLastMenuItem;
 
-    /*
+    /**
      * Initialise MenuItemStatus as appropriate when REDUCE is not running.
      */
     MenuItemStatus() {
         startingOrStoppingREDUCE(false);
     }
 
-    /*
+    /**
      * Reset MenuItemStatus as appropriate when REDUCE is not running.
      */
     void reduceStopped() {
         startingOrStoppingREDUCE(false);
     }
 
-    /*
+    /**
      * Reset MenuItemStatus as appropriate when REDUCE has just started.
      */
     void reduceStarted() {
@@ -347,7 +347,7 @@ class MenuItemStatus {
         RRMenuBar.shutLastMenuItem.setEnabled(shutLastMenuItem = false);
     }
 
-    /*
+    /**
      * Update the enabled status of the menu for this REDUCE panel.
      */
     void updateMenus() {

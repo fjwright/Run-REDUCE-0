@@ -87,7 +87,8 @@ uses the native look-and-feel and
 
     java -jar Run-REDUCE.jar -lfMotif
 
-uses the Motif look-and-feel.
+uses the Motif look-and-feel. Specifying the look-and-feel this way
+takes precedence over using the View menu; see below.
 
 
 ## General Information
@@ -387,6 +388,13 @@ they are used or saved, and empty fields are not saved at all.
 ## The View Menu
 
 The View menu provides the following items.
+
+### Look & Feel
+
+This sub-menu allows you to select a look-and-feel that will be
+applied the next time you start Run-REDUCE (unless you specify a
+look-and-feel command-line argument).  See the Look and Feel section
+above for further details.
 
 ### Font Size...
 

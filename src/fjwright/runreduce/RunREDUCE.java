@@ -49,7 +49,7 @@ public class RunREDUCE {
         if (debugPlatform) System.err.println("I/O display font: " + reduceFont.getName());
 
         reducePanel = new REDUCEPanel();
-        if (RRPreferences.tabbedPaneState)
+        if (RRPreferences.tabbedDisplayState)
             useTabbedPane(true);
         else
             frame.add(reducePanel);
@@ -66,7 +66,7 @@ public class RunREDUCE {
             frame.remove(reducePanel);
             frame.add(tabbedPane);
             tabbedPane.addChangeListener(e -> {
-                if (enableTabbedPaneChangeListener && tabbedPane != null) { // null check necessary???
+                if (enableTabbedPaneChangeListener) {
                     int addTabIndex = tabbedPane.getTabCount() - 1;
                     if (tabbedPane.getSelectedIndex() == addTabIndex) addTab();
                     else if ((reducePanel = (REDUCEPanel) tabbedPane.getSelectedComponent()) != null) {
@@ -94,9 +94,9 @@ public class RunREDUCE {
 
     static void addTab() {
         enableTabbedPaneChangeListener = false;
-        if (!RRPreferences.tabbedPaneState) { // enable tabbed pane
-            RRMenuBar.tabbedPaneCheckBox.setState(RRPreferences.tabbedPaneState = true);
-            RRPreferences.save(RRPreferences.TABBEDPANE);
+        if (!RRPreferences.tabbedDisplayState) { // enable tabbed pane
+            RRMenuBar.tabbedDisplayCheckBox.setState(RRPreferences.tabbedDisplayState = true);
+            RRPreferences.save(RRPreferences.TABBEDDISPLAY);
             useTabbedPane(true);
         }
         int lastTabIndex = tabbedPane.getTabCount() - 1;
@@ -118,8 +118,8 @@ public class RunREDUCE {
                 tabbedPane.setSelectedIndex(selectedIndex - 1);
         } else { // disable tabbed pane
             useTabbedPane(false);
-            RRMenuBar.tabbedPaneCheckBox.setState(RRPreferences.tabbedPaneState = false);
-            RRPreferences.save(RRPreferences.TABBEDPANE);
+            RRMenuBar.tabbedDisplayCheckBox.setState(RRPreferences.tabbedDisplayState = false);
+            RRPreferences.save(RRPreferences.TABBEDDISPLAY);
             RRMenuBar.removeTabMenuItem.setEnabled(false);
         }
         enableTabbedPaneChangeListener = true;
@@ -155,6 +155,20 @@ public class RunREDUCE {
                 default:
                     System.err.format("Unrecognised argument: %s.\nAllowed arguments are: %s, %s, %s and %s.",
                             arg, debugPlatformArg, debugOutputArg, lfNativeArg, lfMotifArg);
+            }
+        }
+
+        if (lookAndFeel == null) {
+            switch (RRPreferences.lookAndFeelState) {
+                case JAVA:
+                default:
+                    // lookAndFeel = null
+                    break;
+                case NATIVE:
+                    lookAndFeel = UIManager.getSystemLookAndFeelClassName();
+                    break;
+                case MOTIF:
+                    lookAndFeel = "com.sun.java.swing.plaf.motif.MotifLookAndFeel";
             }
         }
 
