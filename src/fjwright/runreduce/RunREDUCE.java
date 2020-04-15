@@ -73,11 +73,14 @@ public class RunREDUCE {
             tabLabelNumber = 1;
             tabbedPane.addTab("Tab 1", reducePanel);
         } else {
-            frame.remove(tabbedPane);
-            // Retain the reducePanel from the selected tab:
+            if (tabbedPane != null) {
+                frame.remove(tabbedPane);
+                tabbedPane = null; // release resources
+            }
+            // Retain the reducePanel from the selected tab if possible:
+            if (reducePanel == null) reducePanel = new REDUCEPanel();
             frame.add(reducePanel);
             frame.pack();
-            tabbedPane = null; // release resources
         }
     }
 
