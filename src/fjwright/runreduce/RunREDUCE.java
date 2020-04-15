@@ -71,7 +71,7 @@ public class RunREDUCE {
                 }
             });
             tabLabelNumber = 1;
-            tabbedPane.addTab("Tab 1", reducePanel);
+            tabbedPane.addTab(reducePanel.title != null ? reducePanel.title : "Tab 1", reducePanel);
         } else {
             if (tabbedPane != null) {
                 frame.remove(tabbedPane);

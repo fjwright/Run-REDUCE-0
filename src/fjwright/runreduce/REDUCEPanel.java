@@ -33,6 +33,7 @@ public class REDUCEPanel extends JPanel {
     private PrintWriter reduceInputPrintWriter;
     MenuItemStatus menuItemStatus = new MenuItemStatus();
     boolean runningREDUCE;
+    String title; // REDUCE version if REDUCE is running
 
     public REDUCEPanel() {
         super(new BorderLayout()); // JPanel defaults to FlowLayout!
@@ -272,9 +273,10 @@ public class REDUCEPanel extends JPanel {
                     "REDUCE Process Error");
         }
 
+        title = reduceCommand.version;
         if (RRPreferences.tabbedPaneState) {
             int tabIndex = RunREDUCE.tabbedPane.indexOfComponent(this);
-            RunREDUCE.tabbedPane.setTitleAt(tabIndex, reduceCommand.version);
+            RunREDUCE.tabbedPane.setTitleAt(tabIndex, title);
         }
 
         sendAction.setEnabled(runningREDUCE = true);
