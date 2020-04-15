@@ -14,6 +14,7 @@ Java 8 (or later), but I can only test on 64-bit Windows 10 and Ubuntu 18.
 Run-REDUCE does **not** (yet) provide typeset-quality display of
 mathematical notation.
 
+
 ## Install and Run
 
 You need to have a Java Runtime Environment (JRE), version 8 (or
@@ -69,6 +70,7 @@ Binaries for Free!" for Java 8 and later for most current platforms
 including Linux, Windows and macOS.  I recommend the JRE build of
 either OpenJDK 8 (LTS) or OpenJDK 11 (LTS).
 
+
 ## Look and Feel
 
 The "look" of an application refers to its appearance and the "feel"
@@ -86,6 +88,7 @@ uses the native look-and-feel and
     java -jar Run-REDUCE.jar -lfMotif
 
 uses the Motif look-and-feel.
+
 
 ## General Information
 
@@ -117,6 +120,7 @@ REDUCE installation.  On Microsoft Windows it looks for the folder
 assumes that executable files are under `/usr/lib/reduce`, package
 information is under `/usr/share/reduce`, and documentation is under
 `/usr/share/doc/reduce`.
+
 
 ## The Main Window
 
@@ -167,6 +171,7 @@ explicitly).  As an additional precaution, holding the Shift key while
 pressing *Control+Enter* or clicking on the `Send Input` button always
 suppresses auto-termination.
 
+
 ## The File Menu
 
 Some items in this menu pop up a dialogue that allows you to select
@@ -207,7 +212,6 @@ This menu item is disabled unless REDUCE is running.
 
 The `Packages` button switches to the REDUCE packages directory
 (mainly for my benefit during testing).
-
 
 ### Output to File...
 
@@ -267,6 +271,7 @@ selected file; otherwise, it overwrites any previous file content.
 This terminates both REDUCE and the Run-REDUCE GUI, as does the close
 widget that is normally at the top right-hand corner of the main
 window frame.
+
 
 ## The REDUCE Menu
 
@@ -378,6 +383,7 @@ default value.
 All field values are stripped of leading and trailing space before
 they are used or saved, and empty fields are not saved at all.
 
+
 ## The View Menu
 
 The View menu provides the following items.
@@ -412,6 +418,40 @@ and echoed file input and symbolic-mode output are not coloured.  Note
 that turning Redfront mode on or off does not take effect until REDUCE
 is (re-)started, and turning other modes on or off does not fully take
 effect until the next input prompt.
+
+### Use Tabbed Display
+
+Selecting this checkbox causes Run-REDUCE to start using tabbed
+display with the current REDUCE panel displayed under the first tab.
+Deselecting this checkbox causes Run-REDUCE to stop using tabbed
+display; it preserves the REDUCE panel in the currently selected tab
+but discards the content of all other tabs.
+
+Tabbed display allows multiple independent invocations of the same or
+different versions of REDUCE to be run simultaneously.  Clicking on
+the rightmost tab labelled `+` adds a new tab immediately to the left
+of the `+` tab.  Clicking on the `X` icon at the right of any tab
+title removes that tab and the REDUCE panel it contains.  When there
+is only one tab, removing it disables tabbed display but preserves the
+REDUCE panel that the tab contained.
+
+All REDUCE and I/O display options apply to every tab.
+
+### Add Another Tab
+
+This adds a new tab to a tabbed display, just like the `+` tab.  When
+tabbed display is disabled, this menu item enables tabbed display and
+adds a **second** tab, as it would if tabbed display were already
+enabled.  Hence this menu item is always enabled.
+
+### Remove Selected Tab
+
+This removes the selected tab and the REDUCE panel it contains, just
+like the `X` icon.  When there is only one tab, this menu item
+disables tabbed display but preserves the REDUCE panel that the tab
+contained.  This menu item is disabled unless tabbed display is
+enabled.
+
 
 ## The Help Menu
 

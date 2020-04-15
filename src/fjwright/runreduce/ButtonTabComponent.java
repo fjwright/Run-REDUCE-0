@@ -42,11 +42,12 @@ import java.awt.event.*;
  * a JButton to close the tab it belongs to
  */
 public class ButtonTabComponent extends JPanel {
-//        private final JTabbedPane pane;
+    private final JTabbedPane pane;
 
     public ButtonTabComponent(final JTabbedPane pane) {
         //unset default FlowLayout' gaps
         super(new FlowLayout(FlowLayout.LEFT, 0, 0));
+        this.pane = pane;
         if (pane == null) {
             throw new NullPointerException("TabbedPane is null");
         }
@@ -73,7 +74,7 @@ public class ButtonTabComponent extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(2, 0, 0, 0));
     }
 
-    private static class TabButton extends JButton implements ActionListener {
+    private class TabButton extends JButton implements ActionListener {
         public TabButton() {
             int size = 17;
             setPreferredSize(new Dimension(size, size));
@@ -95,11 +96,11 @@ public class ButtonTabComponent extends JPanel {
         }
 
         public void actionPerformed(ActionEvent e) {
-//            int i = pane.indexOfTabComponent(ButtonTabComponent.this);
-//            if (i != -1) {
-//                pane.remove(i);
-//            }
-            RunREDUCE.removeTab();
+            int i = pane.indexOfTabComponent(ButtonTabComponent.this);
+            if (i != -1) {
+                pane.setSelectedIndex(i);
+                RunREDUCE.removeTab();
+            }
         }
 
         //we don't want to update UI for this button

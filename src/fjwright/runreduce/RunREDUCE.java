@@ -23,6 +23,7 @@ public class RunREDUCE {
     static JTabbedPane tabbedPane;
     static int tabLabelNumber = 1;
     static REDUCEPanel reducePanel;
+    static boolean enableTabbedPaneChangeListener = true;
 
     static REDUCEConfigurationDefault reduceConfigurationDefault;
     static REDUCEConfiguration reduceConfiguration;
@@ -59,20 +60,25 @@ public class RunREDUCE {
     }
 
     static void useTabbedPane(boolean enable) {
+        enableTabbedPaneChangeListener = false;
         if (enable) {
             tabbedPane = new JTabbedPane();
             frame.remove(reducePanel);
             frame.add(tabbedPane);
             tabbedPane.addChangeListener(e -> {
-                if (tabbedPane != null && tabbedPane.getTabCount() > 0 &&
-                        (reducePanel = (REDUCEPanel) tabbedPane.getSelectedComponent()) != null) {
-                    reducePanel.menuItemStatus.updateMenus();
-                    reducePanel.inputTextArea.requestFocusInWindow();
+                if (enableTabbedPaneChangeListener && tabbedPane != null) { // null check necessary???
+                    int addTabIndex = tabbedPane.getTabCount() - 1;
+                    if (tabbedPane.getSelectedIndex() == addTabIndex) addTab();
+                    else if ((reducePanel = (REDUCEPanel) tabbedPane.getSelectedComponent()) != null) {
+                        reducePanel.menuItemStatus.updateMenus();
+                        reducePanel.inputTextArea.requestFocusInWindow();
+                    }
                 }
             });
             tabLabelNumber = 1;
             tabbedPane.addTab(reducePanel.title != null ? reducePanel.title : "Tab 1", reducePanel);
             tabbedPane.setTabComponentAt(0, new ButtonTabComponent(tabbedPane));
+            tabbedPane.addTab("+", null, null, "Add a new REDUCE tab.");
         } else {
             if (tabbedPane != null) {
                 frame.remove(tabbedPane);
@@ -83,32 +89,40 @@ public class RunREDUCE {
             frame.add(reducePanel);
             frame.pack();
         }
+        enableTabbedPaneChangeListener = true;
     }
 
     static void addTab() {
+        enableTabbedPaneChangeListener = false;
         if (!RRPreferences.tabbedPaneState) { // enable tabbed pane
             RRMenuBar.tabbedPaneCheckBox.setState(RRPreferences.tabbedPaneState = true);
             RRPreferences.save(RRPreferences.TABBEDPANE);
             useTabbedPane(true);
         }
-        tabbedPane.addTab("Tab " + (++tabLabelNumber), reducePanel = new REDUCEPanel());
-        int index = tabbedPane.getTabCount() - 1;
-        tabbedPane.setTabComponentAt(index, new ButtonTabComponent(tabbedPane));
-        tabbedPane.setSelectedIndex(index);
+        int lastTabIndex = tabbedPane.getTabCount() - 1;
+        tabbedPane.insertTab("Tab " + (++tabLabelNumber), null, reducePanel = new REDUCEPanel(), null, lastTabIndex);
+        tabbedPane.setTabComponentAt(lastTabIndex, new ButtonTabComponent(tabbedPane));
+        tabbedPane.setSelectedIndex(lastTabIndex);
         RRMenuBar.removeTabMenuItem.setEnabled(true);
+        enableTabbedPaneChangeListener = true;
     }
 
     static void removeTab() {
         // ToDo Does this leave zombie REDUCE processes?
-        if (tabbedPane.getTabCount() > 1) {
+        enableTabbedPaneChangeListener = false;
+        if (tabbedPane.getTabCount() > 2) {
+            int selectedIndex = tabbedPane.getSelectedIndex();
             // Remove both tab and content:
-            tabbedPane.remove(tabbedPane.getSelectedIndex());
+            tabbedPane.remove(selectedIndex);
+            if (selectedIndex == tabbedPane.getTabCount() - 1)
+                tabbedPane.setSelectedIndex(selectedIndex - 1);
         } else { // disable tabbed pane
             useTabbedPane(false);
             RRMenuBar.tabbedPaneCheckBox.setState(RRPreferences.tabbedPaneState = false);
             RRPreferences.save(RRPreferences.TABBEDPANE);
             RRMenuBar.removeTabMenuItem.setEnabled(false);
         }
+        enableTabbedPaneChangeListener = true;
     }
 
     static void errorMessageDialog(Object message, String title) {

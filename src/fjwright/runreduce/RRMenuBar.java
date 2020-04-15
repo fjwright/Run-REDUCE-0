@@ -31,8 +31,8 @@ class RRMenuBar extends JMenuBar {
     static final JMenu runREDUCESubmenu = new JMenu("Run REDUCE...  ");
     static final JMenu autoRunREDUCESubmenu = new JMenu("Auto-run REDUCE...  ");
     static final JMenuItem stopREDUCEMenuItem = new JMenuItem("Stop REDUCE");
-    static final JCheckBoxMenuItem tabbedPaneCheckBox = new JCheckBoxMenuItem("Use Tabbed Pane");
-    static final JMenuItem addTabMenuItem = new JMenuItem("Add New Tab");
+    static final JCheckBoxMenuItem tabbedPaneCheckBox = new JCheckBoxMenuItem("Use Tabbed Display");
+    static final JMenuItem addTabMenuItem = new JMenuItem("Add Another Tab");
     static final JMenuItem removeTabMenuItem = new JMenuItem("Remove Selected Tab");
 
     static final JFileChooser fileChooser = new JFileChooser();

@@ -277,6 +277,7 @@ public class REDUCEPanel extends JPanel {
         if (RRPreferences.tabbedPaneState) {
             int tabIndex = RunREDUCE.tabbedPane.indexOfComponent(this);
             RunREDUCE.tabbedPane.setTitleAt(tabIndex, title);
+            RunREDUCE.tabbedPane.getTabComponentAt(tabIndex).invalidate();
         }
 
         sendAction.setEnabled(runningREDUCE = true);
