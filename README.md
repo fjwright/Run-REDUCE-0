@@ -29,11 +29,7 @@ This project is set up for development using [IntelliJ
 IDEA](https://www.jetbrains.com/idea/) with Run-REDUCE as the
 top-level directory.
 
-### To do soon
-
-* Multiple tabs that each run an independent invocation of REDUCE.
-
-### To do later
+### To do (maybe)
 
 * Easy access to a **local** copy of the Run-REDUCE User Guide.
 * Font and colour selectors.
@@ -107,3 +103,5 @@ top-level directory.
 
 * Better support for non-default look-and-feels.
 * Easy access to the Run-REDUCE User Guide on GitHub.
+* Optional multiple tabs that each run an independent invocation of
+  REDUCE.

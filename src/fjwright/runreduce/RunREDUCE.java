@@ -72,6 +72,7 @@ public class RunREDUCE {
             });
             tabLabelNumber = 1;
             tabbedPane.addTab(reducePanel.title != null ? reducePanel.title : "Tab 1", reducePanel);
+            tabbedPane.setTabComponentAt(0, new ButtonTabComponent(tabbedPane));
         } else {
             if (tabbedPane != null) {
                 frame.remove(tabbedPane);
@@ -91,7 +92,9 @@ public class RunREDUCE {
             useTabbedPane(true);
         }
         tabbedPane.addTab("Tab " + (++tabLabelNumber), reducePanel = new REDUCEPanel());
-        tabbedPane.setSelectedIndex(tabbedPane.getTabCount() - 1);
+        int index = tabbedPane.getTabCount() - 1;
+        tabbedPane.setTabComponentAt(index, new ButtonTabComponent(tabbedPane));
+        tabbedPane.setSelectedIndex(index);
         RRMenuBar.removeTabMenuItem.setEnabled(true);
     }
 
