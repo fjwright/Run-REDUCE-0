@@ -17,39 +17,38 @@ import java.util.regex.Pattern;
 class RRPreferences {
     static final boolean windowsOS = System.getProperty("os.name").startsWith("Windows");
     static final Preferences prefs = Preferences.userRoot().node("/fjwright/runreduce");  // cf. package name
-    // On Windows, Java stores the preferences for this application in the registry under the key
-    // Computer\HKEY_CURRENT_USER\Software\JavaSoft\Prefs\fjwright\runreduce.
+    // On Microsoft Windows the preferences for this application are stored in the registry under the key
+    // Computer\HKEY_CURRENT_USER\Software\JavaSoft\Prefs\fjwright\runreduce
+    // and on Ubuntu Linux they are stored in the XML file
+    // ~/.java/.userPrefs/fjwright/runreduce/prefs.xml.
 
     // Preference keys:
+    static final String LOOKANDFEEL = "lookAndFeel";
     static final String FONTSIZE = "fontSize";
     static final String AUTORUNVERSION = "autoRunVersion";
     static final String BOLDPROMPTS = "boldPrompts";
     static final String COLOUREDIO = "colouredIO";
-    static final String TABBEDDISPLAY = "tabbedDisplay";
-    static final String LOOKANDFEEL = "lookAndFeel";
+    static final String DISPLAYPANE = "displayPane";
+
+    enum LookAndFeel {JAVA, NATIVE, MOTIF}
 
     enum ColouredIO {NONE, MODAL, REDFRONT}
-    enum LookAndFeel {JAVA, NATIVE, MOTIF}
+
+    enum DisplayPane {SINGLE, SPLIT, TABBED}
 
     static final String NONE = "None";
 
     static int fontSize = Math.max(prefs.getInt(FONTSIZE, 12), 5);
     // in case a very small font size gets saved accidentally!
-    // Minimum of 5 matches minimum set for font size SpinnerModel.
+    // Minimum value of 5 matches minimum value set for font size SpinnerModel.
     static String autoRunVersion = prefs.get(AUTORUNVERSION, NONE);
+    static LookAndFeel lookAndFeelState =
+            LookAndFeel.valueOf(prefs.get(LOOKANDFEEL, LookAndFeel.JAVA.toString()));
     static boolean boldPromptsState = prefs.getBoolean(BOLDPROMPTS, false);
-    static ColouredIO colouredIOIntent;
-    static boolean tabbedDisplayState = prefs.getBoolean(TABBEDDISPLAY, false);
-    static LookAndFeel lookAndFeelState = LookAndFeel.valueOf(prefs.get(LOOKANDFEEL, LookAndFeel.JAVA.toString()));
-
-    static {
-        try {
-            colouredIOIntent = ColouredIO.valueOf(prefs.get(COLOUREDIO, ColouredIO.NONE.toString()));
-        } catch (IllegalArgumentException e) {
-            colouredIOIntent = ColouredIO.NONE;
-        }
-    }
-
+    static ColouredIO colouredIOIntent =
+            ColouredIO.valueOf(prefs.get(COLOUREDIO, ColouredIO.NONE.toString()));
+    static DisplayPane displayPane =
+            DisplayPane.valueOf(prefs.get(DISPLAYPANE, DisplayPane.SPLIT.toString())); // temporary!
     static ColouredIO colouredIOState = colouredIOIntent;
 
     static void save(String key, Object... values) {
@@ -59,6 +58,9 @@ class RRPreferences {
                 break;
             case AUTORUNVERSION:
                 prefs.put(AUTORUNVERSION, autoRunVersion = (String) values[0]);
+                break;
+            case LOOKANDFEEL:
+                prefs.put(LOOKANDFEEL, (lookAndFeelState = (LookAndFeel) values[0]).toString());
                 break;
             case BOLDPROMPTS:
                 prefs.putBoolean(BOLDPROMPTS, boldPromptsState);
@@ -74,11 +76,8 @@ class RRPreferences {
                     }
                 }
                 break;
-            case TABBEDDISPLAY:
-                prefs.putBoolean(TABBEDDISPLAY, tabbedDisplayState);
-                break;
-            case LOOKANDFEEL:
-                prefs.put(LOOKANDFEEL, (lookAndFeelState = (LookAndFeel) values[0]).toString());
+            case DISPLAYPANE:
+                prefs.put(DISPLAYPANE, (displayPane = (DisplayPane) values[0]).toString());
                 break;
             default:
                 System.err.println("Attempt to save unexpected preference key: " + key);
@@ -269,7 +268,7 @@ class REDUCEConfiguration extends REDUCEConfigurationType {
      * This method saves the reduceRootDir, packagesRootDir and runREDUCECommands fields as preferences.
      */
     void save() {
-       Preferences prefs = RRPreferences.prefs;
+        Preferences prefs = RRPreferences.prefs;
         prefs.put(REDUCE_ROOT_DIR, reduceRootDir);
         prefs.put(PACKAGES_ROOT_DIR, packagesRootDir);
         // Remove all saved versions before saving current versions:

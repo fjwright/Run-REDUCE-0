@@ -51,26 +51,38 @@ public class RunREDUCE {
         if (debugPlatform) System.err.println("I/O display font: " + reduceFont.getName());
 
         reducePanel = new REDUCEPanel();
-        useSplitPane(true);
-//        if (RRPreferences.tabbedDisplayState)
-//            useTabbedPane(true);
-//        else
-//            frame.add(reducePanel);
+        switch (RRPreferences.displayPane) {
+            case SINGLE:
+                frame.add(reducePanel);
+                frame.pack();
+                break;
+            case SPLIT:
+                useSplitPane(true);
+                break;
+            case TABBED:
+                useTabbedPane(true);
+        }
 
         // Display the window:
-        frame.pack();
         frame.setVisible(true);
     }
 
     static void useSplitPane(boolean enable) {
-        REDUCEPanel reducePanel2 = new REDUCEPanel();
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, reducePanel, reducePanel2);
-        splitPane.setResizeWeight(0.5);
-        frame.add(splitPane);
-
-        reducePanel.addMouseListener(new REDUCEPanelMouseListener());
-        reducePanel2.addMouseListener(new REDUCEPanelMouseListener());
-        reducePanel2.setSelected(false);
+        if (enable) {
+            REDUCEPanel reducePanel2 = new REDUCEPanel();
+            splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, reducePanel, reducePanel2);
+            splitPane.setResizeWeight(0.5);
+            frame.add(splitPane);
+            reducePanel.addMouseListener(new REDUCEPanelMouseListener());
+            reducePanel2.addMouseListener(new REDUCEPanelMouseListener());
+            reducePanel2.setSelected(false);
+        } else { // Revert to single pane.
+            // Retain the reducePanel from the selected tab if possible:
+            frame.remove(splitPane);
+            splitPane = null; // release resources
+            frame.add(reducePanel);
+        }
+        frame.pack();
     }
 
     private static class REDUCEPanelMouseListener extends MouseAdapter {
@@ -114,7 +126,7 @@ public class RunREDUCE {
             tabbedPane.addTab(reducePanel.title != null ? reducePanel.title : "Tab 1", reducePanel);
             tabbedPane.setTabComponentAt(0, new ButtonTabComponent(tabbedPane));
             tabbedPane.addTab("+", null, null, "Add a new REDUCE tab.");
-        } else {
+        } else { // Revert to single pane.
             if (tabbedPane != null) {
                 frame.remove(tabbedPane);
                 tabbedPane = null; // release resources
@@ -122,16 +134,16 @@ public class RunREDUCE {
             // Retain the reducePanel from the selected tab if possible:
             if (reducePanel == null) reducePanel = new REDUCEPanel();
             frame.add(reducePanel);
-            frame.pack();
         }
         enableTabbedPaneChangeListener = true;
+        frame.pack();
     }
 
     static void addTab() {
         enableTabbedPaneChangeListener = false;
-        if (!RRPreferences.tabbedDisplayState) { // enable tabbed pane
-            RRMenuBar.tabbedDisplayCheckBox.setState(RRPreferences.tabbedDisplayState = true);
-            RRPreferences.save(RRPreferences.TABBEDDISPLAY);
+        if (RRPreferences.displayPane != RRPreferences.DisplayPane.TABBED) { // enable tabbed pane
+            RRMenuBar.tabbedPaneRadioButton.setSelected(true);
+            RRPreferences.save(RRPreferences.DISPLAYPANE, RRPreferences.DisplayPane.TABBED);
             useTabbedPane(true);
         }
         int lastTabIndex = tabbedPane.getTabCount() - 1;
@@ -143,7 +155,6 @@ public class RunREDUCE {
     }
 
     static void removeTab() {
-        // ToDo Does this leave zombie REDUCE processes?
         enableTabbedPaneChangeListener = false;
         if (tabbedPane.getTabCount() > 2) {
             int selectedIndex = tabbedPane.getSelectedIndex();
@@ -153,8 +164,8 @@ public class RunREDUCE {
                 tabbedPane.setSelectedIndex(selectedIndex - 1);
         } else { // disable tabbed pane
             useTabbedPane(false);
-            RRMenuBar.tabbedDisplayCheckBox.setState(RRPreferences.tabbedDisplayState = false);
-            RRPreferences.save(RRPreferences.TABBEDDISPLAY);
+            RRMenuBar.singlePaneRadioButton.setSelected(true);
+            RRPreferences.save(RRPreferences.DISPLAYPANE, RRPreferences.DisplayPane.SINGLE);
             RRMenuBar.removeTabMenuItem.setEnabled(false);
         }
         enableTabbedPaneChangeListener = true;

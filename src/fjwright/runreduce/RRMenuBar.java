@@ -20,7 +20,7 @@ import java.util.List;
  * directory or absolute; I currently use the latter.
  */
 class RRMenuBar extends JMenuBar {
-    private static Frame frame = null;
+    private static Frame frame;
 
     static final JMenuItem inputFileMenuItem = new JMenuItem("Input from Files...");
     static final JMenuItem outputFileMenuItem = new JMenuItem("Output to File...");
@@ -31,7 +31,8 @@ class RRMenuBar extends JMenuBar {
     static final JMenu runREDUCESubmenu = new JMenu("Run REDUCE...  ");
     static final JMenu autoRunREDUCESubmenu = new JMenu("Auto-run REDUCE...  ");
     static final JMenuItem stopREDUCEMenuItem = new JMenuItem("Stop REDUCE");
-    static final JCheckBoxMenuItem tabbedDisplayCheckBox = new JCheckBoxMenuItem("Use Tabbed Display");
+    static final JRadioButtonMenuItem singlePaneRadioButton = new JRadioButtonMenuItem("Single Pane Display");
+    static final JRadioButtonMenuItem tabbedPaneRadioButton = new JRadioButtonMenuItem("Tabbed Pane Display");
     static final JMenuItem addTabMenuItem = new JMenuItem("Add Another Tab");
     static final JMenuItem removeTabMenuItem = new JMenuItem("Remove Selected Tab");
 
@@ -344,6 +345,7 @@ class RRMenuBar extends JMenuBar {
         viewMenu.add(colouredIOSubMenu);
         colouredIOSubMenu.setToolTipText("Select a text colouring style for the I/O Display, or none.");
         ButtonGroup colouredIOButtonGroup = new ButtonGroup();
+
         JRadioButtonMenuItem noColouredIORadioButton = new JRadioButtonMenuItem("None");
         colouredIOSubMenu.add(noColouredIORadioButton);
         colouredIOButtonGroup.add(noColouredIORadioButton);
@@ -351,6 +353,7 @@ class RRMenuBar extends JMenuBar {
         noColouredIORadioButton.setSelected(RRPreferences.colouredIOIntent == RRPreferences.ColouredIO.NONE);
         noColouredIORadioButton.addActionListener(e ->
                 RRPreferences.save(RRPreferences.COLOUREDIO, RRPreferences.ColouredIO.NONE));
+
         JRadioButtonMenuItem modeColouredIORadioButton = new JRadioButtonMenuItem("Modal");
         colouredIOSubMenu.add(modeColouredIORadioButton);
         colouredIOButtonGroup.add(modeColouredIORadioButton);
@@ -359,6 +362,7 @@ class RRMenuBar extends JMenuBar {
         modeColouredIORadioButton.setSelected(RRPreferences.colouredIOIntent == RRPreferences.ColouredIO.MODAL);
         modeColouredIORadioButton.addActionListener(e ->
                 RRPreferences.save(RRPreferences.COLOUREDIO, RRPreferences.ColouredIO.MODAL));
+
         JRadioButtonMenuItem redfrontColouredIORadioButton = new JRadioButtonMenuItem("Redfront");
         colouredIOSubMenu.add(redfrontColouredIORadioButton);
         colouredIOButtonGroup.add(redfrontColouredIORadioButton);
@@ -369,23 +373,58 @@ class RRMenuBar extends JMenuBar {
 
         viewMenu.addSeparator();
 
-        viewMenu.add(tabbedDisplayCheckBox);
-        tabbedDisplayCheckBox.setToolTipText("Use multiple tabs that each run an independent invocation of REDUCE.");
-        tabbedDisplayCheckBox.setState(RRPreferences.tabbedDisplayState);
-        tabbedDisplayCheckBox.addItemListener(e -> {
-            RRPreferences.tabbedDisplayState = tabbedDisplayCheckBox.isSelected();
-            RRPreferences.save(RRPreferences.TABBEDDISPLAY);
-            RunREDUCE.useTabbedPane(RRPreferences.tabbedDisplayState);
-            removeTabMenuItem.setEnabled(RRPreferences.tabbedDisplayState);
+        ButtonGroup displayPaneButtonGroup = new ButtonGroup();
+
+        viewMenu.add(singlePaneRadioButton);
+        displayPaneButtonGroup.add(singlePaneRadioButton);
+        singlePaneRadioButton.setToolTipText("Use a single pane to display only one invocation of REDUCE at a time.");
+        singlePaneRadioButton.setSelected(RRPreferences.displayPane == RRPreferences.DisplayPane.SINGLE);
+        singlePaneRadioButton.addActionListener(e -> {
+            switch (RRPreferences.displayPane) {
+                case SPLIT:
+                    RunREDUCE.useSplitPane(false);
+                    addTabMenuItem.setEnabled(true);
+                    break;
+                case TABBED:
+                    RunREDUCE.useTabbedPane(false);
+                    removeTabMenuItem.setEnabled(false);
+            }
+            RRPreferences.save(RRPreferences.DISPLAYPANE, RRPreferences.DisplayPane.SINGLE);
+        });
+
+        JRadioButtonMenuItem splitPaneRadioButton = new JRadioButtonMenuItem("Split Pane Display");
+        viewMenu.add(splitPaneRadioButton);
+        displayPaneButtonGroup.add(splitPaneRadioButton);
+        splitPaneRadioButton.setToolTipText("Use a split pane to display two independent invocations of REDUCE side-by-side.");
+        splitPaneRadioButton.setSelected(RRPreferences.displayPane == RRPreferences.DisplayPane.SPLIT);
+        splitPaneRadioButton.addActionListener(e -> {
+            if (RRPreferences.displayPane == RRPreferences.DisplayPane.TABBED) RunREDUCE.useTabbedPane(false);
+            addTabMenuItem.setEnabled(false);
+            removeTabMenuItem.setEnabled(false);
+            RRPreferences.save(RRPreferences.DISPLAYPANE, RRPreferences.DisplayPane.SPLIT);
+            RunREDUCE.useSplitPane(true);
+        });
+
+        viewMenu.add(tabbedPaneRadioButton);
+        displayPaneButtonGroup.add(tabbedPaneRadioButton);
+        tabbedPaneRadioButton.setToolTipText("Use a tabbed pane in which each tab runs an independent invocation of REDUCE.");
+        tabbedPaneRadioButton.setSelected(RRPreferences.displayPane == RRPreferences.DisplayPane.TABBED);
+        tabbedPaneRadioButton.addActionListener(e -> {
+            if (RRPreferences.displayPane == RRPreferences.DisplayPane.SPLIT) RunREDUCE.useSplitPane(false);
+            RRPreferences.save(RRPreferences.DISPLAYPANE, RRPreferences.DisplayPane.TABBED);
+            RunREDUCE.useTabbedPane(true);
+            addTabMenuItem.setEnabled(true);
+            removeTabMenuItem.setEnabled(true);
         });
 
         viewMenu.add(addTabMenuItem);
         addTabMenuItem.setToolTipText("Add a new REDUCE tab.");
+        addTabMenuItem.setEnabled(RRPreferences.displayPane != RRPreferences.DisplayPane.SPLIT);
         addTabMenuItem.addActionListener(e -> RunREDUCE.addTab());
 
         viewMenu.add(removeTabMenuItem);
         removeTabMenuItem.setToolTipText("Remove the selected REDUCE tab.");
-        removeTabMenuItem.setEnabled(RRPreferences.tabbedDisplayState);
+        removeTabMenuItem.setEnabled(RRPreferences.displayPane == RRPreferences.DisplayPane.TABBED);
         removeTabMenuItem.addActionListener(e -> RunREDUCE.removeTab());
 
 
