@@ -9,6 +9,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseListener;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,9 @@ public class REDUCEPanel extends JPanel {
     MenuItemStatus menuItemStatus = new MenuItemStatus();
     boolean runningREDUCE;
     String title; // REDUCE version if REDUCE is running
+    JLabel outputLabel, inputLabel;
+    static final String outputLabelDefault = "Input/Output Display";
+    static Color deselectedBackground = new Color(0xF8_F8_F8);
 
     public REDUCEPanel() {
         super(new BorderLayout()); // JPanel defaults to FlowLayout!
@@ -45,7 +49,7 @@ public class REDUCEPanel extends JPanel {
         JScrollPane outputScrollPane = new JScrollPane(outputTextPane);
         JPanel outputPane = new JPanel(new BorderLayout(0, 3));
         outputPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JLabel outputLabel = new JLabel("Input/Output Display");
+        outputLabel = new JLabel(outputLabelDefault);
         outputPane.add(outputLabel, BorderLayout.PAGE_START);
         outputPane.add(outputScrollPane);
 
@@ -55,7 +59,7 @@ public class REDUCEPanel extends JPanel {
         JScrollPane inputScrollPane = new JScrollPane(inputTextArea);
         JPanel inputPane = new JPanel(new BorderLayout(0, 3));
         inputPane.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        JLabel inputLabel = new JLabel("Input Editor");
+        inputLabel = new JLabel("Input Editor");
         inputPane.add(inputLabel, BorderLayout.PAGE_START);
         inputPane.add(inputScrollPane);
 
@@ -243,7 +247,7 @@ public class REDUCEPanel extends JPanel {
         }
     }
 
-    /*
+    /**
      * Run the specified REDUCE command in this REDUCE panel.
      */
     void run(REDUCECommand reduceCommand) {
@@ -274,6 +278,7 @@ public class REDUCEPanel extends JPanel {
         }
 
         title = reduceCommand.version;
+        outputLabel.setText(outputLabelDefault + "  |  " + title);
         if (RRPreferences.tabbedDisplayState) {
             int tabIndex = RunREDUCE.tabbedPane.indexOfComponent(this);
             RunREDUCE.tabbedPane.setTitleAt(tabIndex, title);
@@ -293,6 +298,36 @@ public class REDUCEPanel extends JPanel {
             } catch (BadLocationException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    void setSelected(boolean selected) {
+        if (selected) {
+            outputTextPane.setBackground(Color.white);
+            inputTextArea.setBackground(Color.white);
+            outputLabel.setEnabled(true);
+            inputLabel.setEnabled(true);
+        } else {
+            outputTextPane.setBackground(deselectedBackground);
+            inputTextArea.setBackground(deselectedBackground);
+            outputLabel.setEnabled(false);
+            inputLabel.setEnabled(false);
+        }
+    }
+
+    @Override
+    public void addMouseListener(MouseListener mouseListener) {
+        addMouseListener(this, mouseListener);
+    }
+
+    /**
+     * Recursively add a mouse listener to every child in the tree of contained components.
+     */
+    private static void addMouseListener(Container container, MouseListener mouseListener) {
+        // Maybe exclude buttons?
+        for (Component c : container.getComponents()) {
+            c.addMouseListener(mouseListener);
+            if (c instanceof Container) addMouseListener((Container) c, mouseListener);
         }
     }
 }

@@ -13,6 +13,7 @@ package fjwright.runreduce;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 
 /**
  * This is the main class that sets up and runs the application.
@@ -21,6 +22,7 @@ public class RunREDUCE {
     static JFrame frame;
     static Font reduceFont;
     static JTabbedPane tabbedPane;
+    static JSplitPane splitPane;
     static int tabLabelNumber = 1;
     static REDUCEPanel reducePanel;
     static boolean enableTabbedPaneChangeListener = true;
@@ -49,14 +51,47 @@ public class RunREDUCE {
         if (debugPlatform) System.err.println("I/O display font: " + reduceFont.getName());
 
         reducePanel = new REDUCEPanel();
-        if (RRPreferences.tabbedDisplayState)
-            useTabbedPane(true);
-        else
-            frame.add(reducePanel);
+        useSplitPane(true);
+//        if (RRPreferences.tabbedDisplayState)
+//            useTabbedPane(true);
+//        else
+//            frame.add(reducePanel);
 
         // Display the window:
         frame.pack();
         frame.setVisible(true);
+    }
+
+    static void useSplitPane(boolean enable) {
+        REDUCEPanel reducePanel2 = new REDUCEPanel();
+        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, reducePanel, reducePanel2);
+        splitPane.setResizeWeight(0.5);
+        frame.add(splitPane);
+
+        reducePanel.addMouseListener(new REDUCEPanelMouseListener());
+        reducePanel2.addMouseListener(new REDUCEPanelMouseListener());
+        reducePanel2.setSelected(false);
+    }
+
+    private static class REDUCEPanelMouseListener extends MouseAdapter {
+        /**
+         * Invoked when the mouse button has been clicked (pressed
+         * and released) on a component.
+         *
+         * @param e the event to be processed
+         */
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            reducePanel.setSelected(false);
+            Component c = e.getComponent();
+            while (!(c instanceof REDUCEPanel)) {
+                c = c.getParent();
+            }
+            reducePanel = (REDUCEPanel) c;
+            reducePanel.menuItemStatus.updateMenus();
+            reducePanel.inputTextArea.requestFocusInWindow();
+            reducePanel.setSelected(true);
+        }
     }
 
     static void useTabbedPane(boolean enable) {
