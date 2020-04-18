@@ -125,7 +125,31 @@ information is under `/usr/share/reduce`, and documentation is under
 
 ## The Main Window
 
-The main window consists of two panes one above the other.  The top
+The main window consists of one or more REDUCE panels that can each
+run an independent invocation of REDUCE.  There are three options: a
+single REDUCE panel (the default); a split pane containing two REDUCE
+panels side-by-side that are both visible; a tabbed pane containing
+one or more REDUCE panels, of which only the selected panel is
+visible.  The choice of display pane arrangements is controlled by
+radio buttons in the View menu; see below.  You can switch dynamically
+among the three options, in which case the currently selected REDUCE
+panel (only) and the REDUCE invocation running in it (if any) is
+preserved and carried to the new display pane arrangement, but any
+other REDUCE invocations are currently discarded.  With a split or
+tabbed pane, the active REDUCE panel can be selected by clicking on
+the desired panel in a split pane or tab on a tabbed pane.  The
+non-selected panel in a split pane is greyed out.  All menu options
+apply to the currently selected REDUCE panel.
+
+Tabs are initially labelled *Tab 1*, *Tab 2*, etc., and a new tab is
+labelled *Tab n* if it is the *nth* tab to be added.  However, when
+REDUCE is run in a tab, the tab label changes to the name of the
+REDUCE version being run, and remains so until a different REDUCE
+version is run in that tab.
+
+### REDUCE Panels
+
+A REDUCE panel consists of two panes one above the other.  The top
 pane displays a log of all the REDUCE input and output in the current
 session.  This pane is read-only.  The bottom pane is an input editor
 that supports all the standard keyboard and mouse-based editing
@@ -134,6 +158,11 @@ vertical and horizontal scroll bars when appropriate; text does not
 wrap.  The horizontal divider separating the two panes can be dragged
 up and down, and it can be moved all the way up or down by clicking on
 one of the two triangular icons at the left-hand side.
+
+The name of the currently running (or last run) version of REDUCE is
+appended to the label of the REDUCE input/output display pane.  (You
+can edit this name in the REDUCE configuration dialogue if you don't
+like the default version names.)
 
 You type (or paste) REDUCE input into the input editor pane, edit it
 as necessary, and then click on the `Send Input` button, which sends
@@ -427,38 +456,46 @@ that turning Redfront mode on or off does not take effect until REDUCE
 is (re-)started, and turning other modes on or off does not fully take
 effect until the next input prompt.
 
-### Use Tabbed Display
+### Single Pane Display
 
-Selecting this checkbox causes Run-REDUCE to start using tabbed
-display with the current REDUCE panel displayed under the first tab.
-Deselecting this checkbox causes Run-REDUCE to stop using tabbed
-display; it preserves the REDUCE panel in the currently selected tab
-but discards the content of all other tabs.
+Selecting this radio button causes Run-REDUCE to display the selected
+REDUCE panel only.  This is the default.
 
-Tabbed display allows multiple independent invocations of the same or
-different versions of REDUCE to be run simultaneously.  Clicking on
-the rightmost tab labelled `+` adds a new tab immediately to the left
-of the `+` tab.  Clicking on the `X` icon at the right of any tab
-title removes that tab and the REDUCE panel it contains.  When there
-is only one tab, removing it disables tabbed display but preserves the
-REDUCE panel that the tab contained.
+### Split Pane Display
 
-All REDUCE and I/O display options apply to every tab.
+Selecting this radio button causes Run-REDUCE to display two REDUCE
+panels side-by-side.  The left-hand panel displays the selected REDUCE
+panel and is initially active.  Clicking on a REDUCE panel makes it
+active for input via its input editor pane and menus.  The inactive
+REDUCE panel can continue to update its output display.  Both panels
+are the same size initially, but you can change that by dragging the
+divider or clicking on one of the two triangular icons.
+
+### Tabbed Pane Display
+
+Selecting this radio button causes Run-REDUCE to display a tabbed pane
+with the selected REDUCE panel displayed under the first tab.
+Clicking on the rightmost tab labelled `+` adds a new tab immediately
+to the left of the `+` tab.  Clicking on the `X` icon at the right of
+any tab title removes that tab and the REDUCE panel it contains.  When
+there is only one tab, removing it disables tabbed display but
+preserves the REDUCE panel that the tab contained.
 
 ### Add Another Tab
 
 This adds a new tab to a tabbed display, just like the `+` tab.  When
 tabbed display is disabled, this menu item enables tabbed display and
 adds a **second** tab, as it would if tabbed display were already
-enabled.  Hence this menu item is always enabled.
+enabled.  Hence this menu item is enabled when either single or tabbed
+pane display is selected.
 
 ### Remove Selected Tab
 
 This removes the selected tab and the REDUCE panel it contains, just
-like the `X` icon.  When there is only one tab, this menu item
-disables tabbed display but preserves the REDUCE panel that the tab
+like the `X` icon.  When there is only one tab, this menu item reverts
+to single pane display but preserves the REDUCE panel that the tab
 contained.  This menu item is disabled unless tabbed display is
-enabled.
+selected.
 
 
 ## The Help Menu

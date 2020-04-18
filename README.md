@@ -103,5 +103,7 @@ top-level directory.
 
 * Better support for non-default look-and-feels.
 * Easy access to the Run-REDUCE User Guide on GitHub.
-* Optional multiple tabs that each run an independent invocation of
-  REDUCE.
+* Optional split pane display that can run two independent invocations
+  of REDUCE.
+* Optional multiple tabs that can each run an independent invocation
+  of REDUCE.

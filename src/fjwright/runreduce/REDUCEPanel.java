@@ -279,7 +279,7 @@ public class REDUCEPanel extends JPanel {
 
         title = reduceCommand.version;
         outputLabel.setText(outputLabelDefault + "  |  " + title);
-        if (RRPreferences.tabbedDisplayState) {
+        if (RRPreferences.displayPane == RRPreferences.DisplayPane.TABBED) {
             int tabIndex = RunREDUCE.tabbedPane.indexOfComponent(this);
             RunREDUCE.tabbedPane.setTitleAt(tabIndex, title);
             RunREDUCE.tabbedPane.getTabComponentAt(tabIndex).invalidate();
@@ -328,6 +328,21 @@ public class REDUCEPanel extends JPanel {
         for (Component c : container.getComponents()) {
             c.addMouseListener(mouseListener);
             if (c instanceof Container) addMouseListener((Container) c, mouseListener);
+        }
+    }
+
+    @Override
+    public void removeMouseListener(MouseListener mouseListener) {
+        removeMouseListener(this, mouseListener);
+    }
+
+    /**
+     * Recursively remove a mouse listener from every child in the tree of contained components.
+     */
+    private static void removeMouseListener(Container container, MouseListener mouseListener) {
+        for (Component c : container.getComponents()) {
+            c.removeMouseListener(mouseListener);
+            if (c instanceof Container) removeMouseListener((Container) c, mouseListener);
         }
     }
 }

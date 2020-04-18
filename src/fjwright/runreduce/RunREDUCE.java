@@ -21,11 +21,17 @@ import java.awt.event.*;
 public class RunREDUCE {
     static JFrame frame;
     static Font reduceFont;
-    static JTabbedPane tabbedPane;
     static JSplitPane splitPane;
+    static JTabbedPane tabbedPane;
     static int tabLabelNumber = 1;
     static REDUCEPanel reducePanel;
     static boolean enableTabbedPaneChangeListener = true;
+    static final REDUCEPanelMouseListener REDUCE_PANEL_MOUSE_LISTENER = new REDUCEPanelMouseListener();
+
+    static final Dimension SCREEN_SIZE = Toolkit.getDefaultToolkit().getScreenSize();
+    // Set the main window to 2/3 the linear dimension of the screen initially:
+    static Dimension initialFrameSize = // reset to null once used!
+            new Dimension((SCREEN_SIZE.width * 2) / 3, (SCREEN_SIZE.height * 2) / 3);
 
     static REDUCEConfigurationDefault reduceConfigurationDefault;
     static REDUCEConfiguration reduceConfiguration;
@@ -38,9 +44,6 @@ public class RunREDUCE {
         // Create and set up the window:
         frame = new JFrame("Run-REDUCE");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        // Set the main window to 2/3 the linear dimension of the screen:
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        frame.setPreferredSize(new Dimension((screenSize.width * 2) / 3, (screenSize.height * 2) / 3));
 
         // Create the menu bar and add it to the frame:
         new RRMenuBar(frame);
@@ -54,6 +57,7 @@ public class RunREDUCE {
         switch (RRPreferences.displayPane) {
             case SINGLE:
                 frame.add(reducePanel);
+                frame.setPreferredSize(initialFrameSize);
                 frame.pack();
                 break;
             case SPLIT:
@@ -62,6 +66,7 @@ public class RunREDUCE {
             case TABBED:
                 useTabbedPane(true);
         }
+        initialFrameSize = null;
 
         // Display the window:
         frame.setVisible(true);
@@ -72,17 +77,22 @@ public class RunREDUCE {
             REDUCEPanel reducePanel2 = new REDUCEPanel();
             splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, reducePanel, reducePanel2);
             splitPane.setResizeWeight(0.5);
+            splitPane.setOneTouchExpandable(true);
             frame.add(splitPane);
-            reducePanel.addMouseListener(new REDUCEPanelMouseListener());
-            reducePanel2.addMouseListener(new REDUCEPanelMouseListener());
+            reducePanel.addMouseListener(REDUCE_PANEL_MOUSE_LISTENER);
+            reducePanel2.addMouseListener(REDUCE_PANEL_MOUSE_LISTENER);
             reducePanel2.setSelected(false);
         } else { // Revert to single pane.
+            splitPane.getLeftComponent().removeMouseListener(REDUCE_PANEL_MOUSE_LISTENER);
+            splitPane.getRightComponent().removeMouseListener(REDUCE_PANEL_MOUSE_LISTENER);
             // Retain the reducePanel from the selected tab if possible:
             frame.remove(splitPane);
             splitPane = null; // release resources
             frame.add(reducePanel);
         }
+        frame.setPreferredSize(initialFrameSize != null ? initialFrameSize : frame.getSize());
         frame.pack();
+        if (enable) splitPane.setDividerLocation(0.5); // must be after pack()!
     }
 
     private static class REDUCEPanelMouseListener extends MouseAdapter {
@@ -127,16 +137,17 @@ public class RunREDUCE {
             tabbedPane.setTabComponentAt(0, new ButtonTabComponent(tabbedPane));
             tabbedPane.addTab("+", null, null, "Add a new REDUCE tab.");
         } else { // Revert to single pane.
-            if (tabbedPane != null) {
-                frame.remove(tabbedPane);
-                tabbedPane = null; // release resources
-            }
-            // Retain the reducePanel from the selected tab if possible:
-            if (reducePanel == null) reducePanel = new REDUCEPanel();
+            // Retain the reducePanel from the selected tab:
+            reducePanel = (REDUCEPanel) tabbedPane.getSelectedComponent();
+            frame.remove(tabbedPane);
+            tabbedPane = null; // release resources
             frame.add(reducePanel);
+            reducePanel.menuItemStatus.updateMenus();
+            reducePanel.inputTextArea.requestFocusInWindow();
         }
-        enableTabbedPaneChangeListener = true;
+        frame.setPreferredSize(initialFrameSize != null ? initialFrameSize : frame.getSize());
         frame.pack();
+        enableTabbedPaneChangeListener = true;
     }
 
     static void addTab() {
