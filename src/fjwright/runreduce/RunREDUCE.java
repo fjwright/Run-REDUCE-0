@@ -36,6 +36,9 @@ public class RunREDUCE {
     static REDUCEConfigurationDefault reduceConfigurationDefault;
     static REDUCEConfiguration reduceConfiguration;
 
+    private static final Action nextPanel = new NextPanel();
+    private static final Action nextTab = new NextTab();
+
     /**
      * Create the GUI and show it.
      * For thread safety, this method should be invoked from the event-dispatching thread.
@@ -82,6 +85,16 @@ public class RunREDUCE {
             reducePanel.addMouseListener(REDUCE_PANEL_MOUSE_LISTENER);
             reducePanel2.addMouseListener(REDUCE_PANEL_MOUSE_LISTENER);
             reducePanel2.setSelected(false);
+
+            splitPane.setFocusable(true); // necessary despite using the WHEN_FOCUSED input map!
+            InputMap inputMap = splitPane.getInputMap(JComponent.WHEN_FOCUSED);
+            ActionMap actionMap = splitPane.getActionMap();
+            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB,
+                    InputEvent.CTRL_DOWN_MASK), "nextPanel");
+            actionMap.put("nextPanel", nextPanel);
+            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB,
+                    InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK), "nextPanel");
+            actionMap.put("nextPanel", nextPanel);
         } else { // Revert to single pane.
             splitPane.getLeftComponent().removeMouseListener(REDUCE_PANEL_MOUSE_LISTENER);
             splitPane.getRightComponent().removeMouseListener(REDUCE_PANEL_MOUSE_LISTENER);
@@ -116,6 +129,27 @@ public class RunREDUCE {
         }
     }
 
+    private static class NextPanel extends AbstractAction {
+        /**
+         * Invoked when an action occurs.
+         *
+         * @param e the event to be processed
+         */
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            reducePanel.setSelected(false);
+            REDUCEPanel reducePanel2 = (REDUCEPanel) splitPane.getLeftComponent();
+            if (reducePanel == reducePanel2) {
+                reducePanel = (REDUCEPanel) splitPane.getRightComponent();
+            } else {
+                reducePanel = reducePanel2;
+            }
+            reducePanel.menuItemStatus.updateMenus();
+            reducePanel.inputTextArea.requestFocusInWindow();
+            reducePanel.setSelected(true);
+        }
+    }
+
     static void useTabbedPane(boolean enable) {
         enableTabbedPaneChangeListener = false;
         if (enable) {
@@ -136,6 +170,16 @@ public class RunREDUCE {
             tabbedPane.addTab(reducePanel.title != null ? reducePanel.title : "Tab 1", reducePanel);
             tabbedPane.setTabComponentAt(0, new ButtonTabComponent(tabbedPane));
             tabbedPane.addTab("+", null, null, "Add a new REDUCE tab.");
+
+            tabbedPane.setFocusable(true);
+            InputMap inputMap = frame.getRootPane().getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+            ActionMap actionMap = frame.getRootPane().getActionMap();
+            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB,
+                    InputEvent.CTRL_DOWN_MASK), "nextTab");
+            actionMap.put("nextTab", nextTab);
+            inputMap.put(KeyStroke.getKeyStroke(KeyEvent.VK_TAB,
+                    InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK), "nextTab");
+            actionMap.put("nextTab", nextTab);
         } else { // Revert to single pane.
             // Retain the reducePanel from the selected tab:
             reducePanel = (REDUCEPanel) tabbedPane.getSelectedComponent();
@@ -148,6 +192,26 @@ public class RunREDUCE {
         frame.setPreferredSize(initialFrameSize != null ? initialFrameSize : frame.getSize());
         frame.pack();
         enableTabbedPaneChangeListener = true;
+    }
+
+    private static class NextTab extends AbstractAction {
+        /**
+         * Invoked when an action occurs.
+         *
+         * @param e the event to be processed
+         */
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            System.err.println("NextTab action called.");
+            enableTabbedPaneChangeListener = false; // ???
+            int nextTabIndex = tabbedPane.getSelectedIndex() + 1;
+            if (nextTabIndex == tabbedPane.getTabCount() - 1) nextTabIndex = 0;
+            tabbedPane.setSelectedIndex(nextTabIndex);
+            reducePanel = (REDUCEPanel) tabbedPane.getSelectedComponent();
+            reducePanel.menuItemStatus.updateMenus();
+            reducePanel.inputTextArea.requestFocusInWindow();
+            enableTabbedPaneChangeListener = true; // ???
+        }
     }
 
     static void addTab() {

@@ -25,3 +25,4 @@ hs_err_pid*
 # Emacs previous versions
 *~
 
+/out/production/Run-REDUCE/META-INF/MANIFEST.MF
