@@ -4,8 +4,6 @@
 
 ### Francis Wright, April 2020
 
-This application is an incomplete prototype!
-
 For information about how to install and run Run-REDUCE please see the
 [User Guide](docs/UserGuide.md).
 
@@ -28,20 +26,6 @@ because it's the license used by REDUCE.
 This project is set up for development using [IntelliJ
 IDEA](https://www.jetbrains.com/idea/) with Run-REDUCE as the
 top-level directory.
-
-### To do (maybe)
-
-* Easy access to a **local** copy of the Run-REDUCE User Guide.
-* Font and colour selectors.
-* Detect whether REDUCE is running more reliably (maybe).
-* Remember all user choices, including window configurations (maybe).
-* Typeset output supporting copy and paste. Could parse `off nat`
-  output, or use it together with TeX or MathML output.
-* Merge input region into output region (maybe).
-* Integrated plotting support, perhaps with plots in a new tab or in a
-  vertically split window (maybe).
-* A calculator-style interface option (maybe).
-* Hybrid I/O colouring combining modal and redfront modes (maybe).
 
 ## Release Notes
 
@@ -99,11 +83,38 @@ top-level directory.
 * Holding Shift always suppresses auto-termination of input.
 * Fix the activated status of the `Output Here` menu item.
 
-### Pre-release user-visible updates
+### Version 0.8 user-visible updates
 
+* This is a beta test release for Version 1, which is essentially
+  feature-complete.
 * Better support for non-default look-and-feels.
 * Easy access to the Run-REDUCE User Guide on GitHub.
 * Optional split pane display that can run two independent invocations
   of REDUCE.
 * Optional multiple tabs that can each run an independent invocation
   of REDUCE.
+
+### Pre-release user-visible updates
+
+* None
+
+## To do for Version 2 (maybe)
+
+* Switch from Swing to JavaFX.
+* Use a map indexed by version instead of a list as the versions data
+  structure.
+* Keyboard shortcuts (e.g. Control-Tab, Control-Shift-Tab) for
+  switching between split or tabbed pane components.
+* Easy access to a **local** copy of the Run-REDUCE User Guide.
+* Font and colour selectors.
+* Context-sensitive help that accesses appropriate sections of the
+  REDUCE manual.
+* Detect more reliably whether REDUCE is running.
+* Remember all user choices, including window configurations.
+* Typeset output supporting copy and paste. Could parse `off nat`
+  output, or use it together with TeX or MathML output.
+* Merge input region into output region.
+* Integrated plotting support, perhaps with plots in a new tab or in a
+  vertically split window.
+* A calculator-style interface option.
+* Hybrid I/O colouring combining modal and redfront modes.

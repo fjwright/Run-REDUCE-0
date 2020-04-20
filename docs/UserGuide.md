@@ -19,20 +19,22 @@ mathematical notation.
 
 You need to have a Java Runtime Environment (JRE), version 8 (or
 later), installed.  You also need to download the file
-`Run-REDUCE.jar`.  To do this, click on the `release` tab on the
-GitHub project page, expand `Assets`, then click on `Run-REDUCE.jar`
-and save it somewhere convenient, such as your home directory or the
-directory in which you store your REDUCE projects.  You should then be
-able to run Run-REDUCE as an executable file, e.g. by double-clicking
-on it.  Alternatively, you can run Run-REDUCE by executing the shell
+`Run-REDUCE.jar`.  The easiest way to do this is to click on the
+download link at the top of the [Run-REDUCE web
+page](https://fjwright.github.io/Run-REDUCE/).  (Alternatively, you
+can click on the `release` tab on the [GitHub project
+page](https://github.com/fjwright/Run-REDUCE), then click on
+`Run-REDUCE.jar` under `Assets`.)  Save `Run-REDUCE.jar` somewhere
+convenient, such as your home directory or the directory in which you
+store your REDUCE projects.  You can then run Run-REDUCE as an
+executable file by double-clicking on it or by executing the shell
 command
 
     java -jar Run-REDUCE.jar
 
-in the directory containing the file.  This approach has the advantage
-that any error messages will be displayed in the shell window.
-
-Here is a bit more detail:
+in the directory containing the file.  The latter approach has the
+advantage that any error messages will be displayed in the shell
+window.  Here is a bit more detail:
 
 ### Microsoft Windows
 
@@ -71,34 +73,14 @@ including Linux, Windows and macOS.  I recommend the JRE build of
 either OpenJDK 8 (LTS) or OpenJDK 11 (LTS).
 
 
-## Look and Feel
-
-The "look" of an application refers to its appearance and the "feel"
-refers to how the widgets behave.  By default, Run-REDUCE uses the
-standard Swing look-and-feel, sometimes called "Metal", which is the
-same on all platforms (apart from the title bar, which always follows
-the platform default).  You can use a different look-and-feel if you
-start Run-REDUCE by executing one of the following shell commands in the
-directory containing `Run-REDUCE.jar`, which apply to all platforms:
-
-    java -jar Run-REDUCE.jar -lfNative
-
-uses the native look-and-feel and
-
-    java -jar Run-REDUCE.jar -lfMotif
-
-uses the Motif look-and-feel. Specifying the look-and-feel this way
-takes precedence over using the View menu; see below.
-
-
 ## General Information
 
 Run-REDUCE remembers user preferences and uses them the next time it
 starts.  It uses the standard Java package
 [java.util.prefs](https://docs.oracle.com/en/java/javase/13/docs/api/java.prefs/java/util/prefs/package-summary.html),
 which stores data persistently in an implementation-dependent backing
-store.  For example, on Microsoft Windows the preferences for this
-application are stored in the registry under the key
+store.  On Microsoft Windows the preferences for this application are
+stored in the registry under the key
 `Computer\HKEY_CURRENT_USER\Software\JavaSoft\Prefs\fjwright\runreduce`
 and on Ubuntu Linux they are stored in the XML file
 `~/.java/.userPrefs/fjwright/runreduce/prefs.xml`.
@@ -123,6 +105,26 @@ information is under `/usr/share/reduce`, and documentation is under
 `/usr/share/doc/reduce`.
 
 
+## Look and Feel
+
+The "look" of an application refers to its appearance and the "feel"
+refers to how the widgets behave.  By default, Run-REDUCE uses the
+standard Swing look-and-feel, sometimes called "Metal", which is the
+same on all platforms (apart from the title bar, which always follows
+the platform default).  You can use a different look-and-feel if you
+start Run-REDUCE by executing one of the following shell commands in the
+directory containing `Run-REDUCE.jar`, which apply to all platforms:
+
+    java -jar Run-REDUCE.jar -lfNative
+
+uses the native look-and-feel and
+
+    java -jar Run-REDUCE.jar -lfMotif
+
+uses the Motif look-and-feel. Specifying the look-and-feel this way
+takes precedence over using the View menu; see below.
+
+
 ## The Main Window
 
 The main window consists of one or more REDUCE panels that can each
@@ -138,14 +140,15 @@ preserved and carried to the new display pane arrangement, but any
 other REDUCE invocations are currently discarded.  With a split or
 tabbed pane, the active REDUCE panel can be selected by clicking on
 the desired panel in a split pane or tab on a tabbed pane.  The
-non-selected panel in a split pane is greyed out.  All menu options
-apply to the currently selected REDUCE panel.
+non-selected panel in a split pane is greyed out.  All controls and
+the File and REDUCE menus apply to the currently selected REDUCE
+panel.  The View menu applies to all REDUCE panels.
 
 Tabs are initially labelled *Tab 1*, *Tab 2*, etc., and a new tab is
-labelled *Tab n* if it is the *nth* tab to be added.  However, when
-REDUCE is run in a tab, the tab label changes to the name of the
-REDUCE version being run, and remains so until a different REDUCE
-version is run in that tab.
+labelled *Tab n* if it is the *nth* tab to be added.  (Removing tabs
+does not affect the numbering.)  However, when REDUCE is run in a tab,
+the tab label changes to the name of the REDUCE version being run, and
+remains so until a different REDUCE version is run in that tab.
 
 ### REDUCE Panels
 
@@ -240,8 +243,8 @@ to be echoed to the `Input/Output Display` pane.  (Note that a REDUCE
 source code file should end with `;end;` to avoid an error message.)
 This menu item is disabled unless REDUCE is running.
 
-The `Packages` button switches to the REDUCE packages directory
-(mainly for my benefit during testing).
+The `Packages` button switches to the REDUCE packages directory, which
+provides easy access to the package test files.
 
 ### Output to File...
 
@@ -429,8 +432,8 @@ above for further details.
 
 This brings up a dialogue box that allows you to change the font size
 used in the `Input/Output Display` and `Input Editor` panes.
-Run-REDUCE remembers the selected size and uses it the next time
-Run-REDUCE starts.
+Run-REDUCE remembers the selected size and uses it the next time you
+start Run-REDUCE.
 
 ### Bold Prompts
 
@@ -447,13 +450,13 @@ output is blue, symbolic-mode prompts and input are brown,
 symbolic-mode output is purple.  Redfront colouring is intended to
 provide a full emulation of the standard REDUCE `redfront` facility
 and it loads the `redfront` package (silently), which outputs
-additional markup that is then interpreted by Run-REDUCE in the same
-way that it is normally interpreted by the `redfront` executable
-running in a suitable terminal (emulator).  In Redfront mode all
-prompts and interactive input are red, algebraic-mode output is blue,
-and echoed file input and symbolic-mode output are not coloured.  Note
-that turning Redfront mode on or off does not take effect until REDUCE
-is (re-)started, and turning other modes on or off does not fully take
+additional markup that is interpreted by Run-REDUCE in the same way
+that it is normally interpreted by the `redfront` executable running
+in a suitable terminal (emulator).  In Redfront mode all prompts and
+interactive input are red, algebraic-mode output is blue, and echoed
+file input and symbolic-mode output are not coloured.  Note that
+turning Redfront mode on or off does not take effect until REDUCE is
+(re-)started, and turning other modes on or off does not fully take
 effect until the next input prompt.
 
 ### Single Pane Display
@@ -466,10 +469,11 @@ REDUCE panel only.  This is the default.
 Selecting this radio button causes Run-REDUCE to display two REDUCE
 panels side-by-side.  The left-hand panel displays the selected REDUCE
 panel and is initially active.  Clicking on a REDUCE panel makes it
-active for input via its input editor pane and menus.  The inactive
-REDUCE panel can continue to update its output display.  Both panels
-are the same size initially, but you can change that by dragging the
-divider or clicking on one of the two triangular icons.
+active for input via its input editor pane and the menus.  The
+inactive REDUCE panel can continue to update its output display.  Both
+panels are the same size initially, but you can change that by
+dragging the divider or clicking on one of the two triangular icons at
+the top.
 
 ### Tabbed Pane Display
 
@@ -510,7 +514,7 @@ browser.
 ### REDUCE Manual etc.
 
 These menu items open the manuals and other guides that are
-distributed with REDUCE in the default web browser or PDF viewer, as
+distributed with REDUCE in your default web browser or PDF viewer, as
 appropriate.
 
 ### About Run-REDUCE

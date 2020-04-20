@@ -290,14 +290,24 @@ public class REDUCEPanel extends JPanel {
         // Special support for Redfront I/O colouring:
         RRPreferences.colouredIOState = RRPreferences.colouredIOIntent;
         if (RRPreferences.colouredIOState == RRPreferences.ColouredIO.REDFRONT) {
-            sendStringToREDUCENoEcho("load_package redfront;\n");
-            // Tidy up the initial prompt.
+            // Tidy up the initial prompt. Waiting for it is NECESSARY:
             StyledDocument styledDoc = outputTextPane.getStyledDocument();
             try {
-                styledDoc.remove(styledDoc.getLength() - 8, 4);
+                // This typically sleeps a couple of times.
+                while (!(styledDoc.getLength() >= 3 &&
+                        styledDoc.getText(styledDoc.getLength() - 3, 3).equals("1: "))) {
+//                System.err.println("Waiting...");
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                styledDoc.remove(styledDoc.getLength() - 4, 4);
             } catch (BadLocationException e) {
                 e.printStackTrace();
             }
+            sendStringToREDUCENoEcho("load_package redfront;\n");
         }
     }
 
