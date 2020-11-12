@@ -4,6 +4,8 @@
 
 ### Francis Wright, April 2020
 
+# This version is obsolete and has been superseded by https://github.com/fjwright/Run-REDUCE.
+
 For information about how to install and run Run-REDUCE please see the
 [User Guide](docs/UserGuide.md).
 
